@@ -28,21 +28,30 @@ get_choice <- function(sv, ss, beta){
 
 
 simulate <- function(n, num_trials, ss, ss_ratios, k, delays, beta){
-  df <- data.frame(participant=integer(),
-                   trial_number=integer(),
-                   ss=integer(),
-                   ll=integer(),
-                   k=integer(),
-                   delay=integer(),
-                   beta=integer(),
-                   choice=character())
-  for (i in n){
-    for (j in num_trials){
-      a, k, D, sv <- compute_sv(ss, ss_ratios, k, delays)
-      beta, choice <- get_choice(sv, ss, beta)
-      df <- rbind(df, list(i, j, ss, sv, k))
+  df <- data.frame()
+  for (i in 1:n){
+    for (j in 1:num_trials){
+      a = ss*sample(ss_ratios,1)
+      k = k
+      D = sample(delays,1)
+      sv = a/(1+k*D)
+      beta = beta
+      p_ll <- exp(sv*beta)/(exp(sv*beta)+exp(ss*beta))
+      random_number <- runif(1)
+      choice <- ifelse(random_number > p_ll, 'ss', 'll')
+      df <- rbind(df, c(i, j, ss, a, k, D, sv, beta, p_ll, random_number, choice))
     }
   }
+  colnames(df) <- c('participant', 'trial_number', 'ss', 'll', 'k', 'delay', 
+                    'sv', 'beta', 'p_ll', 'random_number', 'choice')
   return(df)
 }
+
+
+test <- simulate(n, num_trials, ss, ss_ratios, k, delays, beta)
+
+
+# Sample from normal distribution
+rnorm(1, mean = 0, sd = 1)
+
 
