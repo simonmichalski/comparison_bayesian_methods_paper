@@ -11,8 +11,8 @@ ss_ratios <- c(1.01, 1.02, 1.05, 1.10, 1.15, 1.25, 1.35, 1.45,
 delays <- c(1, 3, 5, 8, 14, 30, 60, 120)
 
 
-get_choice <- function(a, k, D, ss, beta){
-  sv = a/(1+k*D)
+get_choice <- function(a, k, delay, ss, beta){
+  sv = a/(1+k*delay)
   p_ll <- exp(sv*beta)/(exp(sv*beta)+exp(ss*beta))
   random_number <- runif(1)
   # ss=0; ll=1
@@ -30,13 +30,13 @@ simulate <- function(n_subj, k_dist, sd, beta_dist, num_trials, ss, ss_ratios, d
     
     for (j in 1:num_trials){
       a = ss*sample(ss_ratios,1)
-      D = sample(delays,1)
+      delay = sample(delays,1)
       
-      choice <- get_choice(a, k, D, ss, beta)
-      df <- rbind(df, c(i, 0, j, ss, a, D, choice))
+      choice <- get_choice(a, k, delay, ss, beta)
+      df <- rbind(df, c(i, 0, j, ss, a, delay, choice))
       
-      choice_cond <- get_choice(a, k_cond, D, ss, beta)
-      df <- rbind(df, c(i, 1, j, ss, a, D, choice_cond))
+      choice_cond <- get_choice(a, k_cond, delay, ss, beta)
+      df <- rbind(df, c(i, 1, j, ss, a, delay, choice_cond))
     }
   }
   colnames(df) <- c('subject', 'condition', 'trial', 'ss', 'll', 'delay', 'choice')
