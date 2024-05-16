@@ -1,9 +1,14 @@
 
+cond_sd <- seq(0.1, 1, 0.1)
+num_samples <- 300
+
 n_subj <- 40
 num_trials <- 128
 
-k_dist <- c(0.1,0.2)
-beta_dist <- c(1,2)
+k_mean <- 0.1
+k_sd <- 0.5
+beta_mean <- 0.3
+beta_sd <- 0.5
 
 ss <- 20
 ss_ratios <- c(1.01, 1.02, 1.05, 1.10, 1.15, 1.25, 1.35, 1.45, 
@@ -21,12 +26,12 @@ get_choice <- function(a, k, delay, ss, beta){
 }
 
 
-simulate <- function(n_subj, k_dist, sd, beta_dist, num_trials, ss, ss_ratios, delays){
+simulate <- function(n_subj, k_mean, k_sd, sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays){
   df <- data.frame()
   for (i in 1:n_subj){
-    k <- sample(k_dist,1)
+    k <- rnorm(1, mean = k_mean, sd = k_sd)
     k_cond <- rnorm(1, mean = 0, sd = sd)
-    beta <- sample(beta_dist,1)
+    beta <- rnorm(1, mean = beta_mean, sd = beta_sd)
     
     for (j in 1:num_trials){
       a <- ss*sample(ss_ratios,1)
@@ -44,4 +49,21 @@ simulate <- function(n_subj, k_dist, sd, beta_dist, num_trials, ss, ss_ratios, d
 }
 
 
-sd_1 <- simulate(n_subj, k_dist, 1, beta_dist, num_trials, ss, ss_ratios, delays)
+get_data <- function(cond_sd, num_samples, n_subj, k_mean, k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays){
+  for (i in 1:length(cond_sd)){
+    sd_path <- file.path("out/simulation", paste("sd_", gsub("\\.", "_", cond_sd[i]), sep = ""))
+    if (!dir.exists(sd_path)) {
+      dir.create(sd_path, recursive = TRUE)
+    }
+    
+    for (j in 1:num_samples){
+      df <- simulate(n_subj, k_mean, k_sd, cond_sd[i], beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
+      df_path <- file.path(sd_path, paste("sample_", j, ".rds", sep = ""))
+      saveRDS(df, file = df_path)
+    }
+  }
+}
+
+
+#get_data(cond_sd, num_samples, n_subj, k_mean, k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
+sd_1 <- simulate(n_subj, k_mean, k_sd, 1, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
