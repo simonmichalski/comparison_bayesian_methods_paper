@@ -25,7 +25,7 @@ simulate <- function(n_subj, k_dist, sd, beta_dist, num_trials, ss, ss_ratios, d
   df <- data.frame()
   for (i in 1:n_subj){
     k <- sample(k_dist,1)
-    k_cond <- k + rnorm(1, mean = 0, sd = sd)
+    k_cond <- rnorm(1, mean = 0, sd = sd)
     beta <- sample(beta_dist,1)
     
     for (j in 1:num_trials){
@@ -35,7 +35,7 @@ simulate <- function(n_subj, k_dist, sd, beta_dist, num_trials, ss, ss_ratios, d
       choice <- get_choice(a, k, delay, ss, beta)
       df <- rbind(df, c(i, 0, j, ss, a, delay, choice))
       
-      choice_cond <- get_choice(a, k_cond, delay, ss, beta)
+      choice_cond <- get_choice(a, k+k_cond, delay, ss, beta)
       df <- rbind(df, c(i, 1, j, ss, a, delay, choice_cond))
     }
   }
