@@ -30,9 +30,10 @@ stan_data <- list(
 fit <- stan(
   file = 'discounting_model.stan',
   data = stan_data,
-  chains = 4,
-  iter = 2000,
-  warmup = floor(iter/2),
+  chains = 1,
+  iter = 10,
+  warmup = 0,
   thin = 1,
-  init = 'random'
+  init = 'random',
+  algorithm = "HMC"
 )
