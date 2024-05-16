@@ -37,3 +37,5 @@ fit <- stan(
   init = 'random',
   algorithm = "HMC"
 )
+
+saveRDS(fit, "out/models/discounting_model.stan")
