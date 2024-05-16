@@ -14,51 +14,42 @@ parameters {
   // Hyperparameters (group-level)
   real mu_k;
   real sd_k;
-  real mu_beta;
-  real sd_beta;
   real mu_k_cond;
   real sd_k_cond;
-  real mu_beta_cond;
-  real sd_beta_cond;
+  real mu_beta;
+  real sd_beta;
   
   // Subject-level parameters
   vector[n_subj] k;
   vector[n_subj] k_cond;
-  vector[n_subj] beta;
+  vector<lower=0>[n_subj] beta;
 }
 
 model {
   // Priors group-level parameters (-> erotic cue exposure paper)
   mu_k ~ uniform(-20,3);
   sd_k ~ cauchy(0,2.5);
-  mu_beta ~ uniform(0, 10);
-  sd_beta ~ cauchy(0,2.5);
   mu_k_cond ~ normal(0, 2);
   sd_k_cond ~ cauchy(0,2.5);
-  mu_beta_cond ~ normal(0,2);
-  sd_beta_cond ~ cauchy(0,2.5);
+  mu_beta ~ uniform(0,10);
+  sd_beta ~ cauchy(0,2.5);
   
   // Priors subject-level parameters
   k ~ normal(mu_k, sd_k);
-  beta ~ normal(mu_beta, sd_beta);
   k_cond ~ normal(mu_k_cond, sd_k_cond);
-  beta_cond ~ normal(mu_beta_cond, sd_beta_cond);
+  beta ~ normal(mu_beta, sd_beta);
   
   // Likelihood function
   for (i in 1:n_subj){
     
     for (c in 1:num_cond){
-      real sv[i,c,t];
       
       for (t in 1:num_trials){
-        sv[i,c,t] = ll[i,c,t]/(1+(k[i]+k_cond[i]*condition[i,c,t])*delay[i,c,t])
-        choice[i,c,t] ~ exp(sv[i,c,t]*(beta[i]+beta_cond[i]*condition[i,c,t])/(exp[i,c,t](sv*(beta[i]+beta_cond[i]*condition[i,c,t])+exp(ss[i,c,t]*(beta[i]+beta_cond[i]*condition[i,c,t])))
+        real sv[i,c,t];
+        
+        sv[i,c,t] = ll[i,c,t]/(1+(k[i]+k_cond[i]*condition[i,c,t])*delay[i,c,t]);
+        choice[i,c,t] ~ bernoulli_logit(beta[i]*(sv[i,c,t]-ss[i,c,t]));
       }
     }
   }
 }
-
-
-
-
-
