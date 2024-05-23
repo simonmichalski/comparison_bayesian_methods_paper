@@ -13,8 +13,8 @@ get_subj_stats <- function(data_params){
   print(paste("% ll choices = ", num_ll_choices/nrow(data)))
   
   log_k <- params$log_k
-  k_cond <- params$k_cond
-  data$sv <- data$ll/(1+exp(log_k+k_cond*data$condition)*data$delay)
+  log_k_cond <- params$log_k_cond
+  data$sv <- data$ll/(1+exp(log_k+log_k_cond*data$condition)*data$delay)
   data$consistency <- ifelse(data$sv > data$ss & data$choice == 1, 1, 0)
   num_consistent_trials <- sum(data$consistency)
   print(paste("% consistent choices = ", num_consistent_trials/nrow(data)))

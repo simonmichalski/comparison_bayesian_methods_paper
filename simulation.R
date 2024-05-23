@@ -34,10 +34,10 @@ simulate <- function(n_subj, log_k_mean, log_k_sd, sd, beta_mean, beta_sd, num_t
   
   for (i in 1:n_subj){
     log_k <- rnorm(1, mean = log_k_mean, sd = log_k_sd)
-    k_cond <- rnorm(1, mean = 0, sd = sd)
+    log_k_cond <- rnorm(1, mean = 0, sd = sd)
     beta <- rtruncnorm(1, mean = beta_mean, sd = beta_sd, a = 0, b = Inf)
     
-    params <- rbind(params, c(i, log_k, k_cond, beta))
+    params <- rbind(params, c(i, log_k, log_k_cond, beta))
     
     for (j in 1:num_trials){
       a <- ss*sample(ss_ratios, 1)
@@ -46,12 +46,12 @@ simulate <- function(n_subj, log_k_mean, log_k_sd, sd, beta_mean, beta_sd, num_t
       choice <- get_choice(a, log_k, delay, ss, beta)
       data <- rbind(data, c(i, 0, j, ss, a, delay, choice))
       
-      choice_cond <- get_choice(a, log_k+k_cond, delay, ss, beta)
+      choice_cond <- get_choice(a, log_k+log_k_cond, delay, ss, beta)
       data <- rbind(data, c(i, 1, j, ss, a, delay, choice_cond))
     }
   }
   colnames(data) <- c('subject', 'condition', 'trial', 'ss', 'll', 'delay', 'choice')
-  colnames(params) <- c('subject', 'log_k', 'k_cond', 'beta')
+  colnames(params) <- c('subject', 'log_k', 'log_k_cond', 'beta')
   
   return(list(data = data, params = params))
 }
@@ -81,6 +81,6 @@ get_data <- function(cond_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_me
 
 #get_data(cond_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
 
-sd1 <- simulate(n_subj, log_k_mean, log_k_sd, 1, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
-data_sd1 <- sd1$data
-params_sd1 <- sd1$params
+sd_0_1 <- simulate(n_subj, log_k_mean, log_k_sd, 0.1, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
+data_sd_0_1 <- sd_0_1$data
+params_sd_0_1 <- sd_0_1$params
