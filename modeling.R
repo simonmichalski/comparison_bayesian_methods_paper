@@ -4,7 +4,7 @@ options(mc.cores = parallel::detectCores())
 rstan_options(auto_write = TRUE)
 
 
-data <- sd_1
+data <- data_sd_0_1
 
 # Create 3d arrays; condition index 1:2
 condition_values <- data$condition
@@ -31,11 +31,11 @@ fit <- stan(
   file = 'discounting_model.stan',
   data = stan_data,
   chains = 1,
-  iter = 10,
-  warmup = 0,
+  iter = 2000,
+  warmup = 1000,
   thin = 1,
   init = 'random',
   algorithm = "HMC"
 )
 
-saveRDS(fit, "out/models/discounting_model.stan")
+saveRDS(fit, "out/models/discounting_model.rds")
