@@ -1,16 +1,16 @@
 library('truncnorm')
 
-cond_sd <- seq(0.1, 1, 0.1)
+cond_sd <- seq(0.05, 0.2, 0.05)
 num_samples <- 300
 
 n_subj <- 40
 num_trials <- 128
 
-log_k_mean <- -4.5
-log_k_sd <- 0.6
+log_k_mean <- -3.97
+log_k_sd <- 0.694
 
-beta_mean <- 0.4
-beta_sd <- 0.6
+beta_mean <- 0.405
+beta_sd <- 0.156
 
 ss <- 20
 ss_ratios <- c(1.01, 1.02, 1.05, 1.10, 1.15, 1.25, 1.35, 1.45, 
@@ -18,8 +18,8 @@ ss_ratios <- c(1.01, 1.02, 1.05, 1.10, 1.15, 1.25, 1.35, 1.45,
 delays <- c(1, 3, 5, 8, 14, 30, 60, 120)
 
 
-get_choice <- function(a, k, delay, ss, beta){
-  sv <- a/(1+k*delay)
+get_choice <- function(a, log_k, delay, ss, beta){
+  sv <- a/(1+exp(log_k)*delay)
   p_ll <- exp(sv*beta)/(exp(sv*beta)+exp(ss*beta))
   random_number <- runif(1)
   # ss=0; ll=1
@@ -51,7 +51,7 @@ simulate <- function(n_subj, log_k_mean, log_k_sd, sd, beta_mean, beta_sd, num_t
     }
   }
   colnames(data) <- c('subject', 'condition', 'trial', 'ss', 'll', 'delay', 'choice')
-  colnames(params) <- c('subject', 'log(k)', 'k_cond', 'beta')
+  colnames(params) <- c('subject', 'log_k', 'k_cond', 'beta')
   
   return(list(data = data, params = params))
 }
@@ -81,8 +81,6 @@ get_data <- function(cond_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_me
 
 #get_data(cond_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
 
-data_params_sd1 <- simulate(n_subj, log_k_mean, log_k_sd, 1, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
-data_sd1 <- data_params_sd1$data
-params_sd1 <- data_params_sd1$params
-
-
+sd1 <- simulate(n_subj, log_k_mean, log_k_sd, 1, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
+data_sd1 <- sd1$data
+params_sd1 <- sd1$params
