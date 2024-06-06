@@ -20,7 +20,15 @@ get_subj_stats <- function(data_params){
   print(paste("% consistent choices = ", num_consistent_trials/nrow(data)))
 }
 
+ss <- 20
+ss_ratios <- c(1.01, 1.02, 1.05, 1.10, 1.15, 1.25, 1.35, 1.45, 
+               1.65, 1.85, 2.05, 2.25, 2.65, 3.05, 3.45, 3.85)
+delays <- c(1, 3, 5, 8, 14, 30, 60, 120)
+num_trials <- 128
 
-subj <- simulate(1, -3, 0, 0.1, 0.8, 0, num_trials, ss, ss_ratios, delays)
+log_k <- -6
+beta <- 0.9
+
+subj <- simulate(1, log_k, 0, 0.1, beta, 0, num_trials, ss, ss_ratios, delays)
 get_subj_stats(subj)
 
