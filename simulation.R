@@ -1,6 +1,6 @@
 library('truncnorm')
 
-cond_sd <- seq(0.05, 0.2, 0.05)
+cond_sd <- c(0.066, 0.131, 0.197, 0.262)
 num_samples <- 300
 
 n_subj <- 40
@@ -59,7 +59,7 @@ simulate <- function(n_subj, log_k_mean, log_k_sd, sd, beta_mean, beta_sd, num_t
 
 get_data <- function(cond_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays){
   for (i in 1:length(cond_sd)){
-    sd_path <- file.path("out/simulation", paste("sd_", gsub("\\.", "_", cond_sd[i]), sep = ""))
+    sd_path <- file.path("out", paste0("sd_", gsub("0.", "", cond_sd[i])))
     if (!dir.exists(sd_path)) {
       dir.create(sd_path, recursive = TRUE)
     }
@@ -68,11 +68,11 @@ get_data <- function(cond_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_me
       data_params <- simulate(n_subj, log_k_mean, log_k_sd, cond_sd[i], beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
       
       data <- data_params$data
-      data_path <- file.path(sd_path, paste("sample_", j, "_data.rds", sep = ""))
+      data_path <- file.path(sd_path, paste0("sample_", j, "_data.rds"))
       saveRDS(data, file = data_path)
       
       params <- data_params$params
-      params_path <- file.path(sd_path, paste("sample_", j, "_params.rds", sep = ""))
+      params_path <- file.path(sd_path, paste0("sample_", j, "_params.rds"))
       saveRDS(params, file = params_path)
     }
   }
@@ -81,6 +81,4 @@ get_data <- function(cond_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_me
 
 #get_data(cond_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
 
-sd_0_1 <- simulate(n_subj, log_k_mean, log_k_sd, 0.1, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
-data_sd_0_1 <- sd_0_1$data
-params_sd_0_1 <- sd_0_1$params
+sd_2 <- simulate(n_subj, log_k_mean, log_k_sd, 2, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
