@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-/data
+/discounting_model.rds
 /out
+/stan_school_example
