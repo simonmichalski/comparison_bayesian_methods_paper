@@ -1,8 +1,20 @@
+library('truncnorm')
 
 # Check log(k) and beta distributions
 x <- seq(-10, 4, length=100)
-curve(dnorm(x, -3.97, .694), -6, -2)
-curve(dnorm(x, .405, .156), 0, 1)
+curve(dnorm(x, -4.79, 2.75), -14, 5)
+
+logistic_function <- function(x, k, x0){
+  return(1 / (1 + exp(-k * (x - x0))))
+}
+
+x <- seq(0, 1, length = 100)
+curve(logistic_function(x, 2, 9))
+
+curve(dtruncnorm(x, mean = .46, sd = 1.19, a = 0, b = Inf)*logistic_function(x, 1000, 0.01), 0, 4)
+
+curve(dtruncnorm(x, mean = .46, sd = 1.19, a = 0, b = Inf), 0, 4)
+curve(logistic_function(x, 1000, 0.01))
 
 
 # Simulate single subjects and print choice stats
@@ -27,7 +39,7 @@ delays <- c(1, 3, 5, 8, 14, 30, 60, 120)
 num_trials <- 128
 
 log_k <- -6
-beta <- 0.9
+beta <- 5
 
 subj <- simulate(1, log_k, 0, 0.1, beta, 0, num_trials, ss, ss_ratios, delays)
 get_subj_stats(subj)
