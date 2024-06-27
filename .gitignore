@@ -2,7 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
-.discounting_model.rds
-.plots_seminar.R
+/discounting_model.rds
+/plots_seminar.R
 /out
 /stan_school_example
