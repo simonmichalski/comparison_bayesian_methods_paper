@@ -35,7 +35,8 @@ simulate <- function(n_subj, log_k_mean, log_k_sd, sd, beta_mean, beta_sd, num_t
   for (i in 1:n_subj){
     log_k <- rnorm(1, mean = log_k_mean, sd = log_k_sd)
     log_k_cond <- rnorm(1, mean = 0, sd = sd)
-    beta <- rtruncnorm(1, mean = beta_mean, sd = beta_sd, a = 0, b = Inf)
+    #add logistic 
+    #beta <- rtruncnorm(1, mean = beta_mean, sd = beta_sd, a = 0, b = Inf)
     
     params <- rbind(params, c(i, log_k, log_k_cond, beta))
     
