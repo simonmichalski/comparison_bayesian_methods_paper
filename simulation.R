@@ -27,17 +27,17 @@ get_choice <- function(a, log_k, delay, ss, beta){
 }
 
 
-simulate <- function(n_subj, log_k_mean, log_k_sd, sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays){
+simulate <- function(n_subj, log_k_mean, log_k_sd, s_log_k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays){
   data <- data.frame()
   params <- data.frame()
   
   for (i in 1:n_subj){
     log_k <- rnorm(1, mean = log_k_mean, sd = log_k_sd)
-    log_k_cond <- rnorm(1, mean = 0, sd = sd)
-    #add logistic 
-    #beta <- rtruncnorm(1, mean = beta_mean, sd = beta_sd, a = 0, b = Inf)
+    s_log_k <- rnorm(1, mean = 0, sd = s_log_k_sd)
+    beta <- rnorm(1, mean = beta_mean, sd = beta_sd)
+    beta <- logistic_function(beta, 1, 3.2)
     
-    params <- rbind(params, c(i, log_k, log_k_cond, beta))
+    params <- rbind(params, c(i, log_k, s_log_k, beta))
     
     for (j in 1:num_trials){
       a <- ss*sample(ss_ratios, 1)
@@ -46,26 +46,31 @@ simulate <- function(n_subj, log_k_mean, log_k_sd, sd, beta_mean, beta_sd, num_t
       choice <- get_choice(a, log_k, delay, ss, beta)
       data <- rbind(data, c(i, 0, j, ss, a, delay, choice))
       
-      choice_cond <- get_choice(a, log_k+log_k_cond, delay, ss, beta)
+      choice_cond <- get_choice(a, log_k+s_log_k, delay, ss, beta)
       data <- rbind(data, c(i, 1, j, ss, a, delay, choice_cond))
     }
   }
   colnames(data) <- c('subject', 'condition', 'trial', 'ss', 'll', 'delay', 'choice')
-  colnames(params) <- c('subject', 'log_k', 'log_k_cond', 'beta')
+  colnames(params) <- c('subject', 'log_k', 's_log_k', 'beta')
   
   return(list(data = data, params = params))
 }
 
 
-get_data <- function(cond_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays){
-  for (i in 1:length(cond_sd)){
-    sd_path <- file.path("out", paste0("sd_", gsub("0.", "", cond_sd[i])))
+logistic_function <- function(x, k, x0){
+  return(10 / (1 + exp(-k * (x - x0))))
+}
+
+
+get_data <- function(s_log_k_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays){
+  for (i in 1:length(s_log_k_sd)){
+    sd_path <- file.path("out", paste0("sd_", gsub("0.", "", s_log_k_sd[i])))
     if (!dir.exists(sd_path)) {
       dir.create(sd_path, recursive = TRUE)
     }
     
     for (j in 1:num_samples){
-      data_params <- simulate(n_subj, log_k_mean, log_k_sd, cond_sd[i], beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
+      data_params <- simulate(n_subj, log_k_mean, log_k_sd, s_log_k_sd[i], beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
       
       data <- data_params$data
       data_path <- file.path(sd_path, paste0("sample_", j, "_data.rds"))
@@ -79,6 +84,6 @@ get_data <- function(cond_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_me
 }
 
 
-#get_data(cond_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
+#get_data(s_log_k_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
 
-sd_2 <- simulate(n_subj, log_k_mean, log_k_sd, 2, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
+sd_0.5 <- simulate(n_subj, log_k_mean, log_k_sd, 0.5, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
