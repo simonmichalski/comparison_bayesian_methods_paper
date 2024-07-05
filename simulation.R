@@ -1,16 +1,15 @@
-library('truncnorm')
 
-cond_sd <- c(0.066, 0.131, 0.197, 0.262)
+cond_sd <- c(0.2, 0.51, 0.81)
 num_samples <- 300
 
 n_subj <- 40
 num_trials <- 128
 
-log_k_mean <- -3.97
-log_k_sd <- 0.694
+log_k_mean <- -4.79
+log_k_sd <- 1.02
 
-beta_mean <- 0.405
-beta_sd <- 0.156
+beta_mean <- 0.46
+beta_sd <- 0.44
 
 ss <- 20
 ss_ratios <- c(1.01, 1.02, 1.05, 1.10, 1.15, 1.25, 1.35, 1.45, 
