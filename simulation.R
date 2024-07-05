@@ -1,5 +1,5 @@
 
-cond_sd <- c(0.2, 0.51, 0.81)
+s_log_k_sds <- c(0.2, 0.51, 0.81)
 num_samples <- 300
 
 n_subj <- 40
@@ -17,7 +17,7 @@ ss_ratios <- c(1.01, 1.02, 1.05, 1.10, 1.15, 1.25, 1.35, 1.45,
 delays <- c(1, 3, 5, 8, 14, 30, 60, 120)
 
 
-get_choice <- function(a, log_k, delay, ss, beta){
+get_choice <- function(a, log_k, delay, beta){
   sv <- a/(1+exp(log_k)*delay)
   p_ll <- exp(sv*beta)/(exp(sv*beta)+exp(ss*beta))
   random_number <- runif(1)
@@ -27,7 +27,7 @@ get_choice <- function(a, log_k, delay, ss, beta){
 }
 
 
-simulate <- function(n_subj, log_k_mean, log_k_sd, s_log_k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays){
+simulate <- function(s_log_k_sd){
   data <- data.frame()
   params <- data.frame()
   
@@ -43,10 +43,10 @@ simulate <- function(n_subj, log_k_mean, log_k_sd, s_log_k_sd, beta_mean, beta_s
       a <- ss*sample(ss_ratios, 1)
       delay <- sample(delays, 1)
       
-      choice <- get_choice(a, log_k, delay, ss, beta)
+      choice <- get_choice(a, log_k, delay, beta)
       data <- rbind(data, c(i, 0, j, ss, a, delay, choice))
       
-      choice_cond <- get_choice(a, log_k+s_log_k, delay, ss, beta)
+      choice_cond <- get_choice(a, log_k+s_log_k, delay, beta)
       data <- rbind(data, c(i, 1, j, ss, a, delay, choice_cond))
     }
   }
@@ -62,15 +62,15 @@ logistic_function <- function(x, k, x0){
 }
 
 
-get_data <- function(s_log_k_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays){
-  for (i in 1:length(s_log_k_sd)){
-    sd_path <- file.path("out", paste0("sd_", gsub("0.", "", s_log_k_sd[i])))
+get_data <- function(){
+  for (i in 1:length(s_log_k_sds)){
+    sd_path <- file.path("out", paste0("sd_", gsub("0.", "", s_log_k_sds[i])))
     if (!dir.exists(sd_path)) {
       dir.create(sd_path, recursive = TRUE)
     }
     
     for (j in 1:num_samples){
-      data_params <- simulate(n_subj, log_k_mean, log_k_sd, s_log_k_sd[i], beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
+      data_params <- simulate(s_log_k_sds[i])
       
       data <- data_params$data
       data_path <- file.path(sd_path, paste0("sample_", j, "_data.rds"))
@@ -84,6 +84,6 @@ get_data <- function(s_log_k_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta
 }
 
 
-#get_data(s_log_k_sd, num_samples, n_subj, log_k_mean, log_k_sd, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
+#get_data()
 
-sd_0.5 <- simulate(n_subj, log_k_mean, log_k_sd, 0.5, beta_mean, beta_sd, num_trials, ss, ss_ratios, delays)
+sd_0.5 <- simulate(0.5)
