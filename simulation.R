@@ -1,6 +1,6 @@
 
 s_log_k_sds <- c(0.2, 0.51, 0.81)
-num_samples <- 300
+num_samples <- 100
 
 n_subj <- 40
 num_trials <- 128
@@ -86,4 +86,4 @@ get_data <- function(){
 
 #get_data()
 
-sd_m <- simulate(0.5)
+sd_m <- simulate(0.51)
