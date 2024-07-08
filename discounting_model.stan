@@ -14,14 +14,14 @@ parameters {
   // Hyperparameters (group-level)
   real mu_log_k;
   real<lower=0> sd_log_k;
-  real mu_log_k_cond;
-  real<lower=0> sd_log_k_cond;
+  real mu_s_log_k;
+  real<lower=0> sd_s_log_k;
   real mu_beta;
   real<lower=0> sd_beta;
   
   // Subject-level parameters
   vector[n_subj] log_k;
-  vector[n_subj] log_k_cond;
+  vector[n_subj] s_log_k;
   vector<lower=0>[n_subj] beta;
 }
 
@@ -29,14 +29,14 @@ model {
   // Priors group-level parameters
   mu_log_k ~ uniform(-20,3);
   sd_log_k ~ uniform(0,2.5);
-  mu_log_k_cond ~ normal(0,0.2);
-  sd_log_k_cond ~ uniform(0,2.5);
+  mu_s_log_k ~ normal(0,0.2);
+  sd_s_log_k ~ uniform(0,2.5);
   mu_beta ~ uniform(0,10);
   sd_beta ~ uniform(0,2.5);
   
   // Priors subject-level parameters
   log_k ~ normal(mu_log_k, sd_log_k);
-  log_k_cond ~ normal(mu_log_k_cond, sd_log_k_cond);
+  s_log_k ~ normal(mu_s_log_k, sd_s_log_k);
   beta ~ normal(mu_beta, sd_beta);
   
   // Likelihood function
@@ -47,7 +47,7 @@ model {
       for (t in 1:num_trials){
         real sv[i,c,t];
         
-        sv[i,c,t] = ll[i,c,t]/(1+exp(log_k[i]+log_k_cond[i]*condition[i,c,t])*delay[i,c,t]);
+        sv[i,c,t] = ll[i,c,t]/(1+exp(log_k[i]+s_log_k[i]*condition[i,c,t])*delay[i,c,t]);
         choice[i,c,t] ~ bernoulli_logit(beta[i]*(sv[i,c,t]-ss[i,c,t]));
       }
     }
