@@ -4,7 +4,7 @@ options(mc.cores = parallel::detectCores())
 rstan_options(auto_write = TRUE)
 
 
-data <- sd_2$data
+data <- readRDS("out/test_sd_0_51/data.rds")
 
 # Create 3d arrays; condition index 1:2
 condition_values <- data$condition
@@ -38,4 +38,4 @@ fit <- sampling(
 )
 
 
-saveRDS(fit, "out/models/test_model_sd_2.rds")
+saveRDS(fit, "out/test_sd_0_51/model_prior_sd_0_2.rds")
