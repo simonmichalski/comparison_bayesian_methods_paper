@@ -53,9 +53,24 @@ hist(rnorm(400, mean = 0, sd = sd_large))
 curve(dnorm(x, mean = mean_log_k, sd = sd_log_k), mean_log_k-4, mean_log_k+4, xlab = 'log(k)', ylab = 'Density')
 
 curve(dnorm(x, mean = mean_beta, sd = sd_beta), mean_beta-2, mean_beta+2, xlab = expression(beta), ylab = 'Density')
-curve(logistic_function(x, 1, 3.2), -3, 10, ylim = range(0, 10, 1), xlab = expression(beta), ylab = expression(beta))
+curve(logistic_function(x, 1.97, 1.94), -3, 10, ylim = range(0, 10, 1), xlab = expression(beta), ylab = expression(beta))
 
-x_beta <- rnorm(1000, mean = mean_beta, sd = sd_beta)
+x_beta <- rnorm(1000000, mean = mean_beta, sd = sd_beta)
 hist(x_beta)
-hist(logistic_function(x_beta, 1, 3.2), xlab = expression(beta), main = '', xlim = c(0,2.5))
+hist(logistic_function(x_beta, 0.9, 3.45), xlab = expression(beta), main = '', xlim = c(0,2.5))
+
+
+curve(logistic_function(x, 1.97, 1.94))
+beta_transformed <- logistic_function(x_beta, 1.97, 1.94)
+print(median(beta_transformed))
+print(quantile(beta_transformed))
+print(q1_beta)
+print(q3_beta)
+
+
+x_k <- rnorm(100000, mean = mean_log_k, sd = sd_log_k)
+print(median(x_k))
+print(quantile(x_k))
+print(q1_log_k)
+print(q3_log_k)
 
