@@ -1,7 +1,7 @@
 
 s_log_k_sds <- c(0.2, 0.51, 0.81)
-num_samples <- 100
 
+num_samples <- 100
 n_subj <- 40
 num_trials <- 128
 
@@ -40,8 +40,8 @@ simulate <- function(s_log_k_sd){
     params <- rbind(params, c(i, log_k, s_log_k, beta))
     
     for (j in 1:num_trials){
-      a <- ss*sample(ss_ratios, 1)
-      delay <- sample(delays, 1)
+      a <- ss * ss_ratios[((j - 1) %/% length(delays)) + 1]
+      delay <- delays[(j - 1) %% length(delays) + 1]
       
       choice <- get_choice(a, log_k, delay, beta)
       data <- rbind(data, c(i, 0, j, ss, a, delay, choice))
