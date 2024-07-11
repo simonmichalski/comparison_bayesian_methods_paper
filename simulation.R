@@ -35,7 +35,7 @@ simulate <- function(s_log_k_sd){
     log_k <- rnorm(1, mean = log_k_mean, sd = log_k_sd)
     s_log_k <- rnorm(1, mean = 0, sd = s_log_k_sd)
     beta <- rnorm(1, mean = beta_mean, sd = beta_sd)
-    beta <- logistic_function(beta, 1, 3.2)
+    beta <- logistic_function(beta)
     
     params <- rbind(params, c(i, log_k, s_log_k, beta))
     
@@ -57,8 +57,8 @@ simulate <- function(s_log_k_sd){
 }
 
 
-logistic_function <- function(x, k, x0){
-  return(10 / (1 + exp(-k * (x - x0))))
+logistic_function <- function(x){
+  return(10 / (1 + exp(-1.97 * (x - 1.94))))
 }
 
 
