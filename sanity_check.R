@@ -2,8 +2,8 @@ library('truncnorm')
 library("rstan")
 
 
-fit <- readRDS("out/test2_sd_0_51/model_prior_sd_0_2.rds")
-sim_params <- readRDS("out/test2_sd_0_51/params.rds")
+fit <- readRDS("out/test3_sd_0_51/model_prior_sd_0_2.rds")
+sim_params <- readRDS("out/test3_sd_0_51/params.rds")
 
 summary_list <- summary(fit)
 summary_all_chains <- summary_list$summary
