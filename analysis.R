@@ -16,12 +16,17 @@ traceplot(fit, pars = 'mu_s_log_k')
 
 
 # dBF
+
+
 integrate(posterior, lower = -Inf, upper = 0)
 
 # Savage-Dickey BF
 
 
 # P(effect > 0)
+list_of_samples <- extract(fit)
+mu_s_log_k_samples <- list_of_samples$mu_s_log_k
+p_effect <- sum(mu_s_log_k_samples > 0) / length(mu_s_log_k_samples)
 
 
 # HDI
