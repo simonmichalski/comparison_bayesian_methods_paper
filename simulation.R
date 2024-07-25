@@ -64,7 +64,7 @@ logistic_function <- function(x){
 
 get_data <- function(){
   for (i in 1:length(s_log_k_sds)){
-    sd_path <- file.path("out", paste0("sd_", gsub("0.", "0_", s_log_k_sds[i])))
+    sd_path <- file.path("out", paste0("sd_", gsub("\\.", "_", s_log_k_sds[i])))
     if (!dir.exists(sd_path)) {
       dir.create(sd_path, recursive = TRUE)
     }
@@ -84,6 +84,4 @@ get_data <- function(){
 }
 
 
-#get_data()
-
-sd_m <- simulate(0.51)
+get_data()
