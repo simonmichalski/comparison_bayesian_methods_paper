@@ -1,7 +1,7 @@
 
 s_log_k_sds <- c(0.2, 0.51, 0.81)
 
-num_samples <- 100
+num_samples <- 3
 n_subj <- 40
 num_trials <- 128
 
@@ -64,20 +64,21 @@ logistic_function <- function(x){
 
 get_data <- function(){
   for (i in 1:length(s_log_k_sds)){
-    sd_path <- file.path("out", paste0("sd_", gsub("\\.", "_", s_log_k_sds[i])))
-    if (!dir.exists(sd_path)) {
-      dir.create(sd_path, recursive = TRUE)
-    }
     
     for (j in 1:num_samples){
       data_params <- simulate(s_log_k_sds[i])
       
+      path <- file.path("out", paste0("sd_", gsub("\\.", "_", s_log_k_sds[i])), paste0("sample_", j))
+      if (!dir.exists(path)) {
+        dir.create(path, recursive = TRUE)
+      }
+      
       data <- data_params$data
-      data_path <- file.path(sd_path, paste0("sample_", j, "/data.rds"))
+      data_path <- file.path(path, "data.rds")
       saveRDS(data, file = data_path)
       
       params <- data_params$params
-      params_path <- file.path(sd_path, paste0("sample_", j, "/params.rds"))
+      params_path <- file.path(path, "params.rds")
       saveRDS(params, file = params_path)
     }
   }
