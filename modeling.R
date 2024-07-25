@@ -1,8 +1,12 @@
+library('foreach')
+library('doParallel')
+library('parallel')
 library('rstan')
 
 s_log_k_sds <- c(0.2, 0.51, 0.81)
-num_samples <- 100
-prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
+num_samples <- 3
+#prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
+prior_sds <- c(0.1, 0.5, 1.5)
 
 options(mc.cores = parallel::detectCores())
 rstan_options(auto_write = TRUE)
@@ -11,7 +15,7 @@ for (i in 1:length(s_log_k_sds)){
   sd_path <- file.path("out", paste0("sd_", gsub("0.", "0_", s_log_k_sds[i])))
   
   for (j in 1:num_samples){
-    data_path <- file.path(sd_path, paste0("sample_", j, "/data.rds"))
+    data_path <- file.path(sd_path, paste0("sample_", j), "data.rds")
     data <- readRDS(data_path)
     
     # Create 3d arrays; condition index 1:2
@@ -33,20 +37,27 @@ for (i in 1:length(s_log_k_sds)){
       choice = choice_array
     )
     
-    for (k in 1:length(prior_sds)){
-      model <- stan_model(paste0("discounting_model_prior_sd_", gsub("\\.", "_", prior_sds[k]), ".stan"))
+    num_cores <- detectCores(logical = TRUE)
+    cluster <- makeCluster(num_cores - 1)
+    registerDoParallel(cluster)
+    
+    foreach (k = 1:length(prior_sds), .packages = 'rstan') %dopar% {
+      model <- stan_model(file.path("models", paste0("discounting_model_prior_sd_", gsub("\\.", "_", prior_sds[k]), ".stan")))
       
       fit <- sampling(
         model,
         data = stan_data,
-        chains = 2,
-        iter = 2000,
-        warmup = 1000,
-        thin = 1
+        chains = 1,
+        iter = 10,
+        warmup = 5,
+        thin = 1,
+        save_warmup = FALSE
       )
       
-      model_path <- file.path(sd_path, paste0("sample_", j, "/model_prior_sd_", gsub("\\.", "_", prior_sds[k]), ".rds"))
+      model_path <- file.path(sd_path, paste0("sample_", j), paste0("model_prior_sd_", gsub("\\.", "_", prior_sds[k]), ".rds"))
       saveRDS(fit, model_path)
     }
+    
+    stopCluster(cl = cluster)
   }
 }
