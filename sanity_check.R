@@ -65,8 +65,8 @@ get_subj_stats <- function(data_params){
   print(paste("% ll choices = ", num_ll_choices/nrow(data)))
   
   log_k <- params$log_k
-  log_k_cond <- params$log_k_cond
-  data$sv <- data$ll/(1+exp(log_k+log_k_cond*data$condition)*data$delay)
+  s_log_k <- params$s_log_k
+  data$sv <- data$ll/(1+exp(log_k+s_log_k*data$condition)*data$delay)
   data$consistency <- ifelse(data$sv > data$ss & data$choice == 1, 1, 0)
   num_consistent_trials <- sum(data$consistency)
   print(paste("% consistent choices = ", num_consistent_trials/nrow(data)))
@@ -78,9 +78,9 @@ ss_ratios <- c(1.01, 1.02, 1.05, 1.10, 1.15, 1.25, 1.35, 1.45,
 delays <- c(1, 3, 5, 8, 14, 30, 60, 120)
 num_trials <- 128
 
-log_k <- -6
+log_k <- -1
 beta <- 5
 
-subj <- simulate(1, log_k, 0, 0.1, beta, 0, num_trials, ss, ss_ratios, delays)
+subj <- simulate(1)
 get_subj_stats(subj)
 
