@@ -2,8 +2,8 @@ library("rstan")
 library("bayesplot")
 
 
-fit <- readRDS("out/test3_sd_0_51/model_prior_sd_0_2.rds")
-sim_params <- readRDS("out/test3_sd_0_51/params.rds")
+fit <- readRDS("out/sd_0_2/sample_1/model_prior_sd_0_1.rds")
+sim_params <- readRDS("out/sd_0_2/sample_1/params.rds")
 
 summary_list <- summary(fit)
 summary_all_chains <- summary_list$summary
@@ -18,7 +18,7 @@ traceplot(fit, pars = 'mu_s_log_k')
 # dBF
 
 
-integrate(posterior, lower = -Inf, upper = 0)
+#integrate(posterior, lower = -Inf, upper = 0)
 
 # Savage-Dickey BF
 
