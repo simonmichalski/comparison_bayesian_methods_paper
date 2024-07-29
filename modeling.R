@@ -64,7 +64,7 @@ parallel_modelling <- function(){
     
     fit <- sampling(
       model,
-      data = stan_data_list[stan_data_index],
+      data = stan_data_list[[stan_data_index]],
       chains = 2,
       iter = 2000,
       warmup = 1000,
