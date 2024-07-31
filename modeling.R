@@ -4,9 +4,8 @@ library('parallel')
 library('rstan')
 
 s_log_k_sds <- c(0.2, 0.51, 0.81)
-num_samples <- 3
-#prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
-prior_sds <- c(0.1, 0.5, 1.5)
+num_samples <- 100
+prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 
 options(mc.cores = parallel::detectCores())
 rstan_options(auto_write = TRUE)
