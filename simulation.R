@@ -1,7 +1,7 @@
 
 s_log_k_sds <- c(0.2, 0.51, 0.81)
 
-num_samples <- 3
+num_samples <- 100
 n_subj <- 40
 num_trials <- 128
 
