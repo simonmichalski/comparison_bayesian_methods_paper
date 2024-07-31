@@ -56,6 +56,8 @@ parallel_modelling <- function(){
   registerDoParallel(cluster)
   
   foreach (i = 1:(length(stan_data_list)*length(prior_sds)), .packages = 'rstan', .export=ls(envir=globalenv())) %dopar% {
+    start_time <- Sys.time()
+    
     prior_index <- (i - 1) %% length(prior_sds) + 1
     model <- stan_model(file.path("models", paste0("discounting_model_prior_sd_", gsub("\\.", "_", prior_sds[prior_index]), ".stan")))
     
@@ -77,6 +79,9 @@ parallel_modelling <- function(){
     sd_path <- file.path("out", paste0("sd_", gsub("0.", "0_", s_log_k_sds[s_log_k_sd_index[i]])))
     model_path <- file.path(sd_path, paste0("sample_", sample_numbers[i]), paste0("model_prior_sd_", gsub("\\.", "_", prior_sds[prior_index]), ".rds"))
     saveRDS(fit, model_path)
+    
+    end_time <- Sys.time() - start_time
+    cat(model_path, end_time, attr(end_time, "units"))
   }
   
   stopCluster(cl = cluster)
