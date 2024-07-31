@@ -52,7 +52,7 @@ parallel_modelling <- function(){
   stan_data_list <- get_stan_data()
   
   num_cores <- detectCores(logical = TRUE)
-  cluster <- makeCluster(num_cores - 1)
+  cluster <- makeCluster(num_cores - 5)
   registerDoParallel(cluster)
   
   foreach (i = 1:(length(stan_data_list)*length(prior_sds)), .packages = 'rstan', .export=ls(envir=globalenv())) %dopar% {
