@@ -37,7 +37,7 @@ get_results <- function(){
         
         rhat_mu_s_log_k <- summary(fit)$summary['mu_s_log_k', 'Rhat']
         
-        if (round(rhat_mu_s_log_k, 2) < 1 || round(rhat_mu_s_log_k, 2) > 1.2){
+        if (round(rhat_mu_s_log_k, 2) < 1 || round(rhat_mu_s_log_k, 2) > 1.1){
           print(paste("Model not converged:", fit_path))
         }
         else {
