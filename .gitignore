@@ -2,7 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+/convergence_check2.R
 /discounting_model.rds
 /plots_seminar.R
 /out
 /stan_school_example
+/test_results.rds
