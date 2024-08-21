@@ -1,7 +1,7 @@
 library("rstan")
 library("bayestestR")
 
-s_log_k_sds <- c(0.2, 0.51, 0.81)
+s_log_k_sds <- c(0.51, 0.81)
 num_samples <- 100
 prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 
@@ -21,8 +21,7 @@ get_savage_dickey_bf <- function(prior_sd, posterior_samples){
   return(savage_dickey_bf)
 }
 
-#### ROPE definition!!!!!; rhat criterion!!!!
-get_results <- function(){
+get_results_df <- function(){
   results <- data.frame()
   
   for (i in 1:length(s_log_k_sds)){
@@ -44,14 +43,19 @@ get_results <- function(){
           posterior_samples_mu_s_log_k <- extract(fit)$mu_s_log_k
           
           directional_bf <- get_directional_bf(posterior_samples_mu_s_log_k)
-          savage_dickey_bf <- get_savage_dickey_bf(prior_sds[k], posterior_samples_mu_s_log_k)
-          p_effect <- sum(posterior_samples_mu_s_log_k > 0) / length(posterior_samples_mu_s_log_k)
-          hdi_low <- hdi(posterior_samples_mu_s_log_k, ci = 0.95)$CI_low
-          hdi_high <- hdi(posterior_samples_mu_s_log_k, ci = 0.95)$CI_high
-          prop_hdi_in_rope <- rope(posterior_samples_mu_s_log_k, range = c(-0.1, 0.1), ci = 0.95)$ROPE_Percentage
           
-          results <- rbind(results, c(s_log_k_sds[i], j, prior_sds[k], directional_bf, savage_dickey_bf, p_effect, hdi_low, hdi_high, prop_hdi_in_rope))
-          colnames(results) <- c("s_log_k_sd", "sample", "prior_sd", "directional_bf", "savage_dickey_bf", "p_effect", "hdi_low", "hdi_high", "prop_hdi_in_rope")
+          savage_dickey_bf <- get_savage_dickey_bf(prior_sds[k], posterior_samples_mu_s_log_k)
+          
+          p_effect <- sum(posterior_samples_mu_s_log_k > 0) / length(posterior_samples_mu_s_log_k)
+          
+          hdi_lower <- hdi(posterior_samples_mu_s_log_k, ci = 0.95)$CI_low
+          hdi_upper <- hdi(posterior_samples_mu_s_log_k, ci = 0.95)$CI_high
+          
+          rope_bounds <- s_log_k_sds[i]*0.1
+          prop_hdi_in_rope <- rope(posterior_samples_mu_s_log_k, range = c(-rope_bounds, rope_bounds), ci = 0.95)$ROPE_Percentage
+          
+          results <- rbind(results, c(s_log_k_sds[i], j, prior_sds[k], directional_bf, savage_dickey_bf, p_effect, hdi_lower, hdi_upper, prop_hdi_in_rope))
+          colnames(results) <- c("s_log_k_sd", "sample", "prior_sd", "directional_bf", "savage_dickey_bf", "p_effect", "hdi_lower", "hdi_upper", "prop_hdi_in_rope_conv")
         }
       }
     }
@@ -59,3 +63,39 @@ get_results <- function(){
   return(results)
 }
 
+get_percentage_outside_of_rope <- function(rope_boundary, results){
+  n_outside <- sum(results$hdi_upper < -rope_boundary | results$hdi_lower > rope_boundary)
+  percentage <- n_outside / nrow(results)
+  return(percentage)
+}
+
+get_percentage_outside_p_effect_boundaries <- function(upper_boundary, results){
+  n_outside <- sum(results$p_effect < 1-upper_boundary | results$p_effect > upper_boundary)
+  percentage <- n_outside / nrow(results)
+  return(percentage)
+}
+
+get_simulation_based_thresholds <- function(results){
+  directional_bf_upper <- quantile(results$directional_bf, probs = 0.975)[[1]]
+  directional_bf_lower <- quantile(results$directional_bf, probs = 0.025)[[1]]
+  
+  savage_dickey_bf <- quantile(results$savage_dickey_bf, probs = 0.95)[[1]]
+  
+  p_effect_upper <- tryCatch({uniroot(function(upper_boundary) get_percentage_outside_p_effect_boundaries(upper_boundary, results) - 0.05,
+                             lower = 0, upper = 1)$root},
+                             error = function(e){return(NA)})
+  
+  rope <- tryCatch({uniroot(function(rope_boundary) get_percentage_outside_of_rope(rope_boundary, results) - 0.05,
+                            lower = 0, upper = max(abs(results$hdi_lower), abs(results$hdi_upper)))$root},
+                   error = function(e){return(NA)})
+  
+  sim_thresholds <- list(directional_bf_upper = directional_bf_upper, 
+                         directional_bf_lower = directional_bf_lower,
+                         savage_dickey_bf = savage_dickey_bf,
+                         p_effect_upper = p_effect_upper,
+                         rope = rope)
+  return(sim_thresholds)
+}
+
+df_results <- get_results_df()
+sim_thresholds <- get_simulation_based_thresholds(df_results)
