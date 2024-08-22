@@ -1,0 +1,18 @@
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+library('papaja')
+
+df_results <- readRDS('test_results.rds')
+
+# False positive results
+fp_savage_dickey_bf_conv <- sum(df_results$fp_savage_dickey_bf_conv)
+fp_directional_bf_upper_conv <- sum(df_results$fp_directional_bf_upper_conv)
+```
+
+# **False positive results**
+Overall, there were  false positive results.
+`r fp_savage_dickey_bf_conv` Savage-Dickey BFs were false positive with the conventional decision threshold.
