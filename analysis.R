@@ -14,12 +14,14 @@ get_directional_bf <- function(posterior_samples){
   return(directional_bf)
 }
 
+
 # Savage-Dickey BF10
 get_savage_dickey_bf <- function(prior_sd, posterior_samples){
   prior <- rnorm(10000, 0, prior_sd)
   savage_dickey_bf <- exp(bayesfactor_parameters(posterior_samples, prior = prior)$log_BF)
   return(savage_dickey_bf)
 }
+
 
 get_results_df <- function(){
   results <- data.frame()
@@ -60,8 +62,28 @@ get_results_df <- function(){
       }
     }
   }
+  sim_thresholds <- get_simulation_based_thresholds(results)
+  
+  # Add false positive result columns with conventional decision thresholds
+  results$fp_directional_bf_upper_conv <- ifelse(results$directional_bf > 3, 1, 0)
+  results$fp_directional_bf_lower_conv <- ifelse(results$directional_bf < 0.33, 1, 0)
+  results$fp_savage_dickey_bf_conv <- ifelse(results$savage_dickey_bf > 3, 1, 0)
+  results$fp_p_effect_upper_conv <- ifelse(results$p_effect > 0.95, 1, 0)
+  results$fp_p_effect_lower_conv <- ifelse(results$p_effect < 0.05, 1, 0)
+  results$fp_rope_conv <- ifelse(results$prop_hdi_in_rope_conv == 0, 1, 0)
+  
+  # Add false positive result columns with simulation-based decision thresholds
+  results$fp_directional_bf_upper_sim <- ifelse(results$directional_bf > sim_thresholds$directional_bf_upper, 1, 0)
+  results$fp_directional_bf_lower_sim <- ifelse(results$directional_bf < sim_thresholds$directional_bf_lower, 1, 0)
+  results$fp_savage_dickey_bf_sim <- ifelse(results$savage_dickey_bf > sim_thresholds$savage_dickey_bf, 1, 0)
+  results$fp_p_effect_upper_sim <- ifelse(results$p_effect > sim_thresholds$p_effect_upper, 1, 0)
+  results$fp_p_effect_lower_sim <- ifelse(results$p_effect < 1 - sim_thresholds$p_effect_upper, 1, 0)
+  # add if simulation-based ROPE necessary
+  results$fp_rope_sim <- NA
+  
   return(results)
 }
+
 
 get_percentage_outside_of_rope <- function(rope_boundary, results){
   n_outside <- sum(results$hdi_upper < -rope_boundary | results$hdi_lower > rope_boundary)
@@ -69,11 +91,13 @@ get_percentage_outside_of_rope <- function(rope_boundary, results){
   return(percentage)
 }
 
+
 get_percentage_outside_p_effect_boundaries <- function(upper_boundary, results){
   n_outside <- sum(results$p_effect < 1-upper_boundary | results$p_effect > upper_boundary)
   percentage <- n_outside / nrow(results)
   return(percentage)
 }
+
 
 get_simulation_based_thresholds <- function(results){
   directional_bf_upper <- quantile(results$directional_bf, probs = 0.975)[[1]]
@@ -97,5 +121,6 @@ get_simulation_based_thresholds <- function(results){
   return(sim_thresholds)
 }
 
+
 df_results <- get_results_df()
-sim_thresholds <- get_simulation_based_thresholds(df_results)
+saveRDS(df_results, "test_results.rds")
