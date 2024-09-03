@@ -1,7 +1,7 @@
 library("rstan")
 library("bayestestR")
 
-s_log_k_sds <- c(0.51, 0.81)
+s_log_k_sds <- c(0.2, 0.51, 0.81)
 num_samples <- 100
 prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 
@@ -123,4 +123,4 @@ get_simulation_based_thresholds <- function(results){
 
 
 df_results <- get_results_df()
-saveRDS(df_results, "test_results.rds")
+saveRDS(df_results, "final_results.rds")
