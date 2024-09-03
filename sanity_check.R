@@ -2,13 +2,14 @@ library('truncnorm')
 library("rstan")
 
 
-fit <- readRDS("out/sd_0_51/sample_1/model_prior_sd_0_1.rds")
-sim_params <- readRDS("out/sd_0_51/sample_1/params.rds")
+fit <- readRDS("out/sd_0_51/sample_44/model_prior_sd_2_5.rds")
+sim_params <- readRDS("out/sd_0_51/sample_44/params.rds")
 
-summary_list <- summary(fit)
-summary_all_chains <- summary_list$summary
 
-correlate_model_simulation <- function(summary_all_chains, sim_params){
+correlate_model_simulation <- function(fit, sim_params){
+  summary_list <- summary(fit)
+  summary_all_chains <- summary_list$summary
+  
   log_k_model <- vector()
   s_log_k_model <- vector()
   beta_model <- vector()
@@ -28,7 +29,7 @@ correlate_model_simulation <- function(summary_all_chains, sim_params){
   print(paste("r_beta:", cor(beta_model, beta_sim)))
 }
 
-correlate_model_simulation(summary_all_chains, sim_params)
+correlate_model_simulation(fit, sim_params)
 
 
 # Check log(k) and beta distributions
