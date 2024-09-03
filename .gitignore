@@ -4,7 +4,10 @@
 .Ruserdata
 /convergence_check2.R
 /discounting_model.rds
+/final_results.rds
+/plots
 /plots_seminar.R
+/results.html
 /out
 /stan_school_example
 /test_results.rds
