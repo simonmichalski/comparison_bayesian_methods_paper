@@ -15,7 +15,7 @@ get_directional_bf <- function(posterior_samples, prior_sd){
 
 
 # Savage-Dickey BF10
-get_savage_dickey_bf <- function(prior_sd, posterior_samples){
+get_savage_dickey_bf <- function(posterior_samples, prior_sd){
   prior <- distribution_normal(10000, 0, prior_sd)
   savage_dickey_bf <- exp(bayesfactor_parameters(posterior_samples, prior = prior)$log_BF)
   return(savage_dickey_bf)
@@ -45,7 +45,7 @@ get_results_df <- function(){
           
           directional_bf <- get_directional_bf(posterior_samples_mu_s_log_k, prior_sds[k])
           
-          savage_dickey_bf <- get_savage_dickey_bf(prior_sds[k], posterior_samples_mu_s_log_k)
+          savage_dickey_bf <- get_savage_dickey_bf(posterior_samples_mu_s_log_k, prior_sds[k])
           
           p_effect <- sum(posterior_samples_mu_s_log_k > 0) / length(posterior_samples_mu_s_log_k)
           
