@@ -7,17 +7,16 @@ prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 
 
 # dBF+-
-get_directional_bf <- function(posterior_samples){
-  density_pos <- density(posterior_samples, from = 0, to = 999)
-  density_neg <- density(posterior_samples, from = -999, to = 0)
-  directional_bf <- sum(density_pos$y) / sum(density_neg$y)
+get_directional_bf <- function(posterior_samples, prior_sd){
+  prior <- distribution_normal(10000, 0, prior_sd)
+  directional_bf <- bayesfactor_parameters(posterior_samples, null = c(-Inf, 0), prior = prior)
   return(directional_bf)
 }
 
 
 # Savage-Dickey BF10
 get_savage_dickey_bf <- function(prior_sd, posterior_samples){
-  prior <- rnorm(10000, 0, prior_sd)
+  prior <- distribution_normal(10000, 0, prior_sd)
   savage_dickey_bf <- exp(bayesfactor_parameters(posterior_samples, prior = prior)$log_BF)
   return(savage_dickey_bf)
 }
@@ -44,7 +43,7 @@ get_results_df <- function(){
         else {
           posterior_samples_mu_s_log_k <- extract(fit)$mu_s_log_k
           
-          directional_bf <- get_directional_bf(posterior_samples_mu_s_log_k)
+          directional_bf <- get_directional_bf(posterior_samples_mu_s_log_k, prior_sds[k])
           
           savage_dickey_bf <- get_savage_dickey_bf(prior_sds[k], posterior_samples_mu_s_log_k)
           
