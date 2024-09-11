@@ -9,7 +9,8 @@ prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 # dBF+-
 get_directional_bf <- function(posterior_samples, prior_sd){
   prior <- distribution_normal(10000, 0, prior_sd)
-  directional_bf <- bayesfactor_parameters(posterior_samples, null = c(-Inf, 0), prior = prior)
+  log_directional_bf <- bayesfactor_parameters(posterior_samples, null = c(-Inf, 0), prior = prior)$log_BF
+  directional_bf <- exp(log_directional_bf)
   return(directional_bf)
 }
 
@@ -17,7 +18,8 @@ get_directional_bf <- function(posterior_samples, prior_sd){
 # Savage-Dickey BF10
 get_savage_dickey_bf <- function(posterior_samples, prior_sd){
   prior <- distribution_normal(10000, 0, prior_sd)
-  savage_dickey_bf <- exp(bayesfactor_parameters(posterior_samples, prior = prior)$log_BF)
+  log_savage_dickey_bf <- bayesfactor_parameters(posterior_samples, prior = prior)$log_BF
+  savage_dickey_bf <- exp(log_savage_dickey_bf)
   return(savage_dickey_bf)
 }
 
@@ -35,11 +37,6 @@ get_results_df <- function(){
         fit_path <- file.path(sample_path, paste0("model_prior_sd_", gsub("\\.", "_", prior_sds[k]), ".rds"))
         fit <- readRDS(fit_path)
         
-        rhat_mu_s_log_k <- summary(fit)$summary['mu_s_log_k', 'Rhat']
-        
-        if (round(rhat_mu_s_log_k, 2) < 1 || round(rhat_mu_s_log_k, 2) > 1.1){
-          print(paste("Model not converged:", fit_path))
-        }
         else {
           posterior_samples_mu_s_log_k <- extract(fit)$mu_s_log_k
           
@@ -61,7 +58,7 @@ get_results_df <- function(){
       }
     }
   }
-  sim_thresholds <- get_simulation_based_thresholds(results)
+  #sim_thresholds <- get_simulation_based_thresholds(results)
   
   # Add false positive result columns with conventional decision thresholds
   results$fp_directional_bf_upper_conv <- ifelse(results$directional_bf > 3, 1, 0)
@@ -72,13 +69,13 @@ get_results_df <- function(){
   results$fp_rope_conv <- ifelse(results$prop_hdi_in_rope_conv == 0, 1, 0)
   
   # Add false positive result columns with simulation-based decision thresholds
-  results$fp_directional_bf_upper_sim <- ifelse(results$directional_bf > sim_thresholds$directional_bf_upper, 1, 0)
-  results$fp_directional_bf_lower_sim <- ifelse(results$directional_bf < sim_thresholds$directional_bf_lower, 1, 0)
-  results$fp_savage_dickey_bf_sim <- ifelse(results$savage_dickey_bf > sim_thresholds$savage_dickey_bf, 1, 0)
-  results$fp_p_effect_upper_sim <- ifelse(results$p_effect > sim_thresholds$p_effect_upper, 1, 0)
-  results$fp_p_effect_lower_sim <- ifelse(results$p_effect < 1 - sim_thresholds$p_effect_upper, 1, 0)
+  #results$fp_directional_bf_upper_sim <- ifelse(results$directional_bf > sim_thresholds$directional_bf_upper, 1, 0)
+  #results$fp_directional_bf_lower_sim <- ifelse(results$directional_bf < sim_thresholds$directional_bf_lower, 1, 0)
+  #results$fp_savage_dickey_bf_sim <- ifelse(results$savage_dickey_bf > sim_thresholds$savage_dickey_bf, 1, 0)
+  #results$fp_p_effect_upper_sim <- ifelse(results$p_effect > sim_thresholds$p_effect_upper, 1, 0)
+  #results$fp_p_effect_lower_sim <- ifelse(results$p_effect < 1 - sim_thresholds$p_effect_upper, 1, 0)
   # add if simulation-based ROPE necessary
-  results$fp_rope_sim <- NA
+  #results$fp_rope_sim <- NA
   
   return(results)
 }
