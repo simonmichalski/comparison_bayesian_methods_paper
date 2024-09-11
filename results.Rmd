@@ -6,12 +6,12 @@ knitr::opts_chunk$set(echo = FALSE)
 ```{r}
 library('papaja')
 
-df_results <- readRDS('test_results.rds')
+df_results <- readRDS('final_results.rds')
 
 # False positive results
 fp_savage_dickey_bf_conv <- round((sum(df_results$fp_savage_dickey_bf_conv)/nrow(df_results))*100,2)
 fp_directional_bf_conv <- round((sum(df_results$fp_directional_bf_upper_conv,
-                                     df_results$fp_directional_bf_lower_conv)/nrow(df_results))*100,2)
+                                    df_results$fp_directional_bf_lower_conv)/nrow(df_results))*100,2)
 fp_p_effect_conv <- round((sum(df_results$fp_p_effect_upper_conv,
                                df_results$fp_p_effect_lower_conv)/nrow(df_results))*100,2)
 fp_rope_conv <- round((sum(df_results$fp_rope_conv)/nrow(df_results))*100,2)
@@ -40,7 +40,7 @@ dr_overall <- sum(df_results$fp_savage_dickey_bf_conv !=
 ```
 
 # **False positive results**
-Overall, `r fp_overall` % of all hypothesis tests produced a false positive result. With the conventional decision thresholds, `r fp_savage_dickey_bf_conv` % of Savage-Dickey BFs, `r fp_p_effect_conv` % of P(effect > 0) proportions and `r fp_rope_conv` % of HDI + ROPE decisions were false positive. There were no false positive dBFs (?).
+Overall, `r fp_overall` % of all hypothesis tests produced a false positive result. With the conventional decision thresholds, `r fp_savage_dickey_bf_conv` % of Savage-Dickey BFs, `r fp_directional_bf_conv` % of dBFs, `r fp_p_effect_conv` % of P(effect > 0) proportions and `r fp_rope_conv` % of HDI + ROPE decisions were false positive.
 
 # **Diverging results**
 xx
