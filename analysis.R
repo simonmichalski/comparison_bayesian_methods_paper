@@ -37,24 +37,22 @@ get_results_df <- function(){
         fit_path <- file.path(sample_path, paste0("model_prior_sd_", gsub("\\.", "_", prior_sds[k]), ".rds"))
         fit <- readRDS(fit_path)
         
-        else {
-          posterior_samples_mu_s_log_k <- extract(fit)$mu_s_log_k
-          
-          directional_bf <- get_directional_bf(posterior_samples_mu_s_log_k, prior_sds[k])
-          
-          savage_dickey_bf <- get_savage_dickey_bf(posterior_samples_mu_s_log_k, prior_sds[k])
-          
-          p_effect <- sum(posterior_samples_mu_s_log_k > 0) / length(posterior_samples_mu_s_log_k)
-          
-          hdi_lower <- hdi(posterior_samples_mu_s_log_k, ci = 0.95)$CI_low
-          hdi_upper <- hdi(posterior_samples_mu_s_log_k, ci = 0.95)$CI_high
-          
-          rope_bounds <- s_log_k_sds[i]*0.1
-          prop_hdi_in_rope <- rope(posterior_samples_mu_s_log_k, range = c(-rope_bounds, rope_bounds), ci = 0.95)$ROPE_Percentage
-          
-          results <- rbind(results, c(s_log_k_sds[i], j, prior_sds[k], directional_bf, savage_dickey_bf, p_effect, hdi_lower, hdi_upper, prop_hdi_in_rope))
-          colnames(results) <- c("s_log_k_sd", "sample", "prior_sd", "directional_bf", "savage_dickey_bf", "p_effect", "hdi_lower", "hdi_upper", "prop_hdi_in_rope_conv")
-        }
+        posterior_samples_mu_s_log_k <- extract(fit)$mu_s_log_k
+        
+        directional_bf <- get_directional_bf(posterior_samples_mu_s_log_k, prior_sds[k])
+        
+        savage_dickey_bf <- get_savage_dickey_bf(posterior_samples_mu_s_log_k, prior_sds[k])
+        
+        p_effect <- sum(posterior_samples_mu_s_log_k > 0) / length(posterior_samples_mu_s_log_k)
+        
+        hdi_lower <- hdi(posterior_samples_mu_s_log_k, ci = 0.95)$CI_low
+        hdi_upper <- hdi(posterior_samples_mu_s_log_k, ci = 0.95)$CI_high
+        
+        rope_bounds <- s_log_k_sds[i]*0.1
+        prop_hdi_in_rope <- rope(posterior_samples_mu_s_log_k, range = c(-rope_bounds, rope_bounds), ci = 0.95)$ROPE_Percentage
+        
+        results <- rbind(results, c(s_log_k_sds[i], j, prior_sds[k], directional_bf, savage_dickey_bf, p_effect, hdi_lower, hdi_upper, prop_hdi_in_rope))
+        colnames(results) <- c("s_log_k_sd", "sample", "prior_sd", "directional_bf", "savage_dickey_bf", "p_effect", "hdi_lower", "hdi_upper", "prop_hdi_in_rope_conv")
       }
     }
   }
