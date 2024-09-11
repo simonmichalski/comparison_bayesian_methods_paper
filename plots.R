@@ -14,72 +14,54 @@ library("patchwork")
 
 df_results <- readRDS("final_results.rds")
 
-# Savage-Dickey BFs, dBFs, P(effect > 0)
+# Values
 data_savage_dickey_bf <- aggregate(savage_dickey_bf ~ s_log_k_sd + prior_sd, df_results, mean)
 data_directional_bf <- aggregate(directional_bf ~ s_log_k_sd + prior_sd, df_results, mean)
 data_p_effect <- aggregate(p_effect ~ s_log_k_sd + prior_sd, df_results, mean)
+data_hdi_rope <- aggregate(prop_hdi_in_rope_conv ~ s_log_k_sd + prior_sd, df_results, mean)
 
-plot_savage_dickey_bf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = savage_dickey_bf, color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = expression("Savage-Dickey BF "[10])) +
-  geom_hline(yintercept = 3, linetype = 'dashed') +
-  geom_line(data = data_savage_dickey_bf, 
-            aes(x = as.factor(prior_sd), 
-                y = savage_dickey_bf, 
-                color = as.factor(s_log_k_sd), 
-                group = as.factor(s_log_k_sd))) +
-  geom_jitter(
-    position = position_dodge(width = 0.5),
-    alpha = 0.5) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA),
-    axis.ticks.length = unit(-0.1, 'cm'),
-    legend.position = 'none')
+dodge_width <- 0.7
 
-plot_dfb <- ggplot(df_results, aes(x = as.factor(prior_sd), y = directional_bf, color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = expression("dBF"["+-"])) +
-  geom_hline(yintercept = 3, linetype = 'dashed') +
-  geom_hline(yintercept = 0.33, linetype = 'dashed') +
-  geom_line(data = data_directional_bf, 
-            aes(x = as.factor(prior_sd), 
-                y = directional_bf, 
-                color = as.factor(s_log_k_sd), 
-                group = as.factor(s_log_k_sd))) +
-  geom_jitter(
-    position = position_dodge(width = 0.5),
-    alpha = 0.5
-  ) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA),
-    axis.ticks.length = unit(-0.1, 'cm'),
-    legend.position = 'none'
-  )
-
-plot_p_effect <- ggplot(df_results, aes(x = as.factor(prior_sd), y = p_effect, color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "P(effect > 0)") +
-  geom_hline(yintercept = 0.95, linetype = 'dashed') +
-  geom_hline(yintercept = 0.05, linetype = 'dashed') +
-  geom_line(data = data_p_effect, 
-            aes(x = as.factor(prior_sd), 
-                y = p_effect, 
-                color = as.factor(s_log_k_sd), 
-                group = as.factor(s_log_k_sd))) +
-  geom_jitter(
-    position = position_dodge(width = 0.5),
-    alpha = 0.5
+values_plot <- function(y_column, x_lab, y_lab, hline_intercept, line_data, x_tick_label_size){
+  plot <- ggplot(df_results, aes(x = as.factor(prior_sd), y = !!sym(y_column), color = as.factor(s_log_k_sd))) +
+    labs(x = x_lab, y = y_lab) +
+    geom_jitter(
+      position = position_dodge(width = dodge_width),
+      alpha = 0.5
     ) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA),
-    axis.ticks.length = unit(-0.1, 'cm'),
-    legend.position = 'none'
-  )
+    geom_line(data = line_data,
+              aes(x = as.factor(prior_sd), 
+                  y = !!sym(y_column), 
+                  color = as.factor(s_log_k_sd), 
+                  group = as.factor(s_log_k_sd)),
+              position = position_dodge(width = dodge_width)) +
+    geom_hline(yintercept = hline_intercept[1], linetype = 'dashed') +
+    geom_hline(yintercept = hline_intercept[2], linetype = 'dashed') +
+    theme(
+      panel.background = element_blank(),
+      panel.border = element_rect(color = 'black', fill = NA),
+      axis.ticks.length = unit(-0.1, 'cm'),
+      legend.position = 'none',
+      axis.title.y = element_text(size = 9),
+      axis.text.y = element_text(size = 7),
+      axis.text.x = element_text(size = x_tick_label_size)
+    )
+  
+  return(plot)
+}
 
 
-multiplot_values <- (plot_savage_dickey_bf | plot_dfb) + plot_p_effect +
-  plot_layout(nrow = 2, ncol = 2) +
+# add legend!!!
+
+plot_savage_dickey_bf <- values_plot("savage_dickey_bf", "", expression("Savage-Dickey BF "[10]), c(3,3), data_savage_dickey_bf, 0)
+plot_dbf <- values_plot("directional_bf", "", expression("dBF"["+-"]), c(0.33, 3), data_directional_bf, 0)
+plot_hdi_rope <- values_plot("prop_hdi_in_rope_conv", "Prior SD", "Prop. 95% HDI in ROPE", c(0,0), data_hdi_rope, 7)
+plot_p_effect <- values_plot("p_effect", "Prior SD", "P(effect > 0)", c(0.05, 0.95), data_p_effect, 7)
+
+multiplot_values <- (plot_savage_dickey_bf + plot_dbf) / (plot_hdi_rope + plot_p_effect) +
   plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 14))
+
+ggsave("plots/multiplot_values.pdf", plot = multiplot_values, width = 6, height = 4, units = "in", dpi = 300)
 
 
 # False positive results (conv)
