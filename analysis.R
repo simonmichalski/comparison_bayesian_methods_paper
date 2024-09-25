@@ -25,7 +25,8 @@ get_savage_dickey_bf <- function(posterior_samples, prior_sd){
 
 
 get_results_df <- function(){
-  results <- data.frame()
+  results <- vector('list', nrow(df_results))
+  counter <- 1
   
   for (i in 1:length(s_log_k_sds)){
     sd_path <- file.path("out", paste0("sd_", gsub("\\.", "_", s_log_k_sds[i])))
@@ -48,10 +49,13 @@ get_results_df <- function(){
         hdi_lower <- hdi(posterior_samples_mu_s_log_k, ci = 0.95)$CI_low
         hdi_upper <- hdi(posterior_samples_mu_s_log_k, ci = 0.95)$CI_high
         
-        results <- rbind(results, c(s_log_k_sds[i], j, prior_sds[k], directional_bf, savage_dickey_bf, p_effect, hdi_lower, hdi_upper))
+        results[[counter]] <- c(s_log_k_sds[i], j, prior_sds[k], directional_bf, savage_dickey_bf, p_effect, hdi_lower, hdi_upper)
+        counter <- counter + 1
       }
     }
   }
+  
+  results <- as.data.frame(do.call(rbind, results))
   colnames(results) <- c("s_log_k_sd", "sample", "prior_sd", "directional_bf", "savage_dickey_bf", "p_effect", "hdi_lower", "hdi_upper")
   
   # Add false positive (fp) result columns with conventional decision thresholds (conv)
