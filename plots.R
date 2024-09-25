@@ -2,6 +2,7 @@ library("rstan")
 library("bayesplot")
 library("ggplot2")
 library("patchwork")
+library("dplyr")
 
 #fit <- readRDS("out/test3_sd_0_51/model_prior_sd_0_2.rds")
 
@@ -217,5 +218,22 @@ multiplot_fp <- plot_fp_savage_dickey_bf + plot_fp_dbf + plot_fp_p_effect + plot
 ggsave("plots/multiplot_fp.pdf", plot = multiplot_fp, width = 6, height = 4, units = "in", dpi = 300)
 
 
-# Simulation-based decision thresholds
+# Simulation-based decision thresholds (sbdt)
+sim_based_thresholds <- readRDS("sim_based_thresholds.rds")
+
+data_sbdt_directional_bf <- pivot_longer(sim_based_thresholds[,c("directional_bf_upper", "directional_bf_lower", "n_tests")], 
+                                         cols = starts_with("directional_bf"),
+                                         names_to = "threshold", values_to = "value")
+
+plot_sbdt_savage_dickey_bf <- ggplot(sim_based_thresholds, aes(x = as.factor(n_tests), y = value, group = as.factor(threshold))) +
+  labs(x = "n tests", y = expression("Savage-Dickey BF"[10])) +
+  geom_line(linewidth = 1)
+
+plot_sbdt_directional_bf <- ggplot(data_sbdt_directional_bf, aes(x = as.factor(n_tests), y = directional_bf, group = as.factor(upper_lower)))
+
+plot_sbdt_hdi_bf <- ggplot(data_sbdt_hdi, aes(x = as.factor(n_tests), y = hdi))
+
+plot_sbdt_p_effect_bf <- ggplot(data_sbdt_p_effect, aes(x = as.factor(n_tests), y = p_effect))
+
+
 
