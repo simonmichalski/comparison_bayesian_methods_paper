@@ -1,7 +1,7 @@
 library("rstan")
 library("bayestestR")
 
-s_log_k_sds <- c(0.2, 0.51, 0.81)
+s_log_k_sds <- c(0.2, 0.51, 81)
 num_samples <- 100
 prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 
@@ -25,17 +25,18 @@ get_simulation_based_thresholds <- function(results, n_tests){
                                         lower = 0, upper = 1)$root},
                                error = function(e){return(NA)})
     
-    
     sim_based_thresholds <- rbind(sim_based_thresholds, c(savage_dickey_bf, directional_bf_upper, directional_bf_lower, hdi, p_effect_upper))
   }
-  colnames(sim_based_thresholds) <- c("savage_dickey_bf", "directional_bf_upper", "directional_bf_lower", "hdi", "p_effect_upper")
+  sim_based_thresholds$n_tests <- seq(1:n_tests)
+  colnames(sim_based_thresholds) <- c("savage_dickey_bf", "directional_bf_upper", "directional_bf_lower", "hdi", "p_effect_upper", "n_tests")
   
-  return(sim_thresholds)
+  return(sim_based_thresholds)
 }
 
 
 get_percentage_hdi_outside_zero <- function(hdi_width, results){
-  hdis <- data.frame()
+  hdis <- vector('list', nrow(results))
+  counter <- 1
   
   for (i in 1:length(s_log_k_sds)){
     sd_path <- file.path("out", paste0("sd_", gsub("\\.", "_", s_log_k_sds[i])))
@@ -52,10 +53,12 @@ get_percentage_hdi_outside_zero <- function(hdi_width, results){
         hdi_upper <- hdi(posterior_samples_mu_s_log_k, ci = hdi_width)$CI_high
         hdi_lower <- hdi(posterior_samples_mu_s_log_k, ci = hdi_width)$CI_low
         
-        hdis <- rbind(hdis, c(hdi_upper, hdi_lower))
+        hdis[[counter]] <- c(hdi_upper, hdi_lower)
+        counter <- counter + 1
       }
     }
   }
+  hdis <- as.data.frame(do.call(rbind, hdis))
   colnames(hdis) <- c("hdi_upper", "hdi_lower")
   
   n_outside <- sum(hdis$hdi_upper < 0 | hdis$hdi_lower > 0)
@@ -73,4 +76,4 @@ get_percentage_outside_p_effect_boundaries <- function(upper_boundary, results){
 
 
 sim_based_thresholds <- get_simulation_based_thresholds(df_results, 10)
-
+saveRDS(sim_based_thresholds, "sim_based_thresholds.rds")
