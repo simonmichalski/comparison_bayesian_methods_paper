@@ -9,5 +9,6 @@
 /plots_seminar.R
 /results.html
 /out
+/sim_based_thresholds.rds
 /stan_school_example
 /test_results.rds
