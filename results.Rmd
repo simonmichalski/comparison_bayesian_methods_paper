@@ -85,12 +85,134 @@ dr_p_effect_hdi <- sum(df_results$fp_p_effect_pos_conv == 1 &
                          df_results$fp_hdi_pos_conv == 0,
                        df_results$fp_p_effect_neg_conv == 1 &
                          df_results$fp_hdi_neg_conv == 0)
+
+
+# Prior sensitivity (ps; proportion of samples in which a method came to diverging results)
+get_ps_null_method <- function(column){
+  counter <- 0
+  for (i in seq(from = 1, by = 8, length.out = length(column)/8)){
+    if (all(column[i] == column[seq(i, i+7)]) == FALSE){
+      counter <- counter + 1
+    }
+  }
+  proportion <- counter/(length(column)/8)
+  return(proportion)
+}
+
+
+get_ps_directional_method <- function(column_pos, column_neg){
+  counter <- 0
+  for (i in seq(from = 1, by = 8, length.out = length(column_pos)/8)){
+    if ((all(column_pos[i] == column_pos[seq(i, i+7)]) == TRUE) &
+        (all(column_neg[i] == column_neg[seq(i, i+7)]) == TRUE)){
+      counter <- counter + 1
+    }
+  }
+  proportion <- 1 - counter/(length(column_pos)/8)
+  return(proportion)
+}
+
+
+ps_savage_dickey_bf_conv <- 
+  get_ps_null_method(df_results$fp_savage_dickey_bf_conv)
+
+ps_savage_dickey_bf_conv_0_2 <-
+  get_ps_null_method(df_results$fp_savage_dickey_bf_conv[df_results$s_log_k_sd == 0.2])
+
+ps_savage_dickey_bf_conv_0_51 <- 
+  get_ps_null_method(df_results$fp_savage_dickey_bf_conv[df_results$s_log_k_sd == 0.51])
+
+ps_savage_dickey_bf_conv_0_81 <- 
+  get_ps_null_method(df_results$fp_savage_dickey_bf_conv[df_results$s_log_k_sd == 0.81])
+
+
+ps_directional_bf_conv <- 
+  get_ps_directional_method(df_results$fp_directional_bf_pos_conv,
+                            df_results$fp_directional_bf_neg_conv)
+
+ps_directional_bf_conv_0_2 <- 
+  get_ps_directional_method(df_results$fp_directional_bf_pos_conv[df_results$s_log_k_sd == 0.2],
+                            df_results$fp_directional_bf_neg_conv[df_results$s_log_k_sd == 0.2])
+
+ps_directional_bf_conv_0_51 <-
+  get_ps_directional_method(df_results$fp_directional_bf_pos_conv[df_results$s_log_k_sd == 0.51],
+                            df_results$fp_directional_bf_neg_conv[df_results$s_log_k_sd == 0.51])
+
+ps_directional_bf_conv_0_81 <-
+  get_ps_directional_method(df_results$fp_directional_bf_pos_conv[df_results$s_log_k_sd == 0.81],
+                            df_results$fp_directional_bf_neg_conv[df_results$s_log_k_sd == 0.81])
+
+
+ps_hdi_conv <- 
+  get_ps_directional_method(df_results$fp_hdi_pos_conv,
+                            df_results$fp_hdi_neg_conv)
+
+ps_hdi_conv_0_2 <- 
+  get_ps_directional_method(df_results$fp_hdi_pos_conv[df_results$s_log_k_sd == 0.2],
+                            df_results$fp_hdi_neg_conv[df_results$s_log_k_sd == 0.2])
+
+ps_hdi_conv_0_51 <- 
+  get_ps_directional_method(df_results$fp_hdi_pos_conv[df_results$s_log_k_sd == 0.51],
+                            df_results$fp_hdi_neg_conv[df_results$s_log_k_sd == 0.51])
+
+ps_hdi_conv_0_81 <- 
+  get_ps_directional_method(df_results$fp_hdi_pos_conv[df_results$s_log_k_sd == 0.81],
+                            df_results$fp_hdi_neg_conv[df_results$s_log_k_sd == 0.81])
+
+
+ps_p_effect_conv <- 
+  get_ps_directional_method(df_results$fp_p_effect_pos_conv,
+                            df_results$fp_p_effect_neg_conv)
+
+ps_p_effect_conv_0_2 <- 
+  get_ps_directional_method(df_results$fp_p_effect_pos_conv[df_results$s_log_k_sd == 0.2],
+                            df_results$fp_p_effect_neg_conv[df_results$s_log_k_sd == 0.2])
+
+ps_p_effect_conv_0_51 <- 
+  get_ps_directional_method(df_results$fp_p_effect_pos_conv[df_results$s_log_k_sd == 0.51],
+                            df_results$fp_p_effect_neg_conv[df_results$s_log_k_sd == 0.51])
+
+ps_p_effect_conv_0_81 <- 
+  get_ps_directional_method(df_results$fp_p_effect_pos_conv[df_results$s_log_k_sd == 0.81],
+                            df_results$fp_p_effect_neg_conv[df_results$s_log_k_sd == 0.81])
+
 ```
 
 # **False positive results**
-With conventional decision thresholds, `r fp_overall` % of all hypothesis tests produced a false positive result. `r fp_savage_dickey_bf_conv` % of Savage-Dickey BFs, `r fp_directional_bf_conv` % of dBFs, `r fp_p_effect_conv` % of P(effect > 0) proportions and `r fp_hdi_conv` % of HDI decisions were false positive.
+With conventional decision thresholds, `r fp_overall``\%` of all hypothesis tests produced a false positive result. `r fp_savage_dickey_bf_conv``\%` of Savage-Dickey BFs, `r fp_directional_bf_conv``\%` of dBFs, `r fp_p_effect_conv``\%` of P(effect > 0) proportions and `r fp_hdi_conv` % of HDI decisions were false positive.
 
 # **Diverging results**
-xx
+All models with false positive Savage-Dickey BFs, HDIs or P(effect) proportions were also significant with the dBF (check with new data). `r` of false positive Savage-Dickey BFs were accompanied by a significant HDI and `r` with a significant P(effect > 0). `r` % of significant HDIs were also false positive with P(effect > 0) and `r` with the Savage-Dickey BF. When P(effect > 0) indicated an effect this was also indicated by the Savage-Dickey BF in `r`% of the models and in `r` % of HDIs.
+
+False positive dBFs were accompanied by `r`% of Savage-Dickey BFs
+
+The results of HDI and P(effect > 0) only diverged for `r` % of models.
+
+# **Prior sensitivity**
+Within `r round(ps_savage_dickey_bf_conv * 100, 2)``\%` of all samples the Savage-Dickey BF came to diverging results due to different priors. The dBF produced inconsistent results within `r round(ps_directional_bf_conv * 100, 2)``\%` of all samples. Different priors produced different results within `r round(ps_hdi_conv * 100, 2)``\%` of all samples with the HDI decision rule and P(effect > 0) came to diverging results within `r round(ps_p_effect_conv * 100, 2)``\%` of all samples. See Table `\ref{tab:prior_sensitivity}` for the prior sensitivities per effect SD.`\\`
+
+```
+\begin{table}[H]
+    \caption{Prior sensitivity of each inference method per effect SD}
+    \label{tab:prior_sensitivity}
+    \begin{tabularx}{\textwidth}{lXXX}
+    \midrule
+    \multicolumn{1}{c}{Inference method} & \multicolumn{3}{c}{Prior sensitivity per effect SD}\\
+    \cmidrule{2-4}
+    \multicolumn{1}{c}{} & \multicolumn{1}{c}{0.2} & \multicolumn{1}{c}{0.51} & \multicolumn{1}{c}{0.81}\\
+    \midrule
+    Savage-Dickey $BF_{10}$ & \centering `r ps_savage_dickey_bf_conv_0_2` & \centering `r ps_savage_dickey_bf_conv_0_51` & \centering `r ps_savage_dickey_bf_conv_0_81`\arraybackslash\\
+    $dBF_{+-}$ & \centering `r ps_directional_bf_conv_0_2` & \centering `r ps_directional_bf_conv_0_51` & \centering `r ps_directional_bf_conv_0_81`\arraybackslash\\
+    95\% HDI & \centering `r ps_hdi_conv_0_2` & \centering `r ps_hdi_conv_0_51` & \centering `r ps_hdi_conv_0_81`\arraybackslash\\
+    P(effect > 0) & \centering `r ps_p_effect_conv_0_2` & \centering `r ps_p_effect_conv_0_51` & \centering `r ps_p_effect_conv_0_81`\arraybackslash\\
+    \midrule
+    \end{tabularx}
+\end{table}
+```
+
+
+
+
+
 
 
