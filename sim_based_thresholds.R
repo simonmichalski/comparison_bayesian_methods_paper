@@ -1,7 +1,7 @@
 library("rstan")
 library("bayestestR")
 
-s_log_k_sds <- c(0.2, 0.51, 81)
+s_log_k_sds <- c(0.2, 0.51, 0.81)
 num_samples <- 100
 prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 
@@ -18,7 +18,7 @@ get_simulation_based_thresholds <- function(results, n_tests){
     directional_bf_lower <- quantile(results$directional_bf, probs = 0.025/n_tests)[[1]]
     
     hdi <- tryCatch({uniroot(function(hdi_width) get_percentage_hdi_outside_zero(hdi_width, results) - (0.05/n_tests),
-                             lower = 0.1, upper = 1)$root},
+                             lower = 0.9, upper = 1)$root},
                     error = function(e){return(NA)})
     
     p_effect_upper <- tryCatch({uniroot(function(upper_boundary) get_percentage_outside_p_effect_boundaries(upper_boundary, results) - (0.05/n_tests),
