@@ -25,7 +25,7 @@ get_vectors <- function(){
     prior_sd <- as.numeric(paste(prior_sd_values, collapse = "."))
     prior_sds <- append(prior_sds, prior_sd)
   }
-  return(list(sds, sample_numbers, prior_sds))
+  return(list(sds = sds, sample_numbers = sample_numbers, prior_sds = prior_sds))
 }
 
 vectors <- get_vectors()
