@@ -91,7 +91,7 @@ parallel_modelling <- function(){
       save_warmup = FALSE
     )
 
-    sd_path <- file.path("out_refit", paste0("sd_", gsub("0.", "0_", sds[i])))
+    sd_path <- file.path("out", paste0("sd_", gsub("0.", "0_", sds[i])))
     model_path <- file.path(sd_path, paste0("sample_", sample_numbers[i]), paste0("model_prior_sd_", gsub("\\.", "_", prior_sds[i]), ".rds"))
     saveRDS(fit, model_path)
   }
