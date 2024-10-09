@@ -8,25 +8,65 @@ library('papaja')
 
 df_results <- readRDS('final_results.rds')
 
+# Mean
+mean_savage_dickey_bf <- mean(df_results$savage_dickey_bf)
+mean_directional_bf <- mean(df_results$directional_bf)
+mean_p_effect <- mean(df_results$p_effect)
+
+# SD
+sd_savage_dickey_bf <- sd(df_results$savage_dickey_bf)
+sd_directional_bf <- sd(df_results$directional_bf)
+sd_p_effect <- sd(df_results$p_effect)
+
+# Mean within sample range (mwsr)
+get_mean_within_sample_range <- function(column){
+  range_vec <- vector()
+  for (i in seq(from = 1, by = 8, length.out = length(column)/8)){
+    range_vec <- append(range_vec, range(column[seq(i, i+7)]))
+  }
+  return(mean(range_vec))
+}
+
+mwsr_savage_dickey_bf <- get_mean_within_sample_range(df_results$savage_dickey_bf)
+mwsr_directional_bf <- get_mean_within_sample_range(df_results$directional_bf)
+mwsr_p_effect <- get_mean_within_sample_range(df_results$p_effect)
+
 # False positive results
-fp_savage_dickey_bf_conv <- round((sum(df_results$fp_savage_dickey_bf_conv)/nrow(df_results))*100,2)
+fp_savage_dickey_bf_3 <- sum(df_results$fp_savage_dickey_bf_3)/nrow(df_results)
 
-fp_directional_bf_conv <- round((sum(df_results$fp_directional_bf_pos_conv,
-                                     df_results$fp_directional_bf_neg_conv)/nrow(df_results))*100,2)
+fp_directional_bf_3 <- sum(df_results$fp_directional_bf_3_pos,
+                           df_results$fp_directional_bf_1_3_neg)/nrow(df_results)
 
-fp_p_effect_conv <- round((sum(df_results$fp_p_effect_pos_conv,
-                               df_results$fp_p_effect_neg_conv)/nrow(df_results))*100,2)
+fp_directional_bf_10 <- sum(df_results$fp_directional_bf_10_pos,
+                            df_results$fp_directional_bf_1_10_neg)/nrow(df_results)
 
-fp_hdi_conv <- round((sum(df_results$fp_hdi_pos_conv,
-                          df_results$fp_hdi_neg_conv)/nrow(df_results))*100,2)
+fp_directional_bf_30 <- sum(df_results$fp_directional_bf_30_pos,
+                            df_results$fp_directional_bf_1_30_neg)/nrow(df_results)
 
-fp_overall <- round((sum(df_results$fp_savage_dickey_bf_conv,
-                         df_results$fp_directional_bf_pos_conv,
-                         df_results$fp_directional_bf_neg_conv,
-                         df_results$fp_p_effect_pos_conv,
-                         df_results$fp_p_effect_neg_conv,
-                         df_results$fp_hdi_pos_conv,
-                         df_results$fp_hdi_neg_conv)/(nrow(df_results)*4))*100,2)
+fp_directional_bf_100 <- sum(df_results$fp_directional_bf_100_pos,
+                             df_results$fp_directional_bf_1_100_neg)/nrow(df_results)
+
+fp_p_effect_95 <- sum(df_results$fp_p_effect_95_pos,
+                      df_results$fp_p_effect_05_neg)/nrow(df_results)
+
+fp_p_effect_975 <- sum(df_results$fp_p_effect_975_pos,
+                       df_results$fp_p_effect_025_neg)/nrow(df_results)
+
+fp_p_effect_99 <- sum(df_results$fp_p_effect_99_pos,
+                      df_results$fp_p_effect_01_neg)/nrow(df_results)
+
+fp_hdi_80 <- sum(df_results$fp_hdi_80_pos,
+                 df_results$fp_hdi_80_neg)/nrow(df_results)
+
+fp_hdi_90 <- sum(df_results$fp_hdi_90_pos,
+                 df_results$fp_hdi_90_neg)/nrow(df_results)
+
+fp_hdi_95 <- sum(df_results$fp_hdi_95_pos,
+                 df_results$fp_hdi_95_neg)/nrow(df_results)
+
+fp_hdi_99 <- sum(df_results$fp_hdi_99_pos,
+                 df_results$fp_hdi_99_neg)/nrow(df_results)
+
 
 # Diverging results (first method shows effect, second method not)
 dr_savage_dickey_bf_directional_bf <- sum(df_results$fp_savage_dickey_bf_conv == 1 &
@@ -178,15 +218,32 @@ ps_p_effect_conv_0_81 <-
 
 ```
 
-# **False positive results**
-With conventional decision thresholds, `r fp_overall``\%` of all hypothesis tests produced a false positive result. `r fp_savage_dickey_bf_conv``\%` of Savage-Dickey BFs, `r fp_directional_bf_conv``\%` of dBFs, `r fp_p_effect_conv``\%` of P(effect > 0) proportions and `r fp_hdi_conv` % of HDI decisions were false positive.
+`\section{Results}`
+Within samples, the mean range of Savage-Dickey BFs was `r mwsr_savage_dickey_bf`, the mean range of dBFs was `r mwsr_directional_bf` and the mean range of P(effect > 0) proportions was `r mwsr_p_effect`.`\\`
+
+`\subsection{False positive results}`
+With a decision threshold of 3, `r round(fp_savage_dickey_bf_3 * 100, 2)``\%` of Savage-Dickey BFs were false positive. With a decision threshold of 1/3 for a negative and 3 for a positive effect, `r round(fp_directional_bf_3 * 100, 2)``\%` of dBFs were false positive. With 1/10 and 10 as directional decision thresholds, `r round(fp_directional_bf_10 * 100, 2)``\%` of dBFs were false positive, with 1/30 and 30, `r round(fp_directional_bf_30 * 100, 2)``\%` and with 1/100 and 100, `r round(fp_directional_bf_100 * 100, 2)``\%`. With a 80`\%` HDI, `r round(fp_hdi_80 * 100, 2)``\%` of results were false positive, with a 90`\%` HDI, `r round(fp_hdi_90 * 100, 2)``\%`, with a 95`\%` HDI, `r round(fp_hdi_95 * 100, 2)``\%` and with a 99`\%` HDI, `r round(fp_hdi_99 * 100, 2)``\%`. With P(effect > 0) >.95 for a positive and P(effect > 0) <.05 for negative effect, `r round(fp_p_effect_95 * 100, 2)``\%` of results were false positive. With >.975 and <.025 as directional thresholds, `r round(fp_p_effect_975 * 100, 2)``\%` and with >.99 and <.01, `r round(fp_p_effect_99 * 100, 2)``\%` of results were false positive. See Figure `\ref{fig:fig_fp}` for the proportions of false positive results per effect SD.`\\`
+
+`\subsection{Simulation-based decision thresholds}`
+
+`\subsubsection{Multiple tests}`
+
+`\subsubsection{Overlap of false positive results}`
+
+`\subsubsection{Prior sensitivity}`
+
+
+
+
+
+
 
 # **Diverging results**
 All models with false positive Savage-Dickey BFs, HDIs or P(effect) proportions were also significant with the dBF (check with new data). `r` of false positive Savage-Dickey BFs were accompanied by a significant HDI and `r` with a significant P(effect > 0). `r` % of significant HDIs were also false positive with P(effect > 0) and `r` with the Savage-Dickey BF. When P(effect > 0) indicated an effect this was also indicated by the Savage-Dickey BF in `r`% of the models and in `r` % of HDIs.
 
 False positive dBFs were accompanied by `r`% of Savage-Dickey BFs
 
-The results of HDI and P(effect > 0) only diverged for `r` % of models.
+The results of HDI and P(effect > 0) diverged for `r` % of models.
 
 # **Prior sensitivity**
 Within `r round(ps_savage_dickey_bf_conv * 100, 2)``\%` of all samples the Savage-Dickey BF came to diverging results due to different priors. The dBF produced inconsistent results within `r round(ps_directional_bf_conv * 100, 2)``\%` of all samples. Different priors produced different results within `r round(ps_hdi_conv * 100, 2)``\%` of all samples with the HDI decision rule and P(effect > 0) came to diverging results within `r round(ps_p_effect_conv * 100, 2)``\%` of all samples. See Table `\ref{tab:prior_sensitivity}` for the prior sensitivities per effect SD.`\\`
