@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+/analysis_test
 /convergence_check2.R
 /discounting_model.rds
 /final_results.rds
