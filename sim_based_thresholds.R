@@ -2,7 +2,7 @@ library("rstan")
 library("bayestestR")
 
 s_log_k_sds <- c(0.2, 0.51, 0.81)
-num_samples <- 100
+num_samples <- 200
 prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 
 df_results <- readRDS("final_results.rds")
@@ -18,17 +18,21 @@ get_simulation_based_thresholds <- function(results, n_tests){
     directional_bf_lower <- quantile(results$directional_bf, probs = 0.025/n_tests)[[1]]
     
     hdi <- tryCatch({uniroot(function(hdi_width) get_percentage_hdi_outside_zero(hdi_width, results) - (0.05/n_tests),
-                             lower = 0.9, upper = 1)$root},
+                             lower = 0.95, upper = 1)$root},
                     error = function(e){return(NA)})
     
-    p_effect_upper <- tryCatch({uniroot(function(upper_boundary) get_percentage_outside_p_effect_boundaries(upper_boundary, results) - (0.05/n_tests),
+    p_effect_upper <- tryCatch({uniroot(function(upper_boundary) get_percentage_outside_p_effect__upper_boundary(upper_boundary, results) - (0.025/n_tests),
                                         lower = 0, upper = 1)$root},
                                error = function(e){return(NA)})
     
-    sim_based_thresholds <- rbind(sim_based_thresholds, c(savage_dickey_bf, directional_bf_upper, directional_bf_lower, hdi, p_effect_upper))
+    p_effect_lower <- tryCatch({uniroot(function(lower_boundary) get_percentage_outside_p_effect__lower_boundary(lower_boundary, results) - (0.025/n_tests),
+                                        lower = 0, upper = 1)$root},
+                               error = function(e){return(NA)})
+    
+    sim_based_thresholds <- rbind(sim_based_thresholds, c(savage_dickey_bf, directional_bf_upper, directional_bf_lower, hdi, p_effect_upper, p_effect_lower))
   }
   sim_based_thresholds$n_tests <- seq(1:n_tests)
-  colnames(sim_based_thresholds) <- c("savage_dickey_bf", "directional_bf_upper", "directional_bf_lower", "hdi", "p_effect_upper", "n_tests")
+  colnames(sim_based_thresholds) <- c("savage_dickey_bf", "directional_bf_upper", "directional_bf_lower", "hdi", "p_effect_upper", "p_effect_lower", "n_tests")
   
   return(sim_based_thresholds)
 }
@@ -68,8 +72,15 @@ get_percentage_hdi_outside_zero <- function(hdi_width, results){
 }
 
 
-get_percentage_outside_p_effect_boundaries <- function(upper_boundary, results){
-  n_outside <- sum(results$p_effect < 1-upper_boundary | results$p_effect > upper_boundary)
+get_percentage_outside_p_effect__upper_boundary <- function(upper_boundary, results){
+  n_outside <- sum(results$p_effect > upper_boundary)
+  percentage <- n_outside / nrow(results)
+  return(percentage)
+}
+
+
+get_percentage_outside_p_effect__lower_boundary <- function(lower_boundary, results){
+  n_outside <- sum(results$p_effect < lower_boundary)
   percentage <- n_outside / nrow(results)
   return(percentage)
 }
