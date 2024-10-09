@@ -46,10 +46,10 @@ get_stan_data <- function(){
   
   return(stan_data_list)
 }
-
+stan_data_list <- get_stan_data()
 
 parallel_modelling <- function(){
-  stan_data_list <- get_stan_data()
+  
   
   num_cores <- detectCores(logical = TRUE)
   cluster <- makeCluster(num_cores - 1)
