@@ -2,7 +2,7 @@ library("rstan")
 library("bayestestR")
 
 s_log_k_sds <- c(0.2, 0.51, 0.81)
-num_samples <- 100
+num_samples <- 200
 prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 
 
@@ -25,6 +25,8 @@ get_savage_dickey_bf <- function(posterior_samples, prior_sd){
 
 
 get_results_df <- function(){
+  start_time <- Sys.time()
+  
   results <- vector('list', length(s_log_k_sds)*num_samples*length(prior_sds))
   counter <- 1
   
@@ -101,6 +103,9 @@ get_results_df <- function(){
   results$fp_hdi_95_neg <- ifelse(results$hdi_95_upper < 0, 1, 0)
   results$fp_hdi_99_pos <- ifelse(results$hdi_99_lower > 0, 1, 0)
   results$fp_hdi_99_neg <- ifelse(results$hdi_99_upper < 0, 1, 0)
+  
+  end_time <- Sys.time() - start_time
+  cat(end_time, attr(end_time, "units"))
   
   return(results)
 }
