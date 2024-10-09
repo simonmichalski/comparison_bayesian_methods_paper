@@ -37,7 +37,7 @@ plot_savage_dickey_bf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = sav
                 group = as.factor(s_log_k_sd)),
             linewidth = line_width,
             position = position_dodge(width = dodge_width)) +
-  geom_hline(yintercept = 3, linetype = 'dashed') +
+  #geom_hline(yintercept = 3, linetype = 'dashed') +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA),
@@ -66,8 +66,8 @@ plot_dbf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = directional_bf, 
                 group = as.factor(s_log_k_sd)),
             linewidth = line_width,
             position = position_dodge(width = dodge_width)) +
-  geom_hline(yintercept = 3, linetype = 'dashed') +
-  geom_hline(yintercept = 0.33, linetype = 'dashed') +
+  #geom_hline(yintercept = 3, linetype = 'dashed') +
+  #geom_hline(yintercept = 0.33, linetype = 'dashed') +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA),
@@ -91,7 +91,7 @@ plot_hdi_rope <- ggplot(df_results, aes(x = as.factor(prior_sd), y = prop_hdi_in
                 group = as.factor(s_log_k_sd)),
             linewidth = line_width,
             position = position_dodge(width = dodge_width)) +
-  geom_hline(yintercept = 0, linetype = 'dashed') +
+  #geom_hline(yintercept = 0, linetype = 'dashed') +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA),
@@ -115,8 +115,8 @@ plot_p_effect <- ggplot(df_results, aes(x = as.factor(prior_sd), y = p_effect, c
                 group = as.factor(s_log_k_sd)),
             linewidth = line_width,
             position = position_dodge(width = dodge_width)) +
-  geom_hline(yintercept = 0.95, linetype = 'dashed') +
-  geom_hline(yintercept = 0.05, linetype = 'dashed') +
+  #geom_hline(yintercept = 0.95, linetype = 'dashed') +
+  #geom_hline(yintercept = 0.05, linetype = 'dashed') +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA),
@@ -171,39 +171,17 @@ data_fp_p_effect_99 <- aggregate(fp_p_effect_99_pos + fp_p_effect_01_neg ~ prior
 names(data_fp_p_effect_99)[names(data_fp_p_effect_99) == "fp_p_effect_99_pos + fp_p_effect_01_neg"] <- "fp_p_effect_99"
 
 
-axis_text_size <- 7
-axis_title_size <- 6
-plot_title_size <- 7
-border_size <- 0.2
+axis_text_size <- 4.5
+axis_title_size <- 7
+plot_title_size <- 6
+border_size <- 0.3
 tick_length <- -0.05
 tick_width <- 0.3
 line_width <- 1
 hline_width <- 0.3
 
 plot_fp_savage_dickey_bf_3 <- ggplot(data_fp_savage_dickey_bf_3, aes(x = as.factor(prior_sd), y = fp_savage_dickey_bf_3/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "Prop. false positives", color = "Population SD", title = expression("Savage-Dickey" ~ BF[10] > 3)) +
-  geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
-    axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = c(0.75,0.75),
-    legend.background = element_rect('transparent'),
-    legend.key.size = unit(0.6, "lines"),
-    legend.title = element_text(size = 7, margin = margin(b = 0)),
-    legend.text = element_text(size = 7),
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
-    axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
-    plot.title = element_text(hjust = 0.5, size = plot_title_size)
-  ) +
-  coord_cartesian(ylim = c(0, 0.13))
-
-plot_fp_p_effect_95 <- ggplot(data_fp_p_effect_95, aes(x = as.factor(prior_sd), y = fp_p_effect_95/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "Prop. false positives", title = "P(effect > 0) with 5% threshold") +
+  labs(x = "Prior SD", y = "Prop. false positives", title = expression("Savage-Dickey" ~ BF[10] > 3)) +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
   theme(
@@ -215,12 +193,29 @@ plot_fp_p_effect_95 <- ggplot(data_fp_p_effect_95, aes(x = as.factor(prior_sd), 
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+plot_fp_p_effect_95 <- ggplot(data_fp_p_effect_95, aes(x = as.factor(prior_sd), y = fp_p_effect_95/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(x = "Prior SD", title = "P(effect > 0) [.05, .95]") +
+  geom_line(linewidth = line_width) +
+  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.title.y = element_blank(),
     axis.text.y = element_text(size = axis_text_size),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
 plot_fp_p_effect_975 <- ggplot(data_fp_p_effect_975, aes(x = as.factor(prior_sd), y = fp_p_effect_975/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "Prop. false positives", title = "P(effect > 0) with 2.5% threshold") +
+  labs(x = "Prior SD", title = "P(effect > 0) [.025, .975]") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
   theme(
@@ -231,13 +226,13 @@ plot_fp_p_effect_975 <- ggplot(data_fp_p_effect_975, aes(x = as.factor(prior_sd)
     legend.position = 'none',
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    axis.title.y = element_text(size = axis_title_size),
+    axis.title.y = element_blank(),
     axis.text.y = element_text(size = axis_text_size),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
 plot_fp_p_effect_99 <- ggplot(data_fp_p_effect_99, aes(x = as.factor(prior_sd), y = fp_p_effect_99/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "Prop. false positives", title = "P(effect > 0) with 1% threshold") +
+  labs(x = "Prior SD", title = "P(effect > 0) [.01, .99]") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
   theme(
@@ -248,13 +243,13 @@ plot_fp_p_effect_99 <- ggplot(data_fp_p_effect_99, aes(x = as.factor(prior_sd), 
     legend.position = 'none',
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    axis.title.y = element_text(size = axis_title_size),
+    axis.title.y = element_blank(),
     axis.text.y = element_text(size = axis_text_size),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
 plot_fp_dbf_3 <- ggplot(data_fp_directional_bf_3, aes(x = as.factor(prior_sd), y = fp_directional_bf_3/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(y = "Prop. false positives", title = expression("dBF"["+-"])) +
+  labs(y = "Prop. false positives", title = expression("dBF"["+-"] ~~ "[1/3, 3]"), color = "Population SD") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
   theme(
@@ -262,7 +257,12 @@ plot_fp_dbf_3 <- ggplot(data_fp_directional_bf_3, aes(x = as.factor(prior_sd), y
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
     axis.ticks = element_line(linewidth = tick_width),
     axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = 'none',
+    legend.position = c(0.7,0.35),
+    legend.background = element_rect('transparent'),
+    legend.key.size = unit(0.5, "lines"),
+    legend.title = element_text(size = 5, margin = margin(b = 0)),
+    legend.text = element_text(size = 5),
+    legend.key.height = unit(0.2, "cm"),
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     axis.title.y = element_text(size = axis_title_size),
@@ -271,7 +271,7 @@ plot_fp_dbf_3 <- ggplot(data_fp_directional_bf_3, aes(x = as.factor(prior_sd), y
   )
 
 plot_fp_dbf_10 <- ggplot(data_fp_directional_bf_10, aes(x = as.factor(prior_sd), y = fp_directional_bf_10/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(y = "Prop. false positives", title = expression("dBF"["+-"])) +
+  labs(title = expression("dBF"["+-"] ~~ "[1/10, 10]")) +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
   theme(
@@ -282,13 +282,13 @@ plot_fp_dbf_10 <- ggplot(data_fp_directional_bf_10, aes(x = as.factor(prior_sd),
     legend.position = 'none',
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    axis.title.y = element_text(size = axis_title_size),
+    axis.title.y = element_blank(),
     axis.text.y = element_text(size = axis_text_size),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
 plot_fp_dbf_30 <- ggplot(data_fp_directional_bf_30, aes(x = as.factor(prior_sd), y = fp_directional_bf_30/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(y = "Prop. false positives", title = expression("dBF"["+-"])) +
+  labs(title = expression("dBF"["+-"] ~~ "[1/30, 30]")) +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
   theme(
@@ -299,13 +299,13 @@ plot_fp_dbf_30 <- ggplot(data_fp_directional_bf_30, aes(x = as.factor(prior_sd),
     legend.position = 'none',
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    axis.title.y = element_text(size = axis_title_size),
+    axis.title.y = element_blank(),
     axis.text.y = element_text(size = axis_text_size),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
 plot_fp_dbf_100 <- ggplot(data_fp_directional_bf_100, aes(x = as.factor(prior_sd), y = fp_directional_bf_100/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(y = "Prop. false positives", title = expression("dBF"["+-"])) +
+  labs(title = expression("dBF"["+-"] ~~ "[1/100, 100]")) +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
   theme(
@@ -316,7 +316,7 @@ plot_fp_dbf_100 <- ggplot(data_fp_directional_bf_100, aes(x = as.factor(prior_sd
     legend.position = 'none',
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
-    axis.title.y = element_text(size = axis_title_size),
+    axis.title.y = element_blank(),
     axis.text.y = element_text(size = axis_text_size),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
@@ -339,7 +339,7 @@ plot_fp_hdi_80 <- ggplot(data_fp_hdi_80, aes(x = as.factor(prior_sd), y = fp_hdi
   )
 
 plot_fp_hdi_90 <- ggplot(data_fp_hdi_90, aes(x = as.factor(prior_sd), y = fp_hdi_90/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "Prop. false positives", title = "90% HDI") +
+  labs(x = "Prior SD", title = "90% HDI") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
   theme(
@@ -348,7 +348,7 @@ plot_fp_hdi_90 <- ggplot(data_fp_hdi_90, aes(x = as.factor(prior_sd), y = fp_hdi
     axis.ticks = element_line(linewidth = tick_width),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
-    axis.title.y = element_text(size = axis_title_size),
+    axis.title.y = element_blank(),
     axis.text.y = element_text(size = axis_text_size),
     axis.title.x = element_text(size = axis_title_size),
     axis.text.x = element_text(size = axis_text_size),
@@ -356,7 +356,7 @@ plot_fp_hdi_90 <- ggplot(data_fp_hdi_90, aes(x = as.factor(prior_sd), y = fp_hdi
   )
 
 plot_fp_hdi_95 <- ggplot(data_fp_hdi_95, aes(x = as.factor(prior_sd), y = fp_hdi_95/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "Prop. false positives", title = "95% HDI") +
+  labs(x = "Prior SD", title = "95% HDI") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
   theme(
@@ -365,7 +365,7 @@ plot_fp_hdi_95 <- ggplot(data_fp_hdi_95, aes(x = as.factor(prior_sd), y = fp_hdi
     axis.ticks = element_line(linewidth = tick_width),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
-    axis.title.y = element_text(size = axis_title_size),
+    axis.title.y = element_blank(),
     axis.text.y = element_text(size = axis_text_size),
     axis.title.x = element_text(size = axis_title_size),
     axis.text.x = element_text(size = axis_text_size),
@@ -373,7 +373,7 @@ plot_fp_hdi_95 <- ggplot(data_fp_hdi_95, aes(x = as.factor(prior_sd), y = fp_hdi
   )
 
 plot_fp_hdi_99 <- ggplot(data_fp_hdi_99, aes(x = as.factor(prior_sd), y = fp_hdi_99/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "Prop. false positives", title = "99% HDI") +
+  labs(x = "Prior SD", title = "99% HDI") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
   theme(
@@ -382,7 +382,7 @@ plot_fp_hdi_99 <- ggplot(data_fp_hdi_99, aes(x = as.factor(prior_sd), y = fp_hdi
     axis.ticks = element_line(linewidth = tick_width),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
-    axis.title.y = element_text(size = axis_title_size),
+    axis.title.y = element_blank(),
     axis.text.y = element_text(size = axis_text_size),
     axis.title.x = element_text(size = axis_title_size),
     axis.text.x = element_text(size = axis_text_size),
