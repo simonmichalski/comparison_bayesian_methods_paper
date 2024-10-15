@@ -1,8 +1,8 @@
-library("rstan")
+#library("rstan")
 library("bayesplot")
 library("ggplot2")
 library("patchwork")
-library("dplyr")
+library("tidyr")
 
 #fit <- readRDS("out/test3_sd_0_51/model_prior_sd_0_2.rds")
 
@@ -14,21 +14,28 @@ library("dplyr")
 #mcmc_areas(posterior, pars = c('mu_s_log_k'), prob = 0.95)
 
 df_results <- readRDS("final_results.rds")
+df_sim_thres <- readRDS("analysis_test/sim_based_thresholds_test.rds")
 
 # Values
 data_savage_dickey_bf <- aggregate(savage_dickey_bf ~ s_log_k_sd + prior_sd, df_results, mean)
 data_directional_bf <- aggregate(directional_bf ~ s_log_k_sd + prior_sd, df_results, mean)
 data_p_effect <- aggregate(p_effect ~ s_log_k_sd + prior_sd, df_results, mean)
-#data_hdi_rope <- aggregate(prop_hdi_in_rope_conv ~ s_log_k_sd + prior_sd, df_results, mean)
 
-dodge_width <- 0.7
+dodge_width <- 0.8
+point_size <- 0.5
+axis_text_size <- 4.5
+axis_title_size <- 7
+border_size <- 0.3
+tick_length <- -0.05
+tick_width <- 0.3
 line_width <- 1
 
 plot_savage_dickey_bf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = savage_dickey_bf, color = as.factor(s_log_k_sd))) +
   labs(x = "", y = expression("Savage-Dickey BF"[10]), color = "Population SD") +
   geom_jitter(
     position = position_dodge(width = dodge_width),
-    alpha = 0.5
+    alpha = 0.5,
+    size = point_size
   ) +
   geom_line(data = data_savage_dickey_bf,
             aes(x = as.factor(prior_sd), 
@@ -37,19 +44,21 @@ plot_savage_dickey_bf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = sav
                 group = as.factor(s_log_k_sd)),
             linewidth = line_width,
             position = position_dodge(width = dodge_width)) +
-  #geom_hline(yintercept = 3, linetype = 'dashed') +
   theme(
     panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA),
-    axis.ticks.length = unit(-0.1, 'cm'),
-    legend.position = c(0.75,0.75),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    axis.ticks = element_line(linewidth = tick_width),
+    legend.position = c(0.8,0.75),
     legend.background = element_rect('transparent'),
-    legend.key.size = unit(0.6, "lines"),
-    legend.title = element_text(size = 7, margin = margin(b = 0)),
-    legend.text = element_text(size = 7),
-    axis.title.y = element_text(size = 9),
-    axis.text.y = element_text(size = 7),
-    axis.text.x = element_text(size = 7)
+    legend.key.size = unit(0.5, "lines"),
+    legend.title = element_text(size = 5, margin = margin(b = 0)),
+    legend.text = element_text(size = 5),
+    legend.key.height = unit(0.2, "cm"),
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size)
   )
 
 plot_dbf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = directional_bf, color = as.factor(s_log_k_sd))) +
@@ -57,7 +66,8 @@ plot_dbf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = directional_bf, 
   scale_y_log10(labels = scales::comma) +
   geom_jitter(
     position = position_dodge(width = dodge_width),
-    alpha = 0.5
+    alpha = 0.5,
+    size = point_size
   ) +
   geom_line(data = data_directional_bf,
             aes(x = as.factor(prior_sd), 
@@ -66,47 +76,25 @@ plot_dbf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = directional_bf, 
                 group = as.factor(s_log_k_sd)),
             linewidth = line_width,
             position = position_dodge(width = dodge_width)) +
-  #geom_hline(yintercept = 3, linetype = 'dashed') +
-  #geom_hline(yintercept = 0.33, linetype = 'dashed') +
   theme(
     panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA),
-    axis.ticks.length = unit(-0.1, 'cm'),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    axis.ticks = element_line(linewidth = tick_width),
     legend.position = 'none',
-    axis.title.y = element_text(size = 9),
-    axis.text.y = element_text(size = 7),
-    axis.text.x = element_blank()
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size)
   )
 
-plot_hdi_rope <- ggplot(df_results, aes(x = as.factor(prior_sd), y = prop_hdi_in_rope_conv, color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "Prop. 95% HDI in ROPE") +
-  geom_jitter(
-    position = position_dodge(width = dodge_width),
-    alpha = 0.5
-  ) +
-  geom_line(data = data_hdi_rope,
-            aes(x = as.factor(prior_sd), 
-                y = prop_hdi_in_rope_conv, 
-                color = as.factor(s_log_k_sd), 
-                group = as.factor(s_log_k_sd)),
-            linewidth = line_width,
-            position = position_dodge(width = dodge_width)) +
-  #geom_hline(yintercept = 0, linetype = 'dashed') +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA),
-    axis.ticks.length = unit(-0.1, 'cm'),
-    legend.position = 'none',
-    axis.title.y = element_text(size = 9),
-    axis.text.y = element_text(size = 7),
-    axis.text.x = element_text(size = 7)
-  )
 
 plot_p_effect <- ggplot(df_results, aes(x = as.factor(prior_sd), y = p_effect, color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", y = "P(effect > 0)") +
   geom_jitter(
     position = position_dodge(width = dodge_width),
-    alpha = 0.5
+    alpha = 0.5,
+    size = point_size
   ) +
   geom_line(data = data_p_effect,
             aes(x = as.factor(prior_sd), 
@@ -115,23 +103,23 @@ plot_p_effect <- ggplot(df_results, aes(x = as.factor(prior_sd), y = p_effect, c
                 group = as.factor(s_log_k_sd)),
             linewidth = line_width,
             position = position_dodge(width = dodge_width)) +
-  #geom_hline(yintercept = 0.95, linetype = 'dashed') +
-  #geom_hline(yintercept = 0.05, linetype = 'dashed') +
   theme(
     panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA),
-    axis.ticks.length = unit(-0.1, 'cm'),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    axis.ticks = element_line(linewidth = tick_width),
     legend.position = 'none',
-    axis.title.y = element_text(size = 9),
-    axis.text.y = element_text(size = 7),
-    axis.text.x = element_text(size = 7)
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size)
   )
 
 
-multiplot_values <- (plot_savage_dickey_bf + plot_dbf) / (plot_hdi_rope + plot_p_effect) +
+multiplot_values <- plot_savage_dickey_bf + plot_dbf + plot_p_effect +
   plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 14))
 
-ggsave("plots/multiplot_values.pdf", plot = multiplot_values, width = 6, height = 4, units = "in", dpi = 300)
+ggsave("plots/multiplot_values.pdf", plot = multiplot_values, width = 6, height = 2, units = "in", dpi = 300)
 
 
 # False positive results (conv)
@@ -399,21 +387,106 @@ ggsave("plots/multiplot_fp.pdf", plot = multiplot_fp, width = 6, height = 4, uni
 
 
 # Simulation-based decision thresholds (sbdt)
-sim_based_thresholds <- readRDS("sim_based_thresholds.rds")
+axis_text_size <- 4.5
+axis_title_size <- 7
+border_size <- 0.3
+tick_length <- -0.05
+tick_width <- 0.3
+line_width <- 1
 
-data_sbdt_directional_bf <- pivot_longer(sim_based_thresholds[,c("directional_bf_upper", "directional_bf_lower", "n_tests")], 
-                                         cols = starts_with("directional_bf"),
-                                         names_to = "threshold", values_to = "value")
-
-plot_sbdt_savage_dickey_bf <- ggplot(sim_based_thresholds, aes(x = as.factor(n_tests), y = value, group = as.factor(threshold))) +
+plot_sbdt_savage_dickey_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = savage_dickey_bf, group = 1)) +
   labs(x = "n tests", y = expression("Savage-Dickey BF"[10])) +
-  geom_line(linewidth = 1)
+  geom_line(linewidth = line_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size)
+  )
 
-plot_sbdt_directional_bf <- ggplot(data_sbdt_directional_bf, aes(x = as.factor(n_tests), y = directional_bf, group = as.factor(upper_lower)))
+plot_sbdt_directional_bf_lower <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = directional_bf_lower, group = 1)) +
+  labs(x = "n tests", y = expression("dBF"["+-"] ~~ "lower")) +
+  geom_line(linewidth = line_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size)
+  )
 
-plot_sbdt_hdi_bf <- ggplot(data_sbdt_hdi, aes(x = as.factor(n_tests), y = hdi))
+plot_sbdt_directional_bf_upper <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = directional_bf_upper, group = 1)) +
+  labs(x = "n tests", y = expression("dBF"["+-"] ~~ "upper")) +
+  geom_line(linewidth = line_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size)
+  )
+  
+plot_sbdt_hdi_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = hdi, group = 1)) +
+  labs(x = "n tests", y = "HDI width") +
+  geom_line(linewidth = line_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size)
+  )
 
-plot_sbdt_p_effect_bf <- ggplot(data_sbdt_p_effect, aes(x = as.factor(n_tests), y = p_effect))
+plot_sbdt_p_effect_bf_lower <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = p_effect_lower, group = 1)) +
+  labs(x = "n tests", y = "P(effect > 0) lower") +
+  geom_line(linewidth = line_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size)
+  )
+
+plot_sbdt_p_effect_bf_upper <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = p_effect_upper, group = 1)) +
+  labs(x = "n tests", y = "P(effect > 0) upper") +
+  geom_line(linewidth = line_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size)
+  )
 
 
+multiplot_fp <- (plot_sbdt_savage_dickey_bf | plot_sbdt_directional_bf_lower | plot_sbdt_directional_bf_upper) / 
+  (plot_sbdt_hdi_bf | plot_sbdt_p_effect_bf_lower | plot_sbdt_p_effect_bf_upper) +
+  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
 
+ggsave("plots/multiplot_thresholds.pdf", plot = multiplot_fp, width = 6, height = 2.66, units = "in", dpi = 300)
