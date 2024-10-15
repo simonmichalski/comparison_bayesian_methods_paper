@@ -56,9 +56,9 @@ plot_savage_dickey_bf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = sav
     legend.text = element_text(size = 5),
     legend.key.height = unit(0.2, "cm"),
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size)
+    axis.text.x = element_text(size = axis_text_size, color = "black")
   )
 
 plot_dbf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = directional_bf, color = as.factor(s_log_k_sd))) +
@@ -83,9 +83,9 @@ plot_dbf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = directional_bf, 
     axis.ticks = element_line(linewidth = tick_width),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size)
+    axis.text.x = element_text(size = axis_text_size, color = "black")
   )
 
 
@@ -110,9 +110,9 @@ plot_p_effect <- ggplot(df_results, aes(x = as.factor(prior_sd), y = p_effect, c
     axis.ticks = element_line(linewidth = tick_width),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size)
+    axis.text.x = element_text(size = axis_text_size, color = "black")
   )
 
 
@@ -181,7 +181,7 @@ plot_fp_savage_dickey_bf_3 <- ggplot(data_fp_savage_dickey_bf_3, aes(x = as.fact
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
@@ -198,7 +198,7 @@ plot_fp_p_effect_95 <- ggplot(data_fp_p_effect_95, aes(x = as.factor(prior_sd), 
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     axis.title.y = element_blank(),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
@@ -215,7 +215,7 @@ plot_fp_p_effect_975 <- ggplot(data_fp_p_effect_975, aes(x = as.factor(prior_sd)
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     axis.title.y = element_blank(),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
@@ -232,7 +232,7 @@ plot_fp_p_effect_99 <- ggplot(data_fp_p_effect_99, aes(x = as.factor(prior_sd), 
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     axis.title.y = element_blank(),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
@@ -254,7 +254,7 @@ plot_fp_dbf_3 <- ggplot(data_fp_directional_bf_3, aes(x = as.factor(prior_sd), y
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
@@ -271,7 +271,7 @@ plot_fp_dbf_10 <- ggplot(data_fp_directional_bf_10, aes(x = as.factor(prior_sd),
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     axis.title.y = element_blank(),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
@@ -288,7 +288,7 @@ plot_fp_dbf_30 <- ggplot(data_fp_directional_bf_30, aes(x = as.factor(prior_sd),
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     axis.title.y = element_blank(),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
@@ -305,7 +305,7 @@ plot_fp_dbf_100 <- ggplot(data_fp_directional_bf_100, aes(x = as.factor(prior_sd
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
     axis.title.y = element_blank(),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
@@ -320,9 +320,9 @@ plot_fp_hdi_80 <- ggplot(data_fp_hdi_80, aes(x = as.factor(prior_sd), y = fp_hdi
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
@@ -337,9 +337,9 @@ plot_fp_hdi_90 <- ggplot(data_fp_hdi_90, aes(x = as.factor(prior_sd), y = fp_hdi
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_blank(),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
@@ -354,9 +354,9 @@ plot_fp_hdi_95 <- ggplot(data_fp_hdi_95, aes(x = as.factor(prior_sd), y = fp_hdi
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_blank(),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
@@ -371,9 +371,9 @@ plot_fp_hdi_99 <- ggplot(data_fp_hdi_99, aes(x = as.factor(prior_sd), y = fp_hdi
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_blank(),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
@@ -404,7 +404,7 @@ plot_sbdt_savage_dickey_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_blank(),
     axis.text.x = element_blank()
   )
@@ -419,7 +419,7 @@ plot_sbdt_directional_bf_lower <- ggplot(df_sim_thres, aes(x = as.factor(n_tests
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_blank(),
     axis.text.x = element_blank()
   )
@@ -434,7 +434,7 @@ plot_sbdt_directional_bf_upper <- ggplot(df_sim_thres, aes(x = as.factor(n_tests
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_blank(),
     axis.text.x = element_blank()
   )
@@ -449,9 +449,9 @@ plot_sbdt_hdi_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = hdi, gr
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size)
+    axis.text.x = element_text(size = axis_text_size, color = "black")
   )
 
 plot_sbdt_p_effect_bf_lower <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = p_effect_lower, group = 1)) +
@@ -464,9 +464,9 @@ plot_sbdt_p_effect_bf_lower <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), 
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size)
+    axis.text.x = element_text(size = axis_text_size, color = "black")
   )
 
 plot_sbdt_p_effect_bf_upper <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = p_effect_upper, group = 1)) +
@@ -479,9 +479,9 @@ plot_sbdt_p_effect_bf_upper <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), 
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size)
+    axis.text.x = element_text(size = axis_text_size, color = "black")
   )
 
 
