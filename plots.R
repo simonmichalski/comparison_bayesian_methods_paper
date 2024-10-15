@@ -395,7 +395,7 @@ tick_width <- 0.3
 line_width <- 1
 
 plot_sbdt_savage_dickey_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = savage_dickey_bf, group = 1)) +
-  labs(x = "n tests", y = expression("Savage-Dickey BF"[10])) +
+  labs(y = expression("Savage-Dickey BF"[10])) +
   geom_line(linewidth = line_width) +
   theme(
     panel.background = element_blank(),
@@ -405,12 +405,12 @@ plot_sbdt_savage_dickey_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
     axis.text.y = element_text(size = axis_text_size),
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size)
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank()
   )
 
 plot_sbdt_directional_bf_lower <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = directional_bf_lower, group = 1)) +
-  labs(x = "n tests", y = expression("dBF"["+-"] ~~ "lower")) +
+  labs(y = expression("dBF"["+-"] ~~ "lower")) +
   geom_line(linewidth = line_width) +
   theme(
     panel.background = element_blank(),
@@ -420,12 +420,12 @@ plot_sbdt_directional_bf_lower <- ggplot(df_sim_thres, aes(x = as.factor(n_tests
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
     axis.text.y = element_text(size = axis_text_size),
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size)
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank()
   )
 
 plot_sbdt_directional_bf_upper <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = directional_bf_upper, group = 1)) +
-  labs(x = "n tests", y = expression("dBF"["+-"] ~~ "upper")) +
+  labs(y = expression("dBF"["+-"] ~~ "upper")) +
   geom_line(linewidth = line_width) +
   theme(
     panel.background = element_blank(),
@@ -435,8 +435,8 @@ plot_sbdt_directional_bf_upper <- ggplot(df_sim_thres, aes(x = as.factor(n_tests
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
     axis.text.y = element_text(size = axis_text_size),
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size)
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank()
   )
   
 plot_sbdt_hdi_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = hdi, group = 1)) +
