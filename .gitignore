@@ -2,8 +2,10 @@
 .Rhistory
 .RData
 .Ruserdata
+/convergence_check.R
 /final_results
 /plots
 /results.html
 /out
 /other_stuff
+/sanity_check.R
