@@ -230,7 +230,5 @@ hdi_bounds <- get_hdi_bounds()
 sim_based_thresholds <- get_simulation_based_thresholds(results, hdi_bounds)
 final_results <- add_false_positive_results_columns(results, hdi_bounds, sim_based_thresholds)
 
-saveRDS(results, "final_results/results.rds")
-saveRDS(hdi_bounds, "final_results/hdi_bounds.rds")
 saveRDS(sim_based_thresholds, "final_results/sim_based_thresholds.rds")
 saveRDS(final_results, "final_results/final_results.rds")
