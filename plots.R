@@ -418,15 +418,15 @@ plot_fp_savage_dickey_bf_sim <- ggplot(data_fp_savage_dickey_bf_sim, aes(x = as.
     axis.ticks = element_line(linewidth = tick_width),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
     axis.title.y = element_text(size = axis_title_size),
     axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
 plot_fp_dbf_sim <- ggplot(data_fp_directional_bf_sim, aes(x = as.factor(prior_sd), y = fp_directional_bf_sim/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(title = expression("dBF"["+-"] ~~ "[0.04, 24.14]")) +
+  labs(x = "Prior SD", title = expression("dBF"["+-"] ~~ "[0.04, 24.14]")) +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
   theme(
@@ -435,8 +435,8 @@ plot_fp_dbf_sim <- ggplot(data_fp_directional_bf_sim, aes(x = as.factor(prior_sd
     axis.ticks = element_line(linewidth = tick_width),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
     axis.title.y = element_blank(),
     axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
@@ -469,17 +469,17 @@ plot_fp_p_effect_sim <- ggplot(data_fp_p_effect_sim, aes(x = as.factor(prior_sd)
     axis.ticks = element_line(linewidth = tick_width),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
     axis.title.y = element_blank(),
     axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-multiplot_fp <- (plot_fp_savage_dickey_bf_sim | plot_fp_dbf_sim | plot_fp_hdi_sim | plot_fp_p_effect_sim) +
+multiplot_fp_sim <- (plot_fp_savage_dickey_bf_sim | plot_fp_dbf_sim | plot_fp_hdi_sim | plot_fp_p_effect_sim) +
   plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
 
-ggsave("plots/multiplot_fp_sim.pdf", plot = multiplot_fp, width = 6, height = 4/3, units = "in", dpi = 300)
+ggsave("plots/multiplot_fp_sim.pdf", plot = multiplot_fp_sim, width = 6, height = 4/3, units = "in", dpi = 300)
 
 
 # Simulation-based decision thresholds (sbdt)
