@@ -2,8 +2,8 @@ library('truncnorm')
 library("rstan")
 
 
-fit <- readRDS("out/sd_0_51/sample_44/model_prior_sd_2_5.rds")
-sim_params <- readRDS("out/sd_0_51/sample_44/params.rds")
+fit <- readRDS("out/sd_0_2/sample_1/model_prior_sd_1.rds")
+sim_params <- readRDS("out/sd_0_2/sample_2/params.rds")
 
 
 correlate_model_simulation <- function(fit, sim_params){
