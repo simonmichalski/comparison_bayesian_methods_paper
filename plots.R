@@ -13,8 +13,8 @@ library("tidyr")
 #posterior <- as.matrix(fit)
 #mcmc_areas(posterior, pars = c('mu_s_log_k'), prob = 0.95)
 
-df_results <- readRDS("final_results.rds")
-df_sim_thres <- readRDS("analysis_test/sim_based_thresholds_test.rds")
+df_results <- readRDS("final_results/final_results.rds")
+df_sim_thres <- readRDS("final_results/sim_based_thresholds.rds")
 
 # Values
 data_savage_dickey_bf <- aggregate(savage_dickey_bf ~ s_log_k_sd + prior_sd, df_results, mean)
@@ -168,7 +168,7 @@ tick_width <- 0.3
 line_width <- 1
 hline_width <- 0.3
 
-plot_fp_savage_dickey_bf_3 <- ggplot(data_fp_savage_dickey_bf_3, aes(x = as.factor(prior_sd), y = fp_savage_dickey_bf_3/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_savage_dickey_bf_3 <- ggplot(data_fp_savage_dickey_bf_3, aes(x = as.factor(prior_sd), y = fp_savage_dickey_bf_3/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", y = "Prop. false positives", title = expression("Savage-Dickey" ~ BF[10] > 3)) +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
@@ -185,7 +185,7 @@ plot_fp_savage_dickey_bf_3 <- ggplot(data_fp_savage_dickey_bf_3, aes(x = as.fact
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_p_effect_95 <- ggplot(data_fp_p_effect_95, aes(x = as.factor(prior_sd), y = fp_p_effect_95/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_p_effect_95 <- ggplot(data_fp_p_effect_95, aes(x = as.factor(prior_sd), y = fp_p_effect_95/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", title = "P(effect > 0) [.05, .95]") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
@@ -202,7 +202,7 @@ plot_fp_p_effect_95 <- ggplot(data_fp_p_effect_95, aes(x = as.factor(prior_sd), 
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_p_effect_975 <- ggplot(data_fp_p_effect_975, aes(x = as.factor(prior_sd), y = fp_p_effect_975/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_p_effect_975 <- ggplot(data_fp_p_effect_975, aes(x = as.factor(prior_sd), y = fp_p_effect_975/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", title = "P(effect > 0) [.025, .975]") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
@@ -219,7 +219,7 @@ plot_fp_p_effect_975 <- ggplot(data_fp_p_effect_975, aes(x = as.factor(prior_sd)
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_p_effect_99 <- ggplot(data_fp_p_effect_99, aes(x = as.factor(prior_sd), y = fp_p_effect_99/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_p_effect_99 <- ggplot(data_fp_p_effect_99, aes(x = as.factor(prior_sd), y = fp_p_effect_99/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", title = "P(effect > 0) [.01, .99]") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
@@ -236,7 +236,7 @@ plot_fp_p_effect_99 <- ggplot(data_fp_p_effect_99, aes(x = as.factor(prior_sd), 
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_dbf_3 <- ggplot(data_fp_directional_bf_3, aes(x = as.factor(prior_sd), y = fp_directional_bf_3/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_dbf_3 <- ggplot(data_fp_directional_bf_3, aes(x = as.factor(prior_sd), y = fp_directional_bf_3/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(y = "Prop. false positives", title = expression("dBF"["+-"] ~~ "[1/3, 3]"), color = "Population SD") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
@@ -258,7 +258,7 @@ plot_fp_dbf_3 <- ggplot(data_fp_directional_bf_3, aes(x = as.factor(prior_sd), y
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_dbf_10 <- ggplot(data_fp_directional_bf_10, aes(x = as.factor(prior_sd), y = fp_directional_bf_10/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_dbf_10 <- ggplot(data_fp_directional_bf_10, aes(x = as.factor(prior_sd), y = fp_directional_bf_10/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(title = expression("dBF"["+-"] ~~ "[1/10, 10]")) +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
@@ -275,7 +275,7 @@ plot_fp_dbf_10 <- ggplot(data_fp_directional_bf_10, aes(x = as.factor(prior_sd),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_dbf_30 <- ggplot(data_fp_directional_bf_30, aes(x = as.factor(prior_sd), y = fp_directional_bf_30/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_dbf_30 <- ggplot(data_fp_directional_bf_30, aes(x = as.factor(prior_sd), y = fp_directional_bf_30/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(title = expression("dBF"["+-"] ~~ "[1/30, 30]")) +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
@@ -292,7 +292,7 @@ plot_fp_dbf_30 <- ggplot(data_fp_directional_bf_30, aes(x = as.factor(prior_sd),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_dbf_100 <- ggplot(data_fp_directional_bf_100, aes(x = as.factor(prior_sd), y = fp_directional_bf_100/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_dbf_100 <- ggplot(data_fp_directional_bf_100, aes(x = as.factor(prior_sd), y = fp_directional_bf_100/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(title = expression("dBF"["+-"] ~~ "[1/100, 100]")) +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
@@ -309,7 +309,7 @@ plot_fp_dbf_100 <- ggplot(data_fp_directional_bf_100, aes(x = as.factor(prior_sd
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_hdi_80 <- ggplot(data_fp_hdi_80, aes(x = as.factor(prior_sd), y = fp_hdi_80/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_hdi_80 <- ggplot(data_fp_hdi_80, aes(x = as.factor(prior_sd), y = fp_hdi_80/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", y = "Prop. false positives", title = "80% HDI") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
@@ -326,7 +326,7 @@ plot_fp_hdi_80 <- ggplot(data_fp_hdi_80, aes(x = as.factor(prior_sd), y = fp_hdi
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_hdi_90 <- ggplot(data_fp_hdi_90, aes(x = as.factor(prior_sd), y = fp_hdi_90/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_hdi_90 <- ggplot(data_fp_hdi_90, aes(x = as.factor(prior_sd), y = fp_hdi_90/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", title = "90% HDI") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
@@ -343,7 +343,7 @@ plot_fp_hdi_90 <- ggplot(data_fp_hdi_90, aes(x = as.factor(prior_sd), y = fp_hdi
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_hdi_95 <- ggplot(data_fp_hdi_95, aes(x = as.factor(prior_sd), y = fp_hdi_95/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_hdi_95 <- ggplot(data_fp_hdi_95, aes(x = as.factor(prior_sd), y = fp_hdi_95/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", title = "95% HDI") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
@@ -360,7 +360,7 @@ plot_fp_hdi_95 <- ggplot(data_fp_hdi_95, aes(x = as.factor(prior_sd), y = fp_hdi
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_hdi_99 <- ggplot(data_fp_hdi_99, aes(x = as.factor(prior_sd), y = fp_hdi_99/100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_hdi_99 <- ggplot(data_fp_hdi_99, aes(x = as.factor(prior_sd), y = fp_hdi_99/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", title = "99% HDI") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
@@ -384,6 +384,102 @@ multiplot_fp <- (plot_fp_savage_dickey_bf_3 | plot_fp_p_effect_95 | plot_fp_p_ef
   plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
 
 ggsave("plots/multiplot_fp.pdf", plot = multiplot_fp, width = 6, height = 4, units = "in", dpi = 300)
+
+
+# False positive results (sim)
+data_fp_savage_dickey_bf_sim <- aggregate(fp_savage_dickey_bf_sim ~ prior_sd + s_log_k_sd, df_results, sum)
+
+data_fp_directional_bf_sim <- aggregate(fp_directional_bf_sim_pos + fp_directional_bf_sim_neg ~ prior_sd + s_log_k_sd, df_results, sum)
+names(data_fp_directional_bf_sim)[names(data_fp_directional_bf_sim) == "fp_directional_bf_sim_pos + fp_directional_bf_sim_neg"] <- "fp_directional_bf_sim"
+
+data_fp_hdi_sim <- aggregate(fp_hdi_sim_pos + fp_hdi_sim_neg ~ prior_sd + s_log_k_sd, df_results, sum)
+names(data_fp_hdi_sim)[names(data_fp_hdi_sim) == "fp_hdi_sim_pos + fp_hdi_sim_neg"] <- "fp_hdi_sim"
+
+data_fp_p_effect_sim <- aggregate(fp_p_effect_sim_pos + fp_p_effect_sim_neg ~ prior_sd + s_log_k_sd, df_results, sum)
+names(data_fp_p_effect_sim)[names(data_fp_p_effect_sim) == "fp_p_effect_sim_pos + fp_p_effect_sim_neg"] <- "fp_p_effect_sim"
+
+
+axis_text_size <- 4.5
+axis_title_size <- 7
+plot_title_size <- 6
+border_size <- 0.3
+tick_length <- -0.05
+tick_width <- 0.3
+line_width <- 1
+hline_width <- 0.3
+
+plot_fp_savage_dickey_bf_sim <- ggplot(data_fp_savage_dickey_bf_sim, aes(x = as.factor(prior_sd), y = fp_savage_dickey_bf_sim/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(x = "Prior SD", y = "Prop. false positives", title = expression("Savage-Dickey" ~ BF[10] > 1.26)) +
+  geom_line(linewidth = line_width) +
+  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+plot_fp_dbf_sim <- ggplot(data_fp_directional_bf_sim, aes(x = as.factor(prior_sd), y = fp_directional_bf_sim/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(title = expression("dBF"["+-"] ~~ "[0.04, 24.14]")) +
+  geom_line(linewidth = line_width) +
+  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+plot_fp_hdi_sim <- ggplot(data_fp_hdi_sim, aes(x = as.factor(prior_sd), y = fp_hdi_sim/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(x = "Prior SD", title = "92.46% HDI") +
+  geom_line(linewidth = line_width) +
+  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+plot_fp_p_effect_sim <- ggplot(data_fp_p_effect_sim, aes(x = as.factor(prior_sd), y = fp_p_effect_sim/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(x = "Prior SD", title = "P(effect > 0) [.04, .96]") +
+  geom_line(linewidth = line_width) +
+  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+multiplot_fp <- (plot_fp_savage_dickey_bf_sim | plot_fp_dbf_sim | plot_fp_hdi_sim | plot_fp_p_effect_sim) +
+  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
+
+ggsave("plots/multiplot_fp_sim.pdf", plot = multiplot_fp, width = 6, height = 4/3, units = "in", dpi = 300)
 
 
 # Simulation-based decision thresholds (sbdt)
@@ -439,7 +535,7 @@ plot_sbdt_directional_bf_upper <- ggplot(df_sim_thres, aes(x = as.factor(n_tests
     axis.text.x = element_blank()
   )
   
-plot_sbdt_hdi_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = hdi, group = 1)) +
+plot_sbdt_hdi_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = hdi*100, group = 1)) +
   labs(x = "n tests", y = "HDI width") +
   geom_line(linewidth = line_width) +
   theme(
