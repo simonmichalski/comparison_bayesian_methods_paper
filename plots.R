@@ -1,17 +1,11 @@
-#library("rstan")
 library("bayesplot")
 library("ggplot2")
 library("patchwork")
 library("tidyr")
 
-#fit <- readRDS("out/test3_sd_0_51/model_prior_sd_0_2.rds")
-
-#R-hat plot
-#traceplot(fit, pars = 'mu_s_log_k')
-
-# Plot with HDI (richtig so?)
-#posterior <- as.matrix(fit)
-#mcmc_areas(posterior, pars = c('mu_s_log_k'), prob = 0.95)
+if (!dir.exists("plots")) {
+  dir.create("plots", recursive = TRUE)
+}
 
 df_results <- readRDS("final_results/final_results.rds")
 df_sim_thres <- readRDS("final_results/sim_based_thresholds.rds")
