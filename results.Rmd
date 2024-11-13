@@ -6,8 +6,8 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 ```{r}
 library('papaja')
 
-df_results <- readRDS('analysis_test/final_results_test.rds')
-sim_based_thres <- readRDS('analysis_test/sim_based_thresholds_test.rds')
+df_results <- readRDS('final_results/final_results.rds')
+sim_based_thres <- readRDS('final_results/sim_based_thresholds.rds')
 
 # Mean within sample range (mwsr)
 get_mean_within_sample_range <- function(column){
@@ -60,38 +60,38 @@ fp_hdi_99 <- sum(df_results$fp_hdi_99_pos,
 
 
 # Overlap of false positive results (ofp)
-# Check if n_fp_per_method is the same for every method
-n_fp_per_method <- sum(df_results$fp_savage_dickey_bf_sim)
-n_fp2 <- sum(df_results$fp_directional_bf_sim_pos, df_results$fp_directional_bf_sim_neg)
-n_fp3 <- sum(df_results$fp_p_effect_sim_pos, df_results$fp_p_effect_sim_neg)
-n_fp4 <- sum(df_results$fp_hdi_sim_pos, df_results$fp_hdi_sim_neg)
+# Number of false positives per method
+n_fp_savage_dickey_bf <- sum(df_results$fp_savage_dickey_bf_sim)
+n_fp_directional_bf <- sum(df_results$fp_directional_bf_sim_pos, df_results$fp_directional_bf_sim_neg)
+n_fp_p_effect <- sum(df_results$fp_p_effect_sim_pos, df_results$fp_p_effect_sim_neg)
+n_fp_hdi <- sum(df_results$fp_hdi_sim_pos, df_results$fp_hdi_sim_neg)
 
 ofp_savage_dickey_bf_directional_bf <- sum(df_results$fp_savage_dickey_bf_sim == 1 &
                                              df_results$fp_directional_bf_sim_pos == 1 |
-                                             df_results$fp_directional_bf_sim_neg == 1) / n_fp_per_method
+                                             df_results$fp_directional_bf_sim_neg == 1) / n_fp_savage_dickey_bf
 
 ofp_savage_dickey_bf_hdi <- sum(df_results$fp_savage_dickey_bf_sim == 1 &
-                                  df_results$fp_hdi_sim_pos == 1 &
-                                  df_results$fp_hdi_sim_neg == 1) / n_fp_per_method
+                                  df_results$fp_hdi_sim_pos == 1 |
+                                  df_results$fp_hdi_sim_neg == 1) / n_fp_savage_dickey_bf
 
 ofp_savage_dickey_bf_p_effect <- sum(df_results$fp_savage_dickey_bf_sim == 1 &
-                                       df_results$fp_p_effect_sim_pos == 1 &
-                                       df_results$fp_p_effect_sim_neg == 1) / n_fp_per_method
+                                       df_results$fp_p_effect_sim_pos == 1 |
+                                       df_results$fp_p_effect_sim_neg == 1) / n_fp_savage_dickey_bf
 
 ofp_directional_bf_hdi <- sum(df_results$fp_directional_bf_sim_pos == 1 &
                                 df_results$fp_hdi_sim_pos == 1,
                               df_results$fp_directional_bf_sim_neg == 1 &
-                                df_results$fp_hdi_sim_neg == 1) / n_fp_per_method
+                                df_results$fp_hdi_sim_neg == 1) / n_fp_directional_bf
 
 ofp_directional_bf_p_effect <- sum(df_results$fp_directional_bf_sim_pos == 1 &
                                      df_results$fp_p_effect_sim_pos == 1,
                                    df_results$fp_directional_bf_sim_neg == 1 &
-                                     df_results$fp_p_effect_sim_neg == 1) / n_fp_per_method
+                                     df_results$fp_p_effect_sim_neg == 1) / n_fp_directional_bf
 
 ofp_hdi_p_effect <- sum(df_results$fp_hdi_sim_pos == 1 &
                           df_results$fp_p_effect_sim_pos == 1,
                         df_results$fp_hdi_sim_neg == 1 &
-                          df_results$fp_p_effect_sim_neg == 1) / n_fp_per_method
+                          df_results$fp_p_effect_sim_neg == 1) / n_fp_hdi
 
 
 # Prior sensitivity (ps; proportion of samples in which a method came to diverging results)
@@ -192,7 +192,7 @@ remove_leading_zero <- function(value){
 ```
 
 `\section{Results}`  
-Across all models, Savage-Dickey BFs ranged from `r round(min(df_results$savage_dickey_bf),2)` to `r round(max(df_results$savage_dickey_bf),2)` (`\textit{M}` = `r round(mean(df_results$savage_dickey_bf),2)`, `\textit{SD}` = `r round(sd(df_results$savage_dickey_bf),2)`), dBFs ranged from `r round(min(df_results$directional_bf),2)` to `r round(max(df_results$directional_bf),2)` (`\textit{M}` = `r round(mean(df_results$directional_bf),2)`, `\textit{SD}` = `r round(sd(df_results$directional_bf),2)`) and P(effect > 0) ranged from `r remove_leading_zero(round(min(df_results$p_effect),2))` to `r remove_leading_zero(round(max(df_results$p_effect),2))` (`\textit{M}` = `r remove_leading_zero(round(mean(df_results$p_effect),2))`, `\textit{SD}` = `r remove_leading_zero(round(sd(df_results$p_effect),2))`). See Figure `ref{fig:values}` for the distributions of Savage-Dickey BFs, dBFs and P(effect > 0) proportions.`\\`
+Across all models, Savage-Dickey BFs ranged from `r round(min(df_results$savage_dickey_bf),2)` to `r round(max(df_results$savage_dickey_bf),2)` (`\textit{M}` = `r round(mean(df_results$savage_dickey_bf),2)`, `\textit{SD}` = `r round(sd(df_results$savage_dickey_bf),2)`), dBFs ranged from `r round(min(df_results$directional_bf),2)` to `r round(max(df_results$directional_bf),2)` (`\textit{M}` = `r round(mean(df_results$directional_bf),2)`, `\textit{SD}` = `r round(sd(df_results$directional_bf),2)`) and P(effect > 0) ranged from `r remove_leading_zero(round(min(df_results$p_effect),2))` to `r remove_leading_zero(round(max(df_results$p_effect),2))` (`\textit{M}` = `r remove_leading_zero(round(mean(df_results$p_effect),2))`, `\textit{SD}` = `r remove_leading_zero(round(sd(df_results$p_effect),2))`). See Figure `\ref{fig:values}` for the distributions of Savage-Dickey BFs, dBFs and P(effect > 0) proportions.`\\`
 
 ```
 \begin{figure} [H]
@@ -218,7 +218,7 @@ With a decision threshold of 3, `r round(fp_savage_dickey_bf_3 * 100, 2)``\%` of
 ```
 <br>
 `\subsection{Simulation-based decision thresholds}`  
-With a decision threshold of `r round(sim_based_thres$savage_dickey_bf[1],2)`, 5`\%` of Savage Dickey BFs were false positive. The dBF produced 5`\%` false positive results, with a decision threshold of `r round(sim_based_thres$directional_bf_upper[1],2)` for a positive and `r round(sim_based_thres$directional_bf_lower[1],2)` for a negative effect. A decision rule of P(effect > 0) > `r remove_leading_zero(round(sim_based_thres$p_effect_upper[1],2))` for a positive and P(effect > 0) < `r remove_leading_zero(round(sim_based_thres$p_effect_lower[1],2))` for a negative effect resulted in 5`\%` false positives. The HDI against zero decision rule produced 5`\%` false positive results with a `r round(sim_based_thres$hdi[1]*100,2)``\%` HDI. Simulation-based decision thresholds for single and multiple tests are shown in Figure `ref{fig:thresholds}`.`\\`
+With a decision threshold of `r round(sim_based_thres$savage_dickey_bf[1],2)`, 5`\%` of Savage Dickey BFs were false positive. The dBF produced 5`\%` false positive results, with a decision threshold of `r round(sim_based_thres$directional_bf_upper[1],2)` for a positive and `r round(sim_based_thres$directional_bf_lower[1],2)` for a negative effect. A decision rule of P(effect > 0) > `r remove_leading_zero(round(sim_based_thres$p_effect_upper[1],2))` for a positive and P(effect > 0) < `r remove_leading_zero(round(sim_based_thres$p_effect_lower[1],2))` for a negative effect resulted in 5`\%` false positives. The HDI against zero decision rule produced 5`\%` false positive results with a `r round(sim_based_thres$hdi[1]*100,2)``\%` HDI. Simulation-based decision thresholds for single and multiple tests are shown in Figure `\ref{fig:thresholds}`.`\\`
 
 ```
 \begin{figure} [H]
@@ -235,7 +235,7 @@ With simulation-based decision thresholds, `r round(ofp_savage_dickey_bf_directi
 `\subsubsection{Prior sensitivity}`  
 Within samples, the mean range of Savage-Dickey BFs was `r round(mwsr_savage_dickey_bf,2)`, the mean range of dBFs was `r round(mwsr_directional_bf,2)`, and the mean range of P(effect > 0) proportions was `r round(mwsr_p_effect,2)`.  
 `\\`  
-With simulation-based decision thresholds, the Savage-Dickey BF came to diverging results due to different priors within `r round(ps_savage_dickey_bf_sim * 100, 2)``\%` of all samples. The dBF produced inconsistent results within `r round(ps_directional_bf_sim * 100, 2)``\%` of all samples. The HDI against zero decision rule came to different results within `r round(ps_hdi_sim * 100, 2)``\%` of all samples and P(effect > 0) came to diverging results within `r round(ps_p_effect_sim * 100, 2)``\%` of all samples. See Table `\ref{tab:prior_sensitivity}` for the prior sensitivities per population effect `\textbf{SD}`.`\\`
+With simulation-based decision thresholds, the Savage-Dickey BF came to diverging results due to different priors within `r round(ps_savage_dickey_bf_sim * 100, 2)``\%` of all samples. The dBF produced inconsistent results within `r round(ps_directional_bf_sim * 100, 2)``\%` of all samples. The HDI against zero decision rule came to different results within `r round(ps_hdi_sim * 100, 2)``\%` of all samples and P(effect > 0) came to diverging results within `r round(ps_p_effect_sim * 100, 2)``\%` of all samples. See Table `\ref{tab:prior_sensitivity}` for the prior sensitivities per population effect `\textit{SD}`.`\\`
 
 ```
 \begin{table}[H]
@@ -247,10 +247,10 @@ With simulation-based decision thresholds, the Savage-Dickey BF came to divergin
     \cmidrule{2-4}
     \multicolumn{1}{c}{} & \multicolumn{1}{c}{0.2} & \multicolumn{1}{c}{0.51} & \multicolumn{1}{c}{0.81}\\
     \midrule
-    Savage-Dickey $BF_{10}$ & \centering `r remove_leading_zero(ps_savage_dickey_bf_sim_0_2)` & \centering `r remove_leading_zero(ps_savage_dickey_bf_sim_0_51)` & \centering `r remove_leading_zero(ps_savage_dickey_bf_sim_0_81)`\arraybackslash\\
-    $dBF_{+-}$ & \centering `r remove_leading_zero(ps_directional_bf_sim_0_2)` & \centering `r remove_leading_zero(ps_directional_bf_sim_0_51)` & \centering `r remove_leading_zero(ps_directional_bf_sim_0_81)`\arraybackslash\\
-    95\% HDI & \centering `r remove_leading_zero(ps_hdi_sim_0_2)` & \centering `r remove_leading_zero(ps_hdi_sim_0_51)` & \centering `r remove_leading_zero(ps_hdi_sim_0_81)`\arraybackslash\\
-    P(effect > 0) & \centering `r remove_leading_zero(ps_p_effect_sim_0_2)` & \centering `r remove_leading_zero(ps_p_effect_sim_0_51)` & \centering `r remove_leading_zero(ps_p_effect_sim_0_81)`\arraybackslash\\
+    Savage-Dickey $BF_{10}$ & \centering `r remove_leading_zero(round(ps_savage_dickey_bf_sim_0_2, 2))` & \centering `r remove_leading_zero(round(ps_savage_dickey_bf_sim_0_51, 2))` & \centering `r remove_leading_zero(round(ps_savage_dickey_bf_sim_0_81, 2))`\arraybackslash\\
+    $dBF_{+-}$ & \centering `r remove_leading_zero(round(ps_directional_bf_sim_0_2, 2))` & \centering `r remove_leading_zero(round(ps_directional_bf_sim_0_51, 2))` & \centering `r remove_leading_zero(round(ps_directional_bf_sim_0_81, 2))`\arraybackslash\\
+    95\% HDI & \centering `r remove_leading_zero(round(ps_hdi_sim_0_2, 2))` & \centering `r remove_leading_zero(round(ps_hdi_sim_0_51, 2))` & \centering `r remove_leading_zero(round(ps_hdi_sim_0_81, 2))`\arraybackslash\\
+    P(effect > 0) & \centering `r remove_leading_zero(round(ps_p_effect_sim_0_2, 2))` & \centering `r remove_leading_zero(round(ps_p_effect_sim_0_51, 2))` & \centering `r remove_leading_zero(round(ps_p_effect_sim_0_81, 2))`\arraybackslash\\
     \midrule
     \end{tabularx}
 \end{table}
