@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+/computations.R
 /convergence_check.R
 /final_results
 /plots
