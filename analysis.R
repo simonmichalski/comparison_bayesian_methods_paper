@@ -45,6 +45,7 @@ get_results <- function(){
         fit <- readRDS(fit_path)
         
         posterior_samples_mu_s_log_k <- extract(fit)$mu_s_log_k
+        mu_s_log_k <- summary(fit)$summary[['mu_s_log_k', 'mean']]
         remove(fit)
         
         directional_bf <- get_directional_bf(posterior_samples_mu_s_log_k, prior_sds[k])
@@ -65,7 +66,7 @@ get_results <- function(){
         hdi_99_lower <- hdi(posterior_samples_mu_s_log_k, ci = 0.99)$CI_low
         hdi_99_upper <- hdi(posterior_samples_mu_s_log_k, ci = 0.99)$CI_high
         
-        results[[counter]] <- c(s_log_k_sds[i], j, prior_sds[k], directional_bf, savage_dickey_bf, 
+        results[[counter]] <- c(s_log_k_sds[i], j, prior_sds[k], mu_s_log_k, directional_bf, savage_dickey_bf, 
                                 p_effect, hdi_80_lower, hdi_80_upper, hdi_90_lower, hdi_90_upper, 
                                 hdi_95_lower, hdi_95_upper, hdi_99_lower, hdi_99_upper)
         
@@ -75,7 +76,7 @@ get_results <- function(){
     }
   }
   results <- as.data.frame(do.call(rbind, results))
-  colnames(results) <- c("s_log_k_sd", "sample", "prior_sd", "directional_bf", "savage_dickey_bf", 
+  colnames(results) <- c("s_log_k_sd", "sample", "prior_sd", "mu_s_log_k", "directional_bf", "savage_dickey_bf", 
                          "p_effect", "hdi_80_lower", "hdi_80_upper", "hdi_90_lower", "hdi_90_upper", 
                          "hdi_95_lower", "hdi_95_upper", "hdi_99_lower", "hdi_99_upper")
   return(results)
@@ -229,7 +230,7 @@ hdi_bounds <- get_hdi_bounds()
 sim_based_thresholds <- get_simulation_based_thresholds(results, hdi_bounds)
 final_results <- add_false_positive_results_columns(results, hdi_bounds, sim_based_thresholds)
 
-saveRDS(results, "results.rds")
-saveRDS(hdi_bounds, "hdi_bounds.rds")
-saveRDS(sim_based_thresholds, "sim_based_thresholds.rds")
-saveRDS(final_results, "final_results.rds")
+saveRDS(results, "final_results/results.rds")
+saveRDS(hdi_bounds, "final_results/hdi_bounds.rds")
+saveRDS(sim_based_thresholds, "final_results/sim_based_thresholds.rds")
+saveRDS(final_results, "final_results/final_results.rds")
