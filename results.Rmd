@@ -192,7 +192,7 @@ remove_leading_zero <- function(value){
 ```
 
 `\section{Results}`  
-Across all models, Savage-Dickey BFs ranged from `r round(min(df_results$savage_dickey_bf),2)` to `r round(max(df_results$savage_dickey_bf),2)` (`\textit{M}` = `r round(mean(df_results$savage_dickey_bf),2)`, `\textit{SD}` = `r round(sd(df_results$savage_dickey_bf),2)`), dBFs ranged from `r round(min(df_results$directional_bf),2)` to `r round(max(df_results$directional_bf),2)` (`\textit{M}` = `r round(mean(df_results$directional_bf),2)`, `\textit{SD}` = `r round(sd(df_results$directional_bf),2)`) and P(effect > 0) ranged from `r remove_leading_zero(round(min(df_results$p_effect),2))` to `r remove_leading_zero(round(max(df_results$p_effect),2))` (`\textit{M}` = `r remove_leading_zero(round(mean(df_results$p_effect),2))`, `\textit{SD}` = `r remove_leading_zero(round(sd(df_results$p_effect),2))`). See Figure `\ref{fig:values}` for the distributions of Savage-Dickey BFs, dBFs and P(effect > 0) proportions.`\\`
+Across all models, Savage-Dickey BFs ranged from `r round(min(df_results$savage_dickey_bf),2)` to `r round(max(df_results$savage_dickey_bf),2)` (`\textit{M}` = `r round(mean(df_results$savage_dickey_bf),2)`, `\textit{SD}` = `r round(sd(df_results$savage_dickey_bf),2)`), dBFs ranged from `r round(min(df_results$directional_bf),2)` to `r round(max(df_results$directional_bf),2)` (`\textit{M}` = `r round(mean(df_results$directional_bf),2)`, `\textit{SD}` = `r round(sd(df_results$directional_bf),2)`) and P(effect > 0) ranged from `r remove_leading_zero(round(min(df_results$p_effect),2))` to `r remove_leading_zero(round(max(df_results$p_effect),2))` (`\textit{M}` = `r remove_leading_zero(round(mean(df_results$p_effect),2))`, `\textit{SD}` = `r remove_leading_zero(round(sd(df_results$p_effect),2))`). See Figure `\ref{fig:values}` for the distributions of Savage-Dickey BFs, dBFs, and P(effect > 0) proportions.`\\`
 
 ```
 \begin{figure} [H]
@@ -205,7 +205,7 @@ Across all models, Savage-Dickey BFs ranged from `r round(min(df_results$savage_
 ```
 <br>
 `\subsection{False positive results}`  
-With a decision threshold of 3, `r round(fp_savage_dickey_bf_3 * 100, 2)``\%` of Savage-Dickey BFs were false positive. With a decision threshold of 1/3 for a negative and 3 for a positive effect, `r round(fp_directional_bf_3 * 100, 2)``\%` of dBFs were false positive. With 1/10 and 10 as directional decision thresholds, `r round(fp_directional_bf_10 * 100, 2)``\%` of dBFs were false positive, with 1/30 and 30, `r round(fp_directional_bf_30 * 100, 2)``\%` and with 1/100 and 100, `r round(fp_directional_bf_100 * 100, 2)``\%`. With a 80`\%` HDI, `r round(fp_hdi_80 * 100, 2)``\%` of decisions were false positive, with a 90`\%` HDI, `r round(fp_hdi_90 * 100, 2)``\%`, with a 95`\%` HDI, `r round(fp_hdi_95 * 100, 2)``\%` and with a 99`\%` HDI, `r round(fp_hdi_99 * 100, 2)``\%`. With P(effect > 0) > .95 for a positive and P(effect > 0) < .05 for negative effect, `r round(fp_p_effect_95 * 100, 2)``\%` of P(effect > 0) proportions were false positive. With > .975 and < .025 as directional thresholds, `r round(fp_p_effect_975 * 100, 2)``\%` of P(effect > 0) proportions were false positive and with > .99 and < .01, `r round(fp_p_effect_99 * 100, 2)``\%`. See Figure `\ref{fig:fig_fp}` for the proportions of false positive results per prior and population effect `\textit{SD}`.`\\`
+With a decision threshold of 3, `r round(fp_savage_dickey_bf_3 * 100, 2)``\%` of Savage-Dickey BFs were false positive. With a decision threshold of 1/3 for a negative and 3 for a positive effect, `r round(fp_directional_bf_3 * 100, 2)``\%` of dBFs were false positive. With 1/10 and 10 as directional decision thresholds, `r round(fp_directional_bf_10 * 100, 2)``\%` of dBFs were false positive, with 1/30 and 30, `r round(fp_directional_bf_30 * 100, 2)``\%` and with 1/100 and 100, `r round(fp_directional_bf_100 * 100, 2)``\%`. With a 80`\%` HDI, `r round(fp_hdi_80 * 100, 2)``\%` of decisions were false positive, with a 90`\%` HDI, `r round(fp_hdi_90 * 100, 2)``\%`, with a 95`\%` HDI, `r round(fp_hdi_95 * 100, 2)``\%` and with a 99`\%` HDI, `r round(fp_hdi_99 * 100, 2)``\%`. With P(effect > 0) > .95 for a positive and P(effect > 0) < .05 for negative effect, `r round(fp_p_effect_95 * 100, 2)``\%` of P(effect > 0) proportions were false positive. With > .975 and < .025 as directional thresholds, `r round(fp_p_effect_975 * 100, 2)``\%` of P(effect > 0) proportions were false positive and with > .99 and < .01, `r round(fp_p_effect_99 * 100, 2)``\%`. See Figure `\ref{fig:fig_fp}` for the proportions of false positive results per prior and population effect standard deviations.`\\`
 
 ```
 \begin{figure} [H]
@@ -218,8 +218,16 @@ With a decision threshold of 3, `r round(fp_savage_dickey_bf_3 * 100, 2)``\%` of
 ```
 <br>
 `\subsection{Simulation-based decision thresholds}`  
-With a decision threshold of `r round(sim_based_thres$savage_dickey_bf[1],2)`, 5`\%` of Savage Dickey BFs were false positive. The dBF produced 5`\%` false positive results, with a decision threshold of `r round(sim_based_thres$directional_bf_upper[1],2)` for a positive and `r round(sim_based_thres$directional_bf_lower[1],2)` for a negative effect. A decision rule of P(effect > 0) > `r remove_leading_zero(round(sim_based_thres$p_effect_upper[1],2))` for a positive and P(effect > 0) < `r remove_leading_zero(round(sim_based_thres$p_effect_lower[1],2))` for a negative effect resulted in 5`\%` false positives. The HDI against zero decision rule produced 5`\%` false positive results with a `r round(sim_based_thres$hdi[1]*100,2)``\%` HDI. Simulation-based decision thresholds for single and multiple tests are shown in Figure `\ref{fig:thresholds}`.`\\`
+With a decision threshold of `r round(sim_based_thres$savage_dickey_bf[1],2)`, 5`\%` of Savage Dickey BFs were false positive. The dBF produced 5`\%` false positive results, with a decision threshold of `r round(sim_based_thres$directional_bf_upper[1],2)` for a positive and `r round(sim_based_thres$directional_bf_lower[1],2)` for a negative effect. A decision rule of P(effect > 0) > `r remove_leading_zero(round(sim_based_thres$p_effect_upper[1],2))` for a positive and P(effect > 0) < `r remove_leading_zero(round(sim_based_thres$p_effect_lower[1],2))` for a negative effect resulted in 5`\%` false positives. The HDI against zero decision rule produced 5`\%` false positive results with a `r round(sim_based_thres$hdi[1]*100,2)``\%` HDI. See Figure `\ref{fig:fp_sim}` for the proportions of false positive results per prior and population effect standard deviations. Simulation-based decision thresholds for single and multiple tests are shown in Figure `\ref{fig:thresholds}`.`\\`
 
+```
+\begin{figure} [H]
+    \centering
+    \caption{False positive results with imulation-based decision thresholds}
+    \label{fig:fp_sim}
+    \includegraphics[width=1\linewidth]{figures/multiplot_fp_sim.pdf}
+\end{figure}
+```
 ```
 \begin{figure} [H]
     \centering
@@ -235,7 +243,7 @@ With simulation-based decision thresholds, `r round(ofp_savage_dickey_bf_directi
 `\subsubsection{Prior sensitivity}`  
 Within samples, the mean range of Savage-Dickey BFs was `r round(mwsr_savage_dickey_bf,2)`, the mean range of dBFs was `r round(mwsr_directional_bf,2)`, and the mean range of P(effect > 0) proportions was `r round(mwsr_p_effect,2)`.  
 `\\`  
-With simulation-based decision thresholds, the Savage-Dickey BF came to diverging results due to different priors within `r round(ps_savage_dickey_bf_sim * 100, 2)``\%` of all samples. The dBF produced inconsistent results within `r round(ps_directional_bf_sim * 100, 2)``\%` of all samples. The HDI against zero decision rule came to different results within `r round(ps_hdi_sim * 100, 2)``\%` of all samples and P(effect > 0) came to diverging results within `r round(ps_p_effect_sim * 100, 2)``\%` of all samples. See Table `\ref{tab:prior_sensitivity}` for the prior sensitivities per population effect `\textit{SD}`.`\\`
+With simulation-based decision thresholds, the Savage-Dickey BF came to diverging results due to different priors within `r round(ps_savage_dickey_bf_sim * 100, 2)``\%` of all samples. The dBF produced inconsistent results within `r round(ps_directional_bf_sim * 100, 2)``\%` of all samples. The HDI against zero decision rule came to different results within `r round(ps_hdi_sim * 100, 2)``\%` of all samples and P(effect > 0) came to diverging results within `r round(ps_p_effect_sim * 100, 2)``\%` of all samples. See Table `\ref{tab:prior_sensitivity}` for the prior sensitivities per population effect standard deviation.`\\`
 
 ```
 \begin{table}[H]
