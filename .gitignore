@@ -4,7 +4,6 @@
 .Ruserdata
 /computations.R
 /convergence_check.R
-/final_results
 /logistic_function_params.R
 /plots
 /results.html
