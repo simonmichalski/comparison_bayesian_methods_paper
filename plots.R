@@ -2,6 +2,7 @@ library("bayesplot")
 library("ggplot2")
 library("patchwork")
 library("tidyr")
+library("dplyr")
 
 if (!dir.exists("plots")) {
   dir.create("plots", recursive = TRUE)
@@ -9,6 +10,7 @@ if (!dir.exists("plots")) {
 
 df_results <- readRDS("final_results/final_results.rds")
 df_sim_thres <- readRDS("final_results/sim_based_thresholds.rds")
+df_recovery <- readRDS("final_results/recovery.rds")
 
 # Values
 data_savage_dickey_bf <- aggregate(savage_dickey_bf ~ s_log_k_sd + prior_sd, df_results, mean)
@@ -580,3 +582,103 @@ multiplot_fp <- (plot_sbdt_savage_dickey_bf | plot_sbdt_directional_bf_lower | p
   plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
 
 ggsave("plots/multiplot_thresholds.pdf", plot = multiplot_fp, width = 6, height = 2.66, units = "in", dpi = 300)
+
+
+# Parameter recovery
+data_recovery_log_k <- summarize(group_by(df_recovery, s_log_k_sd, prior_sd), 
+                                 correlation = cor(true_log_k, median_log_k))
+
+data_recovery_s_log_k <- summarize(group_by(df_recovery, s_log_k_sd, prior_sd), 
+                                   correlation = cor(true_s_log_k, median_s_log_k))
+
+axis_text_size <- 7
+axis_title_size <- 10
+border_size <- 0.3
+tick_length <- -0.05
+tick_width <- 0.3
+line_width <- 1
+point_size <- 1.5
+plot_title_size <- 10
+
+scatter_log_k <- ggplot(df_recovery, aes(x = true_log_k, y = median_log_k)) +
+  labs(x = "True value", y = "Estimate", title = expression("log("*italic(k)*")")) +
+  geom_jitter(
+    alpha = 0.1,
+    size = point_size
+    ) +
+  scale_x_continuous(limits = c(-9,0)) +
+  scale_y_continuous(limits = c(-9,0)) +
+  geom_abline(slope = 1, intercept = 0, linewidth = border_size) +
+  coord_fixed(ratio = 1) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+scatter_s_log_k <- ggplot(df_recovery, aes(x = true_s_log_k, y = median_s_log_k)) +
+  labs(x = "True value", y = "Estimate", title = expression("s"["log("*italic(k)*")"])) +
+  geom_jitter(
+    alpha = 0.1,
+    size = point_size
+  ) +
+  scale_x_continuous(limits = c(-3,3)) +
+  scale_y_continuous(limits = c(-3,3)) +
+  geom_abline(slope = 1, intercept = 0, linewidth = border_size) +
+  coord_fixed(ratio = 1) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+plot_cor_log_k <- ggplot(data_recovery_log_k, aes(x = as.factor(prior_sd), y = correlation, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(x = "Prior SD", y = "r", title = expression("log("*italic(k)*")")) +
+  geom_line(linewidth = line_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+plot_cor_s_log_k <- ggplot(data_recovery_s_log_k, aes(x = as.factor(prior_sd), y = correlation, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(x = "Prior SD", y = "r", title = expression("s"["log("*italic(k)*")"])) +
+  geom_line(linewidth = line_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+multiplot_recovery <- (scatter_log_k | scatter_s_log_k) / (plot_cor_log_k | plot_cor_s_log_k) +
+  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
+
+ggsave(file.path("plots", "multiplot_recovery.pdf"), plot = multiplot_recovery, width = 6, height = 6, units = "in", dpi = 300)
