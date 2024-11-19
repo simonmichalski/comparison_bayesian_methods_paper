@@ -4,7 +4,7 @@ library('parallel')
 library('rstan')
 
 s_log_k_sds <- c(0.2, 0.51, 0.81)
-num_samples <- 100
+num_samples <- 200
 prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 
 options(mc.cores = parallel::detectCores())
@@ -46,10 +46,9 @@ get_stan_data <- function(){
   
   return(stan_data_list)
 }
-stan_data_list <- get_stan_data()
+
 
 parallel_modelling <- function(){
-  
   
   num_cores <- detectCores(logical = TRUE)
   cluster <- makeCluster(num_cores - 1)
@@ -88,4 +87,5 @@ parallel_modelling <- function(){
 }
 
 
+stan_data_list <- get_stan_data()
 parallel_modelling()
