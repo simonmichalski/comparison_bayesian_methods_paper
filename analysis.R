@@ -34,6 +34,12 @@ get_savage_dickey_bf <- function(posterior_samples, prior_sd){
 get_results <- function(i,j,k,fit){
   posterior_samples_mu_s_log_k <- extract(fit)$mu_s_log_k
   
+  median_mu_log_k <- median(extract(fit)$mu_log_k)
+  median_sd_log_k <- median(extract(fit)$sd_log_k)
+  
+  median_mu_s_log_k <- median(posterior_samples_mu_s_log_k)
+  median_sd_s_log_k <- median(extract(fit)$sd_s_log_k)
+  
   directional_bf <- get_directional_bf(posterior_samples_mu_s_log_k, prior_sds[k])
   
   savage_dickey_bf <- get_savage_dickey_bf(posterior_samples_mu_s_log_k, prior_sds[k])
@@ -52,9 +58,9 @@ get_results <- function(i,j,k,fit){
   hdi_99_lower <- hdi(posterior_samples_mu_s_log_k, ci = 0.99)$CI_low
   hdi_99_upper <- hdi(posterior_samples_mu_s_log_k, ci = 0.99)$CI_high
   
-  results <- c(s_log_k_sds[i], j, prior_sds[k], directional_bf, savage_dickey_bf, 
-               p_effect, hdi_80_lower, hdi_80_upper, hdi_90_lower, hdi_90_upper, 
-               hdi_95_lower, hdi_95_upper, hdi_99_lower, hdi_99_upper)
+  results <- c(s_log_k_sds[i], j, prior_sds[k], median_mu_log_k, median_sd_log_k, median_mu_s_log_k, 
+               median_sd_s_log_k, directional_bf, savage_dickey_bf, p_effect, hdi_80_lower, hdi_80_upper, 
+               hdi_90_lower, hdi_90_upper, hdi_95_lower, hdi_95_upper, hdi_99_lower, hdi_99_upper)
   
   return(results)
 }
@@ -128,11 +134,11 @@ loop_through_model_files <- function(){
     }
   }
   results_all_models <- as.data.frame(do.call(rbind, results_all_models))
-  colnames(results_all_models) <- c("s_log_k_sd", "sample", "prior_sd", "directional_bf", 
-                                    "savage_dickey_bf", "p_effect", "hdi_80_lower", 
-                                    "hdi_80_upper", "hdi_90_lower", "hdi_90_upper", 
-                                    "hdi_95_lower", "hdi_95_upper", "hdi_99_lower", 
-                                    "hdi_99_upper")
+  colnames(results_all_models) <- c("s_log_k_sd", "sample", "prior_sd", "median_mu_log_k",
+                                    "median_sd_log_k", "median_mu_s_log_k", "median_sd_s_log_k", 
+                                    "directional_bf", "savage_dickey_bf", "p_effect", "hdi_80_lower", 
+                                    "hdi_80_upper", "hdi_90_lower", "hdi_90_upper", "hdi_95_lower", 
+                                    "hdi_95_upper", "hdi_99_lower", "hdi_99_upper")
   
   recovery_all_models <- as.data.frame(do.call(rbind, recovery_all_models))
   colnames(recovery_all_models) <- c("s_log_k_sd", "sample", "prior_sd", "subject", 
