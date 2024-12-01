@@ -1,6 +1,12 @@
 library("rstan")
 library("bayestestR")
 
+
+if (!dir.exists("results")) {
+  dir.create("results")
+}
+
+
 s_log_k_sds <- c(0.2, 0.51, 0.81)
 num_samples <- 200
 prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
@@ -8,8 +14,7 @@ prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 n_subj <- 40
 n_models <- length(s_log_k_sds)*num_samples*length(prior_sds)
 
-hdi_seq <- seq(from = 0.9, to = 1, by = 0.0001)
-n_tests <- 10
+hdi_seq <- seq(from = 0.8, to = 1, by = 0.0001)
 
 
 # dBF+-
@@ -85,6 +90,7 @@ get_hdi_bounds <- function(fit){
 }
 
 
+# Get true and estimated subject-level params
 get_recovery <- function(i,j,k,fit){
   recovery <- vector('list', n_subj)
   
@@ -150,7 +156,7 @@ loop_through_model_files <- function(){
 
 
 # Compute simulation-based decision thresholds
-get_simulation_based_thresholds <- function(results, hdi_bounds){
+get_simulation_based_thresholds <- function(results, hdi_bounds, n_tests){
   sim_based_thresholds <- data.frame()
   
   for (i in 1:n_tests){
@@ -166,25 +172,25 @@ get_simulation_based_thresholds <- function(results, hdi_bounds){
   }
   colnames(sim_based_thresholds) <- c("n_tests", "savage_dickey_bf", "directional_bf_upper", "directional_bf_lower", "p_effect_upper", "p_effect_lower")
   
-  sim_based_thresholds$hdi <- get_sim_based_hdi_widths(hdi_bounds)
+  sim_based_thresholds$hdi <- get_sim_based_hdi_widths(hdi_bounds, n_tests)
   
   return(sim_based_thresholds)
 }
 
 
-get_sim_based_hdi_widths <- function(hdi_bounds){
+get_sim_based_hdi_widths <- function(hdi_bounds, n_tests){
   proportions_false_positives <- c()
   
   for (hdi in 1:length(hdi_seq)){
     num_false_positives <- 0
     
-    for (model in 1:n_models){
+    for (model in 1:length(hdi_bounds)){
       hdi_lower <- hdi_bounds[[model]][[hdi]][1]
       hdi_upper <- hdi_bounds[[model]][[hdi]][2]
       
       num_false_positives <- num_false_positives + ifelse(hdi_upper < 0 | hdi_lower > 0, 1, 0)
     }
-    proportions_false_positives <- append(proportions_false_positives, num_false_positives/n_models)
+    proportions_false_positives <- append(proportions_false_positives, num_false_positives/length(hdi_bounds))
   }
   
   sim_based_hdis <- c()
@@ -255,15 +261,48 @@ add_false_positive_results_columns <- function(results, hdi_bounds, sim_thres){
 }
 
 
+# Get sim-based thresholds per population effect and prior SD
+get_sim_thresholds_per_effect_and_prior_sd <- function(results, hdi_bounds){
+  df_sim_thresholds <- data.frame()
+  column_s_log_k_sds <- c()
+  column_prior_sds <- c()
+  
+  for (i in 1:length(s_log_k_sds)){
+    
+    for (k in 1:length(prior_sds)){
+      indices <- which(results$s_log_k_sd == s_log_k_sds[i] & results$prior_sd == prior_sds[k])
+      rows_results <- results[indices,]
+      models_hdi_bounds <- hdi_bounds[indices]
+      
+      sim_thresholds <- get_simulation_based_thresholds(rows_results, models_hdi_bounds, 1)
+      df_sim_thresholds <- rbind(df_sim_thresholds, sim_thresholds[,-1])
+      column_s_log_k_sds <- append(column_s_log_k_sds, s_log_k_sds[i])
+      column_prior_sds <- append(column_prior_sds, prior_sds[k])
+    }
+  }
+  df_sim_thresholds$s_log_k_sd <- column_s_log_k_sds
+  df_sim_thresholds$prior_sd <- column_prior_sds
+  
+  df_sim_thresholds <- df_sim_thresholds[c("s_log_k_sd", "prior_sd", "savage_dickey_bf", 
+                                           "directional_bf_upper", "directional_bf_lower", 
+                                           "p_effect_upper", "p_effect_lower")]
+  return(df_sim_thresholds)
+}
+
+
 loop_out <- loop_through_model_files()
 results <- loop_out$results
 hdi_bounds <- loop_out$hdi_bounds
 recovery <- loop_out$recovery
 
-saveRDS(recovery, "final_results/recovery.rds")
+saveRDS(hdi_bounds, file.path("results", "hdi_bounds.rds"))
+saveRDS(recovery, file.path("results", "recovery.rds"))
 
-sim_based_thresholds <- get_simulation_based_thresholds(results, hdi_bounds)
-final_results <- add_false_positive_results_columns(results, hdi_bounds, sim_based_thresholds)
+sim_based_thresholds <- get_simulation_based_thresholds(results, hdi_bounds, 10)
+saveRDS(sim_based_thresholds, file.path("results", "sim_based_thresholds.rds"))
 
-saveRDS(sim_based_thresholds, "final_results/sim_based_thresholds.rds")
-saveRDS(final_results, "final_results/final_results.rds")
+results <- add_false_positive_results_columns(results, hdi_bounds, sim_based_thresholds)
+saveRDS(results, file.path("results", "results.rds"))
+
+sim_thresholds_per_effect_and_prior_sd <- get_sim_thresholds_per_effect_and_prior_sd(results, hdi_bounds)
+saveRDS(sim_thresholds_per_effect_and_prior_sd, file.path("results", "sim_thres_per_effect_and_prior_sd.rds"))
