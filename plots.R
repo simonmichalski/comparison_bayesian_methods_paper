@@ -166,22 +166,24 @@ tick_width <- 0.3
 line_width <- 1
 hline_width <- 0.3
 
-plot_fp_savage_dickey_bf_3 <- ggplot(data_fp_savage_dickey_bf_3, aes(x = as.factor(prior_sd), y = fp_savage_dickey_bf_3/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_savage_dickey_bf_3 <- ggplot(data_fp_savage_dickey_bf_3, aes(x = prior_sd, y = fp_savage_dickey_bf_3/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", y = "Prop. false positives", title = expression("Savage-Dickey" ~ BF[10] > 3)) +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
     axis.ticks = element_line(linewidth = tick_width),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size),
     axis.title.y = element_text(size = axis_title_size),
     axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
+plot_fp_savage_dickey_bf_3
 
 plot_fp_p_effect_95 <- ggplot(data_fp_p_effect_95, aes(x = as.factor(prior_sd), y = fp_p_effect_95/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", title = "P(effect > 0) [.05, .95]") +
@@ -592,13 +594,46 @@ data_recovery_log_k <- summarize(group_by(df_recovery, s_log_k_sd, prior_sd, sam
 
 data_recovery_log_k <- aggregate(correlation ~ prior_sd + s_log_k_sd, data_recovery_log_k, mean)
 
-
 df_recovery$diff_s_log_k <- abs(df_recovery$median_s_log_k - df_recovery$true_s_log_k)
 
-data_cor_s_log_k <- summarize(group_by(df_recovery, s_log_k_sd, prior_sd), 
+data_cor_s_log_k <- summarize(group_by(df_recovery, s_log_k_sd, prior_sd, sample), 
                               correlation = cor(true_s_log_k, median_s_log_k))
 
+data_cor_s_log_k <- aggregate(correlation ~ prior_sd + s_log_k_sd, data_cor_s_log_k, mean)
+
 data_diff_s_log_k <- aggregate(diff_s_log_k ~ prior_sd + s_log_k_sd, df_recovery, mean)
+
+
+data_group_level_s_log_k <- aggregate(df_results, abs(median_mu_s_log_k) ~ prior_sd + s_log_k_sd, mean)
+
+data_group_level_log_k <- aggregate(df_results, abs(median_mu_log_k) ~ prior_sd, mean)
+
+var_true_s_log_k <- aggregate(df_recovery, true_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
+var_estimate_s_log_k <- aggregate(df_recovery, median_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
+df_var_s_log_k <- merge(var_true_s_log_k, var_estimate_s_log_k, by = c("prior_sd", "s_log_k_sd", "sample"))
+df_var_s_log_k$var_change <- df_var_s_log_k$median_s_log_k - df_var_s_log_k$true_s_log_k
+data_var_s_log_k <- aggregate(df_var_s_log_k, var_change ~ s_log_k_sd + prior_sd, mean)
+
+var_true_log_k <- aggregate(df_recovery, true_log_k ~ prior_sd + s_log_k_sd + sample, sd)
+var_estimate_log_k <- aggregate(df_recovery, median_log_k ~ prior_sd + s_log_k_sd + sample, sd)
+df_var_log_k <- merge(var_true_log_k, var_estimate_log_k, by = c("prior_sd", "s_log_k_sd", "sample"))
+df_var_log_k$var_change <- df_var_log_k$median_log_k - df_var_log_k$true_log_k
+data_var_log_k <- aggregate(df_var_log_k, var_change ~ prior_sd, mean)
+
+
+subj_estimates_sd <- aggregate(df_recovery, median_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
+subj_estimates_sd_effect <- aggregate(subj_estimates_sd, median_s_log_k ~ s_log_k_sd + prior_sd, mean)
+
+true_sd <- aggregate(df_recovery, true_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
+true_sd_effect <- aggregate(true_sd, true_s_log_k ~ s_log_k_sd + prior_sd, mean)
+
+data_shrinkage <- merge(subj_estimates_sd_effect, true_sd_effect, by = c("s_log_k_sd", "prior_sd"))
+
+data_shrinkage$sd_reduction <- 1 - data_shrinkage$median_s_log_k / data_shrinkage$true_s_log_k
+
+
+df_recovery$s_log_k_sd <- factor(df_recovery$s_log_k_sd, levels = c(0.81, 0.51, 0.2))
+
 
 axis_text_size <- 7
 axis_title_size <- 10
@@ -608,6 +643,81 @@ tick_width <- 0.3
 line_width <- 1
 point_size <- 1.5
 plot_title_size <- 10
+
+
+scatter_s_log_k <- ggplot(df_recovery[order(-df_recovery$s_log_k_sd), ], 
+                          aes(x = true_s_log_k, y = median_s_log_k, color = as.factor(s_log_k_sd), 
+                              group = as.factor(s_log_k_sd))) +
+  labs(x = "True value", y = "Subject-level estimate", title = expression("s"["log("*italic(k)*")"])) +
+  geom_jitter(
+    size = 0.01
+  ) +
+  annotate('text', x = -1, y = 4, label = expression(""*italic(r)*" = .89"), size = 2.5) + 
+  scale_x_continuous(limits = c(-3,4.5)) +
+  scale_y_continuous(limits = c(-3,4.5)) +
+  geom_abline(slope = 1, intercept = 0, linewidth = border_size) +
+  coord_fixed(ratio = 1) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size-1.5),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+plot_group_level_s_log_k <- ggplot(data_group_level_s_log_k, aes(x = as.factor(prior_sd), y = `abs(median_mu_s_log_k)`, color = as.factor(s_log_k_sd), group = as.factor(s_log_k_sd))) + 
+  geom_line(linewidth = 1) +
+  labs(x = expression("Prior " * italic("SD")), y = "Mean abs. group-level mean", 
+       title = expression("s"["log("*italic(k)*")"])) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
+    axis.title.y = element_text(size = axis_title_size-1.5),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+plot_sd_reduction <- ggplot(data_shrinkage, aes(x = as.factor(prior_sd), y = sd_reduction*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(x = expression("Prior " * italic("SD")), y = expression("Mean "*italic("SD")*" reduction (%)"), title = expression("s"["log("*italic(k)*")"])) +
+  geom_line(linewidth = line_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
+    axis.title.y = element_text(size = axis_title_size-1.5),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+plot_var_s_log_k <- ggplot(data_var_s_log_k, aes(x = as.factor(prior_sd), y = var_change, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(x = expression("Prior " * italic("SD")), y = "Mean variance difference", title = expression("s"["log("*italic(k)*")"])) +
+  geom_line(linewidth = line_width) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
+    axis.title.y = element_text(size = axis_title_size-1.5),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
 
 scatter_log_k <- ggplot(df_recovery, aes(x = true_log_k, y = median_log_k)) +
   labs(x = "True value", y = "Estimate", title = expression("log("*italic(k)*")")) +
@@ -632,27 +742,44 @@ scatter_log_k <- ggplot(df_recovery, aes(x = true_log_k, y = median_log_k)) +
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-scatter_s_log_k <- ggplot(df_recovery, aes(x = true_s_log_k, y = median_s_log_k)) +
-  labs(x = "True value", y = "Estimate", title = expression("s"["log("*italic(k)*")"])) +
-  geom_jitter(
-    size = 0.1
-  ) +
-  scale_x_continuous(limits = c(-3,4.5)) +
-  scale_y_continuous(limits = c(-3,4.5)) +
-  geom_abline(slope = 1, intercept = 0, linewidth = border_size) +
-  coord_fixed(ratio = 1) +
+plot_group_level_log_k <- ggplot(data_group_level_log_k, aes(x = as.factor(prior_sd), y = `abs(median_mu_log_k)`, group = 1)) + 
+  geom_line(linewidth = 1) +
+  labs(x = expression("Prior " * italic("SD")), y = "Mean abs. group-level mean", 
+       title = expression("log("*italic(k)*")")) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
     axis.ticks = element_line(linewidth = tick_width),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
-    axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
     axis.text.x = element_text(size = axis_text_size, color = "black"),
+    axis.title.y = element_text(size = axis_title_size-1),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
+
+plot_var_log_k <- ggplot(data_var_log_k, aes(x = as.factor(prior_sd), y = var_change, group = 1)) +
+  labs(x = expression("Prior " * italic("SD")), y = "Mean variance difference", title = expression("log("*italic(k)*")")) +
+  geom_line(linewidth = line_width) +
+  scale_y_continuous(limits = c(-0.1,-0.02)) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
+    axis.title.y = element_text(size = axis_title_size-1),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  )
+
+
+
+
+
 
 plot_cor_log_k <- ggplot(data_recovery_log_k, aes(x = as.factor(prior_sd), y = correlation, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", y = "r", title = expression("log("*italic(k)*")")) +
@@ -707,10 +834,19 @@ plot_diff_s_log_k <- ggplot(data_diff_s_log_k, aes(x = as.factor(prior_sd), y = 
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-multiplot_recovery <- (scatter_log_k | scatter_s_log_k) / (plot_cor_log_k | plot_cor_s_log_k) +
+#multiplot_recovery <- (scatter_s_log_k | plot_group_level_s_log_k | plot_var_s_log_k) / 
+#  (scatter_log_k | plot_group_level_log_k | plot_var_log_k) +
+#  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
+
+#multiplot_recovery <- (scatter_log_k | scatter_s_log_k) /
+#  (plot_group_level_log_k | plot_group_level_s_log_k) /
+#  (plot_var_log_k | plot_var_s_log_k) + 
+#  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
+
+multiplot_recovery <- (scatter_s_log_k | plot_var_s_log_k | plot_group_level_s_log_k) +
   plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
 
-ggsave(file.path("plots", "multiplot_recovery.pdf"), plot = multiplot_recovery, width = 6, height = 6, units = "in", dpi = 300)
+ggsave(file.path("plots", "multiplot_recovery.png"), plot = multiplot_recovery, width = 6, height = 2, units = "in", dpi = 300)
 
 
 multiplot_s_log_k <- (scatter_s_log_k | plot_cor_s_log_k | plot_diff_s_log_k) +
@@ -718,10 +854,16 @@ multiplot_s_log_k <- (scatter_s_log_k | plot_cor_s_log_k | plot_diff_s_log_k) +
 
 ggsave(file.path("plots", "recovery_s_log_k.png"), plot = multiplot_s_log_k, width = 6, height = 3, units = "in", dpi = 300)
 
+multiplot_s_log_k <- (scatter_s_log_k | plot_group_level_s_log_k | plot_sd_reduction) +
+  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
+
+ggsave(file.path("plots", "recovery_s_log_k.png"), plot = multiplot_s_log_k, width = 6, height = 3, units = "in", dpi = 300)
+
+
 
 # Prior sensitivity example
-fit_1 <- readRDS(file.path("out", "sd_0_51", "sample_51", "model_prior_sd_0_1.rds"))
-fit_2 <- readRDS(file.path("out", "sd_0_2", "sample_2", "model_prior_sd_0_2.rds"))
+fit_1 <- readRDS(file.path("out", "sd_0_2", "sample_167", "model_prior_sd_0_1.rds"))
+fit_2 <- readRDS(file.path("out", "sd_0_2", "sample_167", "model_prior_sd_1_5.rds"))
 
 posterior_1 <- data.frame(mu_s_log_k = extract(fit_1)$mu_s_log_k)
 posterior_2 <- data.frame(mu_s_log_k = extract(fit_2)$mu_s_log_k)
@@ -763,11 +905,11 @@ ps_example_1 <- ggplot(posterior_1, aes(x = mu_s_log_k)) +
   )
 
 ps_example_2 <- ggplot(posterior_2, aes(x = mu_s_log_k)) +
-  labs(x = expression(theta), title = expression("Prior " * italic("SD") *  "= 0.2")) +
+  labs(x = expression(theta), title = expression("Prior " * italic("SD") *  "= 1.5")) +
   geom_density(aes(linetype = "Posterior")) +
-  stat_function(fun = dnorm, n = 10000, args = list(mean = 0, sd = 0.2), aes(linetype = "Prior")) +
+  stat_function(fun = dnorm, n = 10000, args = list(mean = 0, sd = 1.5), aes(linetype = "Prior")) +
   annotate("point", x = 0, y = y_cord_2, size = point_size) + 
-  annotate("point", x = 0, y = dnorm(0,0,0.2), size = point_size) + 
+  annotate("point", x = 0, y = dnorm(0,0,1.5), size = point_size) + 
   theme(
   panel.background = element_blank(),
   panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
@@ -782,13 +924,14 @@ ps_example_2 <- ggplot(posterior_2, aes(x = mu_s_log_k)) +
 )
 
 ps_example <- (ps_example_1 | ps_example_2) + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 12))
+ps_example
 
 ggsave(file.path("plots", "prior_sensitivity_example.pdf"), plot = ps_example, width = 6, height = 3, units = "in", dpi = 300)
 
 
 # Partial pooling example
 fit <- readRDS(file.path("out", "sd_0_2", "sample_1", "model_prior_sd_0_05.rds"))
-mu_s_log_k <- summary(fit)$summary[["mu_s_log_k","mean"]]
+mu_s_log_k <- median(extract(fit)$mu_s_log_k)
 
 data_shrinkage_example <- df_recovery[c(1:40), c("true_s_log_k", "median_s_log_k")]
 data_shrinkage_example$id <- seq(1:40)
@@ -802,7 +945,7 @@ tick_length <- -0.05
 tick_width <- 0.3
 
 plot_shrinkage <- ggplot(data_shrinkage_example, aes(x = type, y = value, group = id)) +
-  labs(y = expression(theta)) +
+  labs(y = expression(theta["i"])) +
   geom_point(size = 1) +
   geom_line(linewidth = 0.2) +
   geom_hline(yintercept = mu_s_log_k, linewidth = 0.3, linetype = "dashed") +
