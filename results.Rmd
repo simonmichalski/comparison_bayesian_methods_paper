@@ -4,10 +4,24 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 ```
 
 ```{r}
-library('papaja')
+#library('papaja')
+library("dplyr")
 
-df_results <- readRDS('final_results/final_results.rds')
-sim_based_thres <- readRDS('final_results/sim_based_thresholds.rds')
+df_results <- readRDS(file.path("final_results", "final_results.rds"))
+sim_based_thres <- readRDS(file.path("final_results", "sim_based_thresholds.rds"))
+df_recovery <- readRDS(file.path("final_results", "recovery.rds"))
+
+# Correlation true estimated subject-level parameters
+data_cor_s_log_k <- summarize(group_by(df_recovery, s_log_k_sd, prior_sd, sample), 
+                              correlation = cor(true_s_log_k, median_s_log_k))
+cor_s_log_k_overall <- mean(data_cor_s_log_k$correlation)
+cor_s_log_k_effect_sd_0_2 <- mean(data_cor_s_log_k$correlation[data_cor_s_log_k$s_log_k_sd == 0.2])
+cor_s_log_k_effect_sd_0_51 <- mean(data_cor_s_log_k$correlation[data_cor_s_log_k$s_log_k_sd == 0.51])
+cor_s_log_k_effect_sd_0_81 <- mean(data_cor_s_log_k$correlation[data_cor_s_log_k$s_log_k_sd == 0.81])
+
+data_cor_log_k <- summarize(group_by(df_recovery, s_log_k_sd, prior_sd, sample), 
+                            correlation = cor(true_log_k, median_log_k))
+cor_log_k_overall <- mean(data_cor_log_k$correlation)
 
 # Mean within sample range (mwsr)
 get_mean_within_sample_range <- function(column){
@@ -191,7 +205,34 @@ remove_leading_zero <- function(value){
 
 ```
 
-`\section{Results}`  
+`\section{Results}`
+`\subsection{Parameter recovery}`
+The mean correlation between true and estimated subject-level s`\textsubscript{log(\textit{k})}` parameters within samples from the small population effect standard deviation was `\textit{r}` = `r remove_leading_zero(round(cor_s_log_k_0_2, 2))`, within samples from the medium population effect standard deviation `\textit{r}` = `r remove_leading_zero(round(cor_s_log_k_0_51, 2))`, and within samples from the large population effect standard deviation `\textit{r}` = `r remove_leading_zero(round(cor_s_log_k_0_81, 2))`. THe mean correlation over all samples was `\textit{r}` = `r remove_leading_zero(round(cor_s_log_k_overall, 2))`. The mean correlation between true and estimated subject-level log(`\textit{k}`) parameters within samples was `\textit{r}` = `r remove_leading_zero(round(cor_log_k_overall, 2))`.
+
+-> partial pooling stats and multiplot
+
+-> table: true subj param SD | group-level SD | subj-level estimate SD | Partial pooling (SD reduction)
+- 4 rows: log_k + s_log_k (3 effect SDs)
+
+
+-> table: true sample mean | group-level mean | mean subj-level estimate | Mean change
+- 4 rows: log_k + s_log_k (3 effect SDs) ?? unnötig, weil keine Unterschiede
+
+
+
+The mean variance difference between true subject-level parameters and subject-level estimates within samples was XX for the large population effect standard deviation, XX for the medium population effect standard deviation, and XX for the small population effect standard deviation (???).`\\`
+
+```
+\begin{figure} [H]
+    \centering
+    \caption{Parameter recovery and partial pooling}
+    \label{fig:recovery}
+    \includegraphics[width=1\linewidth]{figures/multiplot_recovery.png}
+    \caption*{Note. \textnormal{Recovery of subject-level parameters (A), mean estimates of the group-level mean (B), mean differences between the variance of true subject-level parameters and the variance of subject-level estimates within samples (C)}}
+\end{figure}
+```
+<br>
+`\subsection{Inference methods}`
 Across all models, Savage-Dickey BFs ranged from `r round(min(df_results$savage_dickey_bf),2)` to `r round(max(df_results$savage_dickey_bf),2)` (`\textit{M}` = `r round(mean(df_results$savage_dickey_bf),2)`, `\textit{SD}` = `r round(sd(df_results$savage_dickey_bf),2)`), dBFs ranged from `r round(min(df_results$directional_bf),2)` to `r round(max(df_results$directional_bf),2)` (`\textit{M}` = `r round(mean(df_results$directional_bf),2)`, `\textit{SD}` = `r round(sd(df_results$directional_bf),2)`) and P(effect > 0) ranged from `r remove_leading_zero(round(min(df_results$p_effect),2))` to `r remove_leading_zero(round(max(df_results$p_effect),2))` (`\textit{M}` = `r remove_leading_zero(round(mean(df_results$p_effect),2))`, `\textit{SD}` = `r remove_leading_zero(round(sd(df_results$p_effect),2))`). See Figure `\ref{fig:values}` for the distributions of Savage-Dickey BFs, dBFs, and P(effect > 0) proportions.`\\`
 
 ```
@@ -200,7 +241,7 @@ Across all models, Savage-Dickey BFs ranged from `r round(min(df_results$savage_
     \caption{Distributions of Savage-Dickey BFs, dBFs and P(effect > 0) proportions}
     \label{fig:values}
     \includegraphics[width=1\linewidth]{figures/multiplot_values.pdf}
-    \caption*{Note. \textnormal{Distribution of Savage-Dickey BFs (A), dBFs (B), and and P(effect > 0) proportions (C). Solid lines represent mean values.}}
+    \caption*{Note. \textnormal{Solid lines indicate mean values.}}
 \end{figure}
 ```
 <br>
@@ -223,7 +264,7 @@ With a decision threshold of `r round(sim_based_thres$savage_dickey_bf[1],2)`, 5
 ```
 \begin{figure} [H]
     \centering
-    \caption{False positive results with imulation-based decision thresholds}
+    \caption{False positive results with simulation-based decision thresholds}
     \label{fig:fp_sim}
     \includegraphics[width=1\linewidth]{figures/multiplot_fp_sim.pdf}
 \end{figure}
