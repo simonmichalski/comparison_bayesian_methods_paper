@@ -11,17 +11,97 @@ df_results <- readRDS(file.path("final_results", "final_results.rds"))
 sim_based_thres <- readRDS(file.path("final_results", "sim_based_thresholds.rds"))
 df_recovery <- readRDS(file.path("final_results", "recovery.rds"))
 
-# Correlation true estimated subject-level parameters
+# Correlation true-estimated subject-level parameters
 data_cor_s_log_k <- summarize(group_by(df_recovery, s_log_k_sd, prior_sd, sample), 
                               correlation = cor(true_s_log_k, median_s_log_k))
-cor_s_log_k_overall <- mean(data_cor_s_log_k$correlation)
-cor_s_log_k_effect_sd_0_2 <- mean(data_cor_s_log_k$correlation[data_cor_s_log_k$s_log_k_sd == 0.2])
-cor_s_log_k_effect_sd_0_51 <- mean(data_cor_s_log_k$correlation[data_cor_s_log_k$s_log_k_sd == 0.51])
-cor_s_log_k_effect_sd_0_81 <- mean(data_cor_s_log_k$correlation[data_cor_s_log_k$s_log_k_sd == 0.81])
+mean_cor_s_log_k_overall <- mean(data_cor_s_log_k$correlation)
+iqr_cor_s_log_k_overall <- IQR(data_cor_s_log_k$correlation)
+mean_cor_s_log_k_0_2 <- mean(data_cor_s_log_k$correlation[data_cor_s_log_k$s_log_k_sd == 0.2])
+iqr_cor_s_log_k_0_2 <- IQR(data_cor_s_log_k$correlation[data_cor_s_log_k$s_log_k_sd == 0.2])
+mean_cor_s_log_k_0_51 <- mean(data_cor_s_log_k$correlation[data_cor_s_log_k$s_log_k_sd == 0.51])
+iqr_cor_s_log_k_0_51 <- IQR(data_cor_s_log_k$correlation[data_cor_s_log_k$s_log_k_sd == 0.51])
+mean_cor_s_log_k_0_81 <- mean(data_cor_s_log_k$correlation[data_cor_s_log_k$s_log_k_sd == 0.81])
+iqr_cor_s_log_k_0_81 <- IQR(data_cor_s_log_k$correlation[data_cor_s_log_k$s_log_k_sd == 0.81])
 
 data_cor_log_k <- summarize(group_by(df_recovery, s_log_k_sd, prior_sd, sample), 
                             correlation = cor(true_log_k, median_log_k))
-cor_log_k_overall <- mean(data_cor_log_k$correlation)
+mean_cor_log_k_overall <- mean(data_cor_log_k$correlation)
+iqr_cor_log_k_overall <- IQR(data_cor_log_k$correlation)
+
+# Subject-level parameter shrinkage
+sd_estimates_s_log_k <- aggregate(df_recovery, median_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
+sd_true_s_log_k <- aggregate(df_recovery, true_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
+data_shrinkage_s_log_k <- merge(sd_estimates_s_log_k, sd_true_s_log_k, by = c("s_log_k_sd", "prior_sd", "sample"))
+data_shrinkage_s_log_k$sd_reduction <- (data_shrinkage_s_log_k$true_s_log_k - data_shrinkage_s_log_k$median_s_log_k) / data_shrinkage_s_log_k$true_s_log_k
+mean_shrinkage_overall <- mean(data_shrinkage_s_log_k$sd_reduction)
+sd_shrinkage_overall <- sd(data_shrinkage_s_log_k$sd_reduction)
+mean_shrinkage_0_2 <- mean(data_shrinkage_s_log_k[data_shrinkage_s_log_k$s_log_k_sd == 0.2, "sd_reduction"])
+sd_shrinkage_0_2 <- sd(data_shrinkage_s_log_k[data_shrinkage_s_log_k$s_log_k_sd == 0.2, "sd_reduction"])
+mean_shrinkage_0_51 <-mean(data_shrinkage_s_log_k[data_shrinkage_s_log_k$s_log_k_sd == 0.51, "sd_reduction"])
+sd_shrinkage_0_51 <-sd(data_shrinkage_s_log_k[data_shrinkage_s_log_k$s_log_k_sd == 0.51, "sd_reduction"])
+mean_shrinkage_0_81 <-mean(data_shrinkage_s_log_k[data_shrinkage_s_log_k$s_log_k_sd == 0.81, "sd_reduction"])
+sd_shrinkage_0_81 <-sd(data_shrinkage_s_log_k[data_shrinkage_s_log_k$s_log_k_sd == 0.81, "sd_reduction"])
+mean_sd_true_0_2 <- mean(sd_true_s_log_k[sd_true_s_log_k$s_log_k_sd == 0.2, "true_s_log_k"])
+sd_sd_true_0_2 <- sd(sd_true_s_log_k[sd_true_s_log_k$s_log_k_sd == 0.2, "true_s_log_k"])
+mean_sd_true_0_51 <- mean(sd_true_s_log_k[sd_true_s_log_k$s_log_k_sd == 0.51, "true_s_log_k"])
+sd_sd_true_0_51 <- sd(sd_true_s_log_k[sd_true_s_log_k$s_log_k_sd == 0.51, "true_s_log_k"])
+mean_sd_true_0_81 <- mean(sd_true_s_log_k[sd_true_s_log_k$s_log_k_sd == 0.81, "true_s_log_k"])
+sd_sd_true_0_81 <- sd(sd_true_s_log_k[sd_true_s_log_k$s_log_k_sd == 0.81, "true_s_log_k"])
+mean_sd_estimates_0_2 <- mean(sd_estimates_s_log_k[sd_estimates_s_log_k$s_log_k_sd == 0.2, "median_s_log_k"])
+sd_sd_estimates_0_2 <- sd(sd_estimates_s_log_k[sd_estimates_s_log_k$s_log_k_sd == 0.2, "median_s_log_k"])
+mean_sd_estimates_0_51 <- mean(sd_estimates_s_log_k[sd_estimates_s_log_k$s_log_k_sd == 0.51, "median_s_log_k"])
+sd_sd_estimates_0_51 <- sd(sd_estimates_s_log_k[sd_estimates_s_log_k$s_log_k_sd == 0.51, "median_s_log_k"])
+mean_sd_estimates_0_81 <- mean(sd_estimates_s_log_k[sd_estimates_s_log_k$s_log_k_sd == 0.81, "median_s_log_k"])
+sd_sd_estimates_0_81 <- sd(sd_estimates_s_log_k[sd_estimates_s_log_k$s_log_k_sd == 0.81, "median_s_log_k"])
+
+sd_estimates_log_k <- aggregate(df_recovery, median_log_k ~ prior_sd + s_log_k_sd + sample, sd)
+sd_true_log_k <- aggregate(df_recovery, true_log_k ~ prior_sd + s_log_k_sd + sample, sd)
+data_shrinkage_log_k <- merge(sd_estimates_log_k, sd_true_log_k, by = c("s_log_k_sd", "prior_sd", "sample"))
+data_shrinkage_log_k$sd_reduction <- (data_shrinkage_log_k$true_log_k - data_shrinkage_log_k$median_log_k) / data_shrinkage_log_k$true_log_k
+mean_shrinkage_overall_log_k <- mean(data_shrinkage_log_k$sd_reduction)
+sd_shrinkage_overall_log_k <- sd(data_shrinkage_log_k$sd_reduction)
+mean_sd_true_overall_log_k <- mean(sd_true_log_k$true_log_k)
+sd_sd_true_overall_log_k <- sd(sd_true_log_k$true_log_k)
+mean_sd_estimates_overall_log_k <- mean(sd_estimates_log_k$median_log_k)
+sd_sd_estimates_overall_log_k <- sd(sd_estimates_log_k$median_log_k)
+
+# Recovery group-level mean
+true_means_s_log_k <- aggregate(df_recovery, true_s_log_k ~ prior_sd + s_log_k_sd + sample, mean)
+mean_true_group_level_mean_overall <- mean(true_means_s_log_k$true_s_log_k)
+sd_true_group_level_mean_overall <- sd(true_means_s_log_k$true_s_log_k)
+mean_true_group_level_mean_0_2 <- mean(true_means_s_log_k[true_means_s_log_k$s_log_k_sd == 0.2, "true_s_log_k"])
+sd_true_group_level_mean_0_2 <- sd(true_means_s_log_k[true_means_s_log_k$s_log_k_sd == 0.2, "true_s_log_k"])
+mean_true_group_level_mean_0_51 <- mean(true_means_s_log_k[true_means_s_log_k$s_log_k_sd == 0.51, "true_s_log_k"])
+sd_true_group_level_mean_0_51 <- sd(true_means_s_log_k[true_means_s_log_k$s_log_k_sd == 0.51, "true_s_log_k"])
+mean_true_group_level_mean_0_81 <- mean(true_means_s_log_k[true_means_s_log_k$s_log_k_sd == 0.81, "true_s_log_k"])
+sd_true_group_level_mean_0_81 <- sd(true_means_s_log_k[true_means_s_log_k$s_log_k_sd == 0.81, "true_s_log_k"])
+
+true_means_log_k <- aggregate(df_recovery, true_log_k ~ prior_sd + s_log_k_sd + sample, mean)
+mean_true_group_level_mean_log_k <- mean(true_means_log_k$true_log_k)
+sd_true_group_level_mean_log_k <- sd(true_means_log_k$true_log_k)
+
+mean_group_level_mean_overall <- mean(df_results$median_mu_s_log_k)
+sd_group_level_mean_overall <- sd(df_results$median_mu_s_log_k)
+mean_group_level_mean_0_2 <- mean(df_results[df_results$s_log_k_sd == 0.2, "median_mu_s_log_k"])
+sd_group_level_mean_0_2 <- sd(df_results[df_results$s_log_k_sd == 0.2, "median_mu_s_log_k"])
+mean_group_level_mean_0_51 <- mean(df_results[df_results$s_log_k_sd == 0.51, "median_mu_s_log_k"])
+sd_group_level_mean_0_51 <- sd(df_results[df_results$s_log_k_sd == 0.51, "median_mu_s_log_k"])
+mean_group_level_mean_0_81 <- mean(df_results[df_results$s_log_k_sd == 0.81, "median_mu_s_log_k"])
+sd_group_level_mean_0_81 <- sd(df_results[df_results$s_log_k_sd == 0.81, "median_mu_s_log_k"])
+
+mean_group_level_mean_log_k <- mean(df_results$median_mu_log_k)
+sd_group_level_mean_log_k <- sd(df_results$median_mu_log_k)
+
+# Recovery group-level SD
+mean_group_level_sd_0_2 <- mean(df_results[df_results$s_log_k_sd == 0.2, "median_sd_s_log_k"])
+sd_group_level_sd_0_2 <- sd(df_results[df_results$s_log_k_sd == 0.2, "median_sd_s_log_k"])
+mean_group_level_sd_0_51 <- mean(df_results[df_results$s_log_k_sd == 0.51, "median_sd_s_log_k"])
+sd_group_level_sd_0_51 <- sd(df_results[df_results$s_log_k_sd == 0.51, "median_sd_s_log_k"])
+mean_group_level_sd_0_81 <- mean(df_results[df_results$s_log_k_sd == 0.81, "median_sd_s_log_k"])
+sd_group_level_sd_0_81 <- sd(df_results[df_results$s_log_k_sd == 0.81, "median_sd_s_log_k"])
+
+mean_group_level_sd_log_k <- mean(df_results$median_sd_log_k)
+sd_group_level_sd_log_k <- sd(df_results$median_sd_log_k)
 
 # Mean within sample range (mwsr)
 get_mean_within_sample_range <- function(column){
@@ -206,13 +286,52 @@ remove_leading_zero <- function(value){
 ```
 
 `\section{Results}`
-`\subsection{Parameter recovery}`
-The mean correlation between true and estimated subject-level s`\textsubscript{log(\textit{k})}` parameters within samples from the small population effect standard deviation was `\textit{r}` = `r remove_leading_zero(round(cor_s_log_k_0_2, 2))`, within samples from the medium population effect standard deviation `\textit{r}` = `r remove_leading_zero(round(cor_s_log_k_0_51, 2))`, and within samples from the large population effect standard deviation `\textit{r}` = `r remove_leading_zero(round(cor_s_log_k_0_81, 2))`. THe mean correlation over all samples was `\textit{r}` = `r remove_leading_zero(round(cor_s_log_k_overall, 2))`. The mean correlation between true and estimated subject-level log(`\textit{k}`) parameters within samples was `\textit{r}` = `r remove_leading_zero(round(cor_log_k_overall, 2))`.
+`\subsection{Recovery of subject-level parameters}`
+The mean correlation between true and estimated subject-level s`\textsubscript{log(\textit{k})}` parameters was `\textit{r}` = `r remove_leading_zero(round(mean_cor_s_log_k_0_2,2))` (`\textit{IQR}` = `r remove_leading_zero(round(iqr_cor_s_log_k_0_2,2))`) within models fitted to samples of the small population effect standard deviation, `\textit{r}` = `r remove_leading_zero(round(mean_cor_s_log_k_0_51,2))` (`\textit{IQR}` = `r remove_leading_zero(round(iqr_cor_s_log_k_0_51,2))`) within models fitted to samples from the medium population effect standard deviation, and `\textit{r}` = `r remove_leading_zero(round(mean_cor_s_log_k_0_81,2))` (`\textit{IQR}` = `r remove_leading_zero(round(iqr_cor_s_log_k_0_81,2))`) within models fitted to samples from the large population effect standard deviation. The mean correlation within models over all population effect standard deviations was `\textit{r}` = `r remove_leading_zero(round(mean_cor_s_log_k_overall,2))` (`\textit{IQR}` = `r remove_leading_zero(round(iqr_cor_s_log_k_overall,2))`). The mean correlation within models between true and estimated subject-level log(`\textit{k}`) parameters was `\textit{r}` = `r remove_leading_zero(round(mean_cor_log_k_overall,2))` (`\textit{IQR}` = `r remove_leading_zero(round(iqr_cor_log_k_overall,2))`).
+`\\`
+Since hierarchical Bayesian models perform partial pooling, subject-level parameter shrinkage was computed for each model by dividing the difference between the standard deviation of the true subject-level parameters and the standard deviation of the estimated subject-level parameters with the standard deviation of the true subject-level parameters `\autocite{kruschke_doing_2015}`. On average, the true subject-level standard deviation of s`\textsubscript{log(\textit{k})}` parameters was reduced by `r round(mean_shrinkage_overall * 100, 2)``\%` (`\textit{SD}` = `r round(sd_shrinkage_overall * 100, 2)`) within models. Descriptively, shrinkage of subject-level parameters was stronger, the lower the standard deviation of the sampling distribution was (Table `\ref{tab:shrinkage}`), but constant across all variations of the group-level mean prior of s`\textsubscript{log(\textit{k})}` (Figure Supplement).
+
+```
+\begin{table}[H]
+    \caption{Shrinkage of subject-level parameters within models}
+    \label{tab:shrinkage}
+    \begin{tabularx}{\textwidth}{lXXXXXX}
+    \midrule
+    \multicolumn{1}{c}{Sampling distribution} & \multicolumn{2}{c}{\textit{SD} true parameters} & \multicolumn{2}{c}{\textit{SD} estimates} & \multicolumn{2}{c}{\textit{SD} reduction (\%)}\\
+    \cmidrule{2-7}
+    \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textit{M}} & \multicolumn{1}{c}{\textit{SD}} & \multicolumn{1}{c}{\textit{M}} & \multicolumn{1}{c}{\textit{SD}} & \multicolumn{1}{c}{\textit{M}} & \multicolumn{1}{c}{\textit{SD}}\\
+    \midrule
+    s\textsubscript{log(\textit{k})} $\sim \mathcal{N}$(0,0.2) & \centering `r round(mean_sd_true_0_2,2)` & \centering `r round(sd_sd_true_0_2,2)` & \centering `r round(mean_sd_estimates_0_2,2)` & \centering `r round(sd_sd_estimates_0_2,2)` & \centering `r round(mean_shrinkage_0_2 * 100, 2)` & \centering `r  round(sd_shrinkage_0_2 * 100,2)`\arraybackslash\\
+    s\textsubscript{log(\textit{k})} $\sim \mathcal{N}$(0,0.51) & \centering `r round(mean_sd_true_0_51,2)` & \centering `r round(sd_sd_true_0_51,2)` & \centering `r round(mean_sd_estimates_0_51,2)` & \centering `r round(sd_sd_estimates_0_51,2)` & \centering `r round(mean_shrinkage_0_51 * 100, 2)` & \centering `r round(sd_shrinkage_0_51 * 100,2)`\arraybackslash\\
+    s\textsubscript{log(\textit{k})} $\sim \mathcal{N}$(0,0.81) & \centering `r round(mean_sd_true_0_81,2)` & \centering `r round(sd_sd_true_0_81,2)` & \centering `r round(mean_sd_estimates_0_81,2)` & \centering `r  round(sd_sd_estimates_0_81,2)` & \centering `r round(mean_shrinkage_0_81 * 100, 2)` & \centering `r round(sd_shrinkage_0_81 * 100,2)`\arraybackslash\\
+    log(\textit{k}) $\sim \mathcal{N}$(-4.79,1.02) & \centering `r round(mean_sd_true_overall_log_k,2)` & \centering `r round(sd_sd_true_overall_log_k,2)` & \centering `r round(mean_sd_estimates_overall_log_k,2)` & \centering `r  round(sd_sd_estimates_overall_log_k,2)` & \centering `r round(mean_shrinkage_overall_log_k * 100, 2)` & \centering `r  round(sd_shrinkage_overall_log_k * 100,2)`\arraybackslash\\
+    \midrule
+    \end{tabularx}
+\end{table}
+```
+
+`\subsection{Recovery of group-level parameters}`
+The mean true group-level mean of s`\textsubscript{log(\textit{k})}` parameters was `r round(mean_true_group_level_mean_0_2,2)` (`\textit{SD}` = `r round(sd_true_group_level_mean_0_2,2)`) within samples from the small population effect standard deviation, `r round(mean_true_group_level_mean_0_51,2)` (`\textit{SD}` = `r round(sd_true_group_level_mean_0_51,2)`) within samples from the medium population effect standard deviation, and `r round(mean_true_group_level_mean_0_81,2)` (`\textit{SD}` = `r round(sd_true_group_level_mean_0_81,2)`) within samples from the small population effect standard deviation. The mean true group-level mean of log(`\textit{k}`) parameters was `r round(mean_true_group_level_mean_log_k,2)` (`\textit{SD}` = `r round(sd_true_group_level_mean_log_k,2)`). The mean estimate of the group-level mean of s`\textsubscript{log(\textit{k})}` was `r round(mean_group_level_mean_0_2, 2)` (`\textit{SD}` = `r round(sd_group_level_mean_0_2, 2)`) within models fitted to samples from the small population effect standard deviation, `r round(mean_group_level_mean_0_51, 2)` (`\textit{SD}` = `r round(sd_group_level_mean_0_51, 2)`) within models fitted to samples from the medium population effect standard deviation, and `r round(mean_group_level_mean_0_81, 2)` (`\textit{SD}` = `r round(sd_group_level_mean_0_81, 2)`) within models fitted to samples from the large population effect standard deviation. Mean absolute estimates of the group-level mean of s`\textsubscript{log(\textit{k})}` per population effect and prior standard deviation are depicted in Figure `\ref{fig:recovery}`. Descriptively, mean absolute estimates of the group-level mean were constant with wider priors, but decreased with decreasing prior width. The mean estimate of the group-level mean of log(`\textit{k}`) was `r round(mean_group_level_mean_log_k, 2)` (`\textit{SD}` = `r round(sd_group_level_mean_log_k, 2)`).
+`\\`
+The mean estimate of the group-level standard deviation of s`\textsubscript{log(\textit{k})}` was `r round(mean_group_level_sd_0_2, 2)` (`\textit{SD}` = `r round(sd_group_level_sd_0_2, 2)`) within models fitted to samples from the small population effect standard deviation, `r round(mean_group_level_sd_0_51, 2)` (`\textit{SD}` = `r round(sd_group_level_sd_0_51, 2)`) within models fitted to samples from the medium population effect standard deviation, and `r round(mean_group_level_sd_0_81, 2)` (`\textit{SD}` = `r round(sd_group_level_sd_0_81, 2)`) within models fitted to samples from the large population effect standard deviation. The mean estimate of the group-level standard deviation of log(`\textit{k}`) was `r round(mean_group_level_sd_log_k, 2)` (`\textit{SD}` = `r round(sd_group_level_sd_log_k, 2)`).
+
+```
+\begin{figure} [H]
+    \centering
+    \caption{Group-level}
+    \label{fig:values}
+    \includegraphics[width=1\linewidth]{figures/recovery.pdf}
+\end{figure}
+```
+
+
+
+
+
+-> Scatter Plot: y = SD estimates, x = SD true parameters (4800 Punkte, farblich, mit 45° Linie)
 
 -> partial pooling stats and multiplot
 
--> table: true subj param SD | group-level SD | subj-level estimate SD | Partial pooling (SD reduction)
-- 4 rows: log_k + s_log_k (3 effect SDs)
 
 
 -> table: true sample mean | group-level mean | mean subj-level estimate | Mean change
@@ -220,7 +339,7 @@ The mean correlation between true and estimated subject-level s`\textsubscript{l
 
 
 
-The mean variance difference between true subject-level parameters and subject-level estimates within samples was XX for the large population effect standard deviation, XX for the medium population effect standard deviation, and XX for the small population effect standard deviation (???).`\\`
+
 
 ```
 \begin{figure} [H]
