@@ -14,7 +14,7 @@ prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 n_subj <- 40
 n_models <- length(s_log_k_sds)*num_samples*length(prior_sds)
 
-hdi_seq <- seq(from = 0.8, to = 1, by = 0.0001)
+hdi_seq <- seq(from = 0.7, to = 0.97, by = 0.0001)
 
 
 # dBF+-
@@ -285,7 +285,7 @@ get_sim_thresholds_per_effect_and_prior_sd <- function(results, hdi_bounds){
   
   df_sim_thresholds <- df_sim_thresholds[c("s_log_k_sd", "prior_sd", "savage_dickey_bf", 
                                            "directional_bf_upper", "directional_bf_lower", 
-                                           "p_effect_upper", "p_effect_lower")]
+                                           "p_effect_upper", "p_effect_lower", "hdi")]
   return(df_sim_thresholds)
 }
 
