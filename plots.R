@@ -635,6 +635,13 @@ data_shrinkage$sd_reduction <- 1 - data_shrinkage$median_s_log_k / data_shrinkag
 df_recovery$s_log_k_sd <- factor(df_recovery$s_log_k_sd, levels = c(0.81, 0.51, 0.2))
 
 
+
+sd_true_s_log_k <- aggregate(df_recovery, true_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
+sd_estimates_s_log_k <- aggregate(df_recovery, median_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
+data_sd_subj <- merge(sd_true_s_log_k, sd_estimates_s_log_k, by = c("prior_sd", "s_log_k_sd", "sample"))
+#data_sd_subj$s_log_k_sd <- factor(data_sd_subj$s_log_k_sd, levels = c(0.81, 0.51, 0.2))
+
+
 axis_text_size <- 7
 axis_title_size <- 10
 border_size <- 0.3
@@ -670,8 +677,44 @@ scatter_s_log_k <- ggplot(df_recovery[order(-df_recovery$s_log_k_sd), ],
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
+scatter_sd_s_log_k <- ggplot(data_sd_subj[order(-data_sd_subj$s_log_k_sd), ], 
+                             aes(x = true_s_log_k, y = median_s_log_k, color = as.factor(s_log_k_sd), 
+                              group = as.factor(s_log_k_sd))) +
+  labs(x = expression(italic("SD")*" true parameters"), y = expression(italic("SD")*" estimates"), 
+       title = expression("s"["log("*italic(k)*")"]), color = expression("Population "*italic("SD"))) +
+  geom_jitter(
+    size = 0.05
+  ) +
+  scale_x_continuous(limits = c(0,1.1)) +
+  scale_y_continuous(limits = c(0,1.1)) +
+  geom_abline(slope = 1, intercept = 0, linewidth = border_size) +
+  coord_fixed(ratio = 1) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = c(0.25,0.8),
+    legend.background = element_rect('transparent'),
+    legend.key.size = unit(0.5, "points"),
+    legend.title = element_text(size = 8, margin = margin(b = 0)),
+    legend.text = element_text(size = 8),
+    legend.key.height = unit(0.3, "cm"),
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black"),
+    plot.title = element_text(hjust = 0.5, size = plot_title_size)
+  ) +
+  guides(
+    color = guide_legend(override.aes = list(size = 1))
+  )
+
 plot_group_level_s_log_k <- ggplot(data_group_level_s_log_k, aes(x = as.factor(prior_sd), y = `abs(median_mu_s_log_k)`, color = as.factor(s_log_k_sd), group = as.factor(s_log_k_sd))) + 
-  geom_line(linewidth = 1) +
+  geom_segment(aes(y = 0.02783835, x = "0.05", xend = "2.5", linetype = "True"), color = "#F8766D", linewidth = 0.3) +
+  geom_segment(aes(y = 0.06441371, x = "0.05", xend = "2.5", linetype = "True"), color = "#00BA38", linewidth = 0.3) +
+  geom_segment(aes(y = 0.10842135, x = "0.05", xend = "2.5", linetype = "True"), color = "#619CFF", linewidth = 0.3) +
+  geom_line(aes(linetype = "Estimate"), linewidth = 1) +
   labs(x = expression("Prior " * italic("SD")), y = "Mean abs. group-level mean", 
        title = expression("s"["log("*italic(k)*")"])) +
   theme(
@@ -679,13 +722,20 @@ plot_group_level_s_log_k <- ggplot(data_group_level_s_log_k, aes(x = as.factor(p
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
     axis.ticks = element_line(linewidth = tick_width),
     axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = 'none',
+    legend.position = c(0.175,0.75),
+    legend.background = element_rect('transparent'),
+    legend.key.size = unit(1, "lines"),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 8),
+    legend.key.height = unit(0.3, "cm"),
     axis.title.x = element_text(size = axis_title_size),
     axis.text.x = element_text(size = axis_text_size, color = "black"),
-    axis.title.y = element_text(size = axis_title_size-1.5),
+    axis.title.y = element_text(size = axis_title_size),
     axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
-  )
+  ) +
+  scale_linetype_manual(values = c("solid","dashed")) +
+  guides(color = "none", linetype = guide_legend(override.aes = list(color = "black")))
 
 plot_sd_reduction <- ggplot(data_shrinkage, aes(x = as.factor(prior_sd), y = sd_reduction*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = expression("Prior " * italic("SD")), y = expression("Mean "*italic("SD")*" reduction (%)"), title = expression("s"["log("*italic(k)*")"])) +
@@ -843,10 +893,10 @@ plot_diff_s_log_k <- ggplot(data_diff_s_log_k, aes(x = as.factor(prior_sd), y = 
 #  (plot_var_log_k | plot_var_s_log_k) + 
 #  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
 
-multiplot_recovery <- (scatter_s_log_k | plot_var_s_log_k | plot_group_level_s_log_k) +
+multiplot_recovery2 <- (scatter_s_log_k | plot_var_s_log_k | plot_group_level_s_log_k) +
   plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
 
-ggsave(file.path("plots", "multiplot_recovery.png"), plot = multiplot_recovery, width = 6, height = 2, units = "in", dpi = 300)
+ggsave(file.path("plots", "multiplot_recovery.png"), plot = multiplot_recovery2, width = 6, height = 2, units = "in", dpi = 300)
 
 
 multiplot_s_log_k <- (scatter_s_log_k | plot_cor_s_log_k | plot_diff_s_log_k) +
@@ -858,6 +908,12 @@ multiplot_s_log_k <- (scatter_s_log_k | plot_group_level_s_log_k | plot_sd_reduc
   plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
 
 ggsave(file.path("plots", "recovery_s_log_k.png"), plot = multiplot_s_log_k, width = 6, height = 3, units = "in", dpi = 300)
+
+
+multiplot_recovery <- (scatter_sd_s_log_k | plot_group_level_s_log_k) +
+  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
+
+ggsave(file.path("plots", "recovery_s_log_k.png"), plot = multiplot_recovery, width = 6, height = 3, units = "in", dpi = 300)
 
 
 
