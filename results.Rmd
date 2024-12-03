@@ -285,11 +285,13 @@ remove_leading_zero <- function(value){
 
 ```
 
-`\section{Results}`
-`\subsection{Recovery of subject-level parameters}`
+`\section{Results}`  
+Note that the intervals between the prior standard deviations are not equal, as they were chosen to cover the most plausible prior standard deviations between zero and 2.5. Hence, overall means cannot be interpreted continuously as averages of all possible prior standard deviations between 0.05 and 2.5, but as averages of discrete prior variations selected in this study.
+
+`\subsection{Recovery of subject-level parameters}`  
 The mean correlation between true and estimated subject-level s`\textsubscript{log(\textit{k})}` parameters was `\textit{r}` = `r remove_leading_zero(round(mean_cor_s_log_k_0_2,2))` (`\textit{IQR}` = `r remove_leading_zero(round(iqr_cor_s_log_k_0_2,2))`) within models fitted to samples of the small population effect standard deviation, `\textit{r}` = `r remove_leading_zero(round(mean_cor_s_log_k_0_51,2))` (`\textit{IQR}` = `r remove_leading_zero(round(iqr_cor_s_log_k_0_51,2))`) within models fitted to samples from the medium population effect standard deviation, and `\textit{r}` = `r remove_leading_zero(round(mean_cor_s_log_k_0_81,2))` (`\textit{IQR}` = `r remove_leading_zero(round(iqr_cor_s_log_k_0_81,2))`) within models fitted to samples from the large population effect standard deviation. The mean correlation within models over all population effect standard deviations was `\textit{r}` = `r remove_leading_zero(round(mean_cor_s_log_k_overall,2))` (`\textit{IQR}` = `r remove_leading_zero(round(iqr_cor_s_log_k_overall,2))`). The mean correlation within models between true and estimated subject-level log(`\textit{k}`) parameters was `\textit{r}` = `r remove_leading_zero(round(mean_cor_log_k_overall,2))` (`\textit{IQR}` = `r remove_leading_zero(round(iqr_cor_log_k_overall,2))`).
-`\\`
-Since hierarchical Bayesian models perform partial pooling, subject-level parameter shrinkage was computed for each model by dividing the difference between the standard deviation of the true subject-level parameters and the standard deviation of the estimated subject-level parameters with the standard deviation of the true subject-level parameters `\autocite{kruschke_doing_2015}`. On average, the true subject-level standard deviation of s`\textsubscript{log(\textit{k})}` parameters was reduced by `r round(mean_shrinkage_overall * 100, 2)``\%` (`\textit{SD}` = `r round(sd_shrinkage_overall * 100, 2)`) within models. Descriptively, shrinkage of subject-level parameters was stronger, the lower the standard deviation of the sampling distribution was (Table `\ref{tab:shrinkage}`), but constant across all variations of the group-level mean prior of s`\textsubscript{log(\textit{k})}` (Figure Supplement).
+`\\`  
+Since hierarchical Bayesian models perform partial pooling, subject-level parameter shrinkage was computed for each model by dividing the difference between the standard deviation of the true subject-level parameters and the standard deviation of the estimated subject-level parameters with the standard deviation of the true subject-level parameters `\autocite{kruschke_doing_2015}`. On average, the true subject-level standard deviation of s`\textsubscript{log(\textit{k})}` parameters was reduced by `r round(mean_shrinkage_overall * 100, 2)``\%` (`\textit{SD}` = `r round(sd_shrinkage_overall * 100, 2)`) within models. See Figure `\hyperref[fig:recovery]{\ref{fig:recovery}A}` for the ratio of true and estimated subject-level standard deviation within each model. Descriptively, shrinkage of subject-level parameters was stronger, the lower the standard deviation of the sampling distribution was (Table `\ref{tab:shrinkage}`), but constant across all variations of the group-level mean prior of s`\textsubscript{log(\textit{k})}` (Figure Supplement).
 
 ```
 \begin{table}[H]
@@ -310,68 +312,55 @@ Since hierarchical Bayesian models perform partial pooling, subject-level parame
 \end{table}
 ```
 
-`\subsection{Recovery of group-level parameters}`
-The mean true group-level mean of s`\textsubscript{log(\textit{k})}` parameters was `r round(mean_true_group_level_mean_0_2,2)` (`\textit{SD}` = `r round(sd_true_group_level_mean_0_2,2)`) within samples from the small population effect standard deviation, `r round(mean_true_group_level_mean_0_51,2)` (`\textit{SD}` = `r round(sd_true_group_level_mean_0_51,2)`) within samples from the medium population effect standard deviation, and `r round(mean_true_group_level_mean_0_81,2)` (`\textit{SD}` = `r round(sd_true_group_level_mean_0_81,2)`) within samples from the small population effect standard deviation. The mean true group-level mean of log(`\textit{k}`) parameters was `r round(mean_true_group_level_mean_log_k,2)` (`\textit{SD}` = `r round(sd_true_group_level_mean_log_k,2)`). The mean estimate of the group-level mean of s`\textsubscript{log(\textit{k})}` was `r round(mean_group_level_mean_0_2, 2)` (`\textit{SD}` = `r round(sd_group_level_mean_0_2, 2)`) within models fitted to samples from the small population effect standard deviation, `r round(mean_group_level_mean_0_51, 2)` (`\textit{SD}` = `r round(sd_group_level_mean_0_51, 2)`) within models fitted to samples from the medium population effect standard deviation, and `r round(mean_group_level_mean_0_81, 2)` (`\textit{SD}` = `r round(sd_group_level_mean_0_81, 2)`) within models fitted to samples from the large population effect standard deviation. Mean absolute estimates of the group-level mean of s`\textsubscript{log(\textit{k})}` per population effect and prior standard deviation are depicted in Figure `\ref{fig:recovery}`. Descriptively, mean absolute estimates of the group-level mean were constant with wider priors, but decreased with decreasing prior width. The mean estimate of the group-level mean of log(`\textit{k}`) was `r round(mean_group_level_mean_log_k, 2)` (`\textit{SD}` = `r round(sd_group_level_mean_log_k, 2)`).
-`\\`
+`\subsection{Recovery of group-level parameters}`  
+The mean true group-level mean of s`\textsubscript{log(\textit{k})}` parameters was `r round(mean_true_group_level_mean_0_2,2)` (`\textit{SD}` = `r round(sd_true_group_level_mean_0_2,2)`) within samples from the small population effect standard deviation, `r round(mean_true_group_level_mean_0_51,2)` (`\textit{SD}` = `r round(sd_true_group_level_mean_0_51,2)`) within samples from the medium population effect standard deviation, and `r round(mean_true_group_level_mean_0_81,2)` (`\textit{SD}` = `r round(sd_true_group_level_mean_0_81,2)`) within samples from the small population effect standard deviation. The mean true group-level mean of log(`\textit{k}`) parameters was `r round(mean_true_group_level_mean_log_k,2)` (`\textit{SD}` = `r round(sd_true_group_level_mean_log_k,2)`). The mean estimate of the group-level mean of s`\textsubscript{log(\textit{k})}` was `r round(mean_group_level_mean_0_2, 2)` (`\textit{SD}` = `r round(sd_group_level_mean_0_2, 2)`) within models fitted to samples from the small population effect standard deviation, `r round(mean_group_level_mean_0_51, 2)` (`\textit{SD}` = `r round(sd_group_level_mean_0_51, 2)`) within models fitted to samples from the medium population effect standard deviation, and `r round(mean_group_level_mean_0_81, 2)` (`\textit{SD}` = `r round(sd_group_level_mean_0_81, 2)`) within models fitted to samples from the large population effect standard deviation. Mean absolute estimates of the group-level mean of s`\textsubscript{log(\textit{k})}` per population effect and prior standard deviation are depicted in Figure `\hyperref[fig:recovery]{\ref{fig:recovery}B}`. Descriptively, mean absolute estimates of the group-level mean were constant with wider priors, but decreased with decreasing prior width. The mean estimate of the group-level mean of log(`\textit{k}`) was `r round(mean_group_level_mean_log_k, 2)` (`\textit{SD}` = `r round(sd_group_level_mean_log_k, 2)`).
+`\\`  
 The mean estimate of the group-level standard deviation of s`\textsubscript{log(\textit{k})}` was `r round(mean_group_level_sd_0_2, 2)` (`\textit{SD}` = `r round(sd_group_level_sd_0_2, 2)`) within models fitted to samples from the small population effect standard deviation, `r round(mean_group_level_sd_0_51, 2)` (`\textit{SD}` = `r round(sd_group_level_sd_0_51, 2)`) within models fitted to samples from the medium population effect standard deviation, and `r round(mean_group_level_sd_0_81, 2)` (`\textit{SD}` = `r round(sd_group_level_sd_0_81, 2)`) within models fitted to samples from the large population effect standard deviation. The mean estimate of the group-level standard deviation of log(`\textit{k}`) was `r round(mean_group_level_sd_log_k, 2)` (`\textit{SD}` = `r round(sd_group_level_sd_log_k, 2)`).
 
 ```
 \begin{figure} [H]
     \centering
-    \caption{Group-level}
-    \label{fig:values}
-    \includegraphics[width=1\linewidth]{figures/recovery.pdf}
-\end{figure}
-```
-
-
-
-
-
--> Scatter Plot: y = SD estimates, x = SD true parameters (4800 Punkte, farblich, mit 45° Linie)
-
--> partial pooling stats and multiplot
-
-
-
--> table: true sample mean | group-level mean | mean subj-level estimate | Mean change
-- 4 rows: log_k + s_log_k (3 effect SDs) ?? unnötig, weil keine Unterschiede
-
-
-
-
-
-```
-\begin{figure} [H]
-    \centering
-    \caption{Parameter recovery and partial pooling}
+    \caption{Parameter recovery}
     \label{fig:recovery}
-    \includegraphics[width=1\linewidth]{figures/multiplot_recovery.png}
-    \caption*{Note. \textnormal{Recovery of subject-level parameters (A), mean estimates of the group-level mean (B), mean differences between the variance of true subject-level parameters and the variance of subject-level estimates within samples (C)}}
+    \includegraphics[width=1\linewidth]{figures/recovery_s_log_k.pdf}
+    \caption*{Note. \textnormal{(A) Ratio of the true and estimated subject-level standard deviation within models. The true subject-level standard deviation of models below the line were shrunk. Note that absolute shrinkage was comparable between population effect standard deviations, but relative shrinkage was higher, the lower the population effect standard deviation was (B)  Shrinkage of group-level mean estimates towards informative priors. Dashed lines show the true absolute sample means of 0.03 (small population effect standard deviation), 0.06 (medium population effect standard deviation), and 0.11 (large population effect standard deviation).}}
 \end{figure}
 ```
 <br>
-`\subsection{Inference methods}`
-Across all models, Savage-Dickey BFs ranged from `r round(min(df_results$savage_dickey_bf),2)` to `r round(max(df_results$savage_dickey_bf),2)` (`\textit{M}` = `r round(mean(df_results$savage_dickey_bf),2)`, `\textit{SD}` = `r round(sd(df_results$savage_dickey_bf),2)`), dBFs ranged from `r round(min(df_results$directional_bf),2)` to `r round(max(df_results$directional_bf),2)` (`\textit{M}` = `r round(mean(df_results$directional_bf),2)`, `\textit{SD}` = `r round(sd(df_results$directional_bf),2)`) and P(effect > 0) ranged from `r remove_leading_zero(round(min(df_results$p_effect),2))` to `r remove_leading_zero(round(max(df_results$p_effect),2))` (`\textit{M}` = `r remove_leading_zero(round(mean(df_results$p_effect),2))`, `\textit{SD}` = `r remove_leading_zero(round(sd(df_results$p_effect),2))`). See Figure `\ref{fig:values}` for the distributions of Savage-Dickey BFs, dBFs, and P(effect > 0) proportions.`\\`
+`\subsection{Inference methods}`  
+Across all models, Savage-Dickey BFs ranged from `r round(min(df_results$savage_dickey_bf),2)` to `r round(max(df_results$savage_dickey_bf),2)` (`\textit{M}` = `r round(mean(df_results$savage_dickey_bf),2)`, `\textit{SD}` = `r round(sd(df_results$savage_dickey_bf),2)`), dBFs ranged from `r round(min(df_results$directional_bf),2)` to `r round(max(df_results$directional_bf),2)` (`\textit{M}` = `r round(mean(df_results$directional_bf),2)`, `\textit{SD}` = `r round(sd(df_results$directional_bf),2)`) and P(effect > 0) ranged from `r remove_leading_zero(round(min(df_results$p_effect),2))` to `r remove_leading_zero(round(max(df_results$p_effect),2))` (`\textit{M}` = `r remove_leading_zero(round(mean(df_results$p_effect),2))`, `\textit{SD}` = `r remove_leading_zero(round(sd(df_results$p_effect),2))`). The Savage-Dickey BFs, dBFs, and P(effect > 0) proportions of all models are shown in Figure `\ref{fig:values}`.`\\`
 
 ```
 \begin{figure} [H]
     \centering
-    \caption{Distributions of Savage-Dickey BFs, dBFs and P(effect > 0) proportions}
+    \caption{Savage-Dickey BFs, dBFs, and P(effect > 0) proportions of all models}
     \label{fig:values}
     \includegraphics[width=1\linewidth]{figures/multiplot_values.pdf}
     \caption*{Note. \textnormal{Solid lines indicate mean values.}}
 \end{figure}
 ```
 <br>
-`\subsection{False positive results}`  
-With a decision threshold of 3, `r round(fp_savage_dickey_bf_3 * 100, 2)``\%` of Savage-Dickey BFs were false positive. With a decision threshold of 1/3 for a negative and 3 for a positive effect, `r round(fp_directional_bf_3 * 100, 2)``\%` of dBFs were false positive. With 1/10 and 10 as directional decision thresholds, `r round(fp_directional_bf_10 * 100, 2)``\%` of dBFs were false positive, with 1/30 and 30, `r round(fp_directional_bf_30 * 100, 2)``\%` and with 1/100 and 100, `r round(fp_directional_bf_100 * 100, 2)``\%`. With a 80`\%` HDI, `r round(fp_hdi_80 * 100, 2)``\%` of decisions were false positive, with a 90`\%` HDI, `r round(fp_hdi_90 * 100, 2)``\%`, with a 95`\%` HDI, `r round(fp_hdi_95 * 100, 2)``\%` and with a 99`\%` HDI, `r round(fp_hdi_99 * 100, 2)``\%`. With P(effect > 0) > .95 for a positive and P(effect > 0) < .05 for negative effect, `r round(fp_p_effect_95 * 100, 2)``\%` of P(effect > 0) proportions were false positive. With > .975 and < .025 as directional thresholds, `r round(fp_p_effect_975 * 100, 2)``\%` of P(effect > 0) proportions were false positive and with > .99 and < .01, `r round(fp_p_effect_99 * 100, 2)``\%`. See Figure `\ref{fig:fig_fp}` for the proportions of false positive results per prior and population effect standard deviations.`\\`
+`\subsection{False positive results}` 
+The proportion of false positive results of every decision threshold was calculated for every combination of the prior and population effect standard deviation (Figure `\ref{fig:false_positves}`) and overall. 
+
+
+
+With a decision threshold of 3, `r round(fp_savage_dickey_bf_3 * 100, 2)``\%` of Savage-Dickey BFs were false positive. With a decision threshold of 1/3 for a negative and 3 for a positive effect, `r round(fp_directional_bf_3 * 100, 2)``\%` of dBFs were false positive. With 1/10 and 10 as directional decision thresholds, `r round(fp_directional_bf_10 * 100, 2)``\%` of dBFs were false positive, with 1/30 and 30, `r round(fp_directional_bf_30 * 100, 2)``\%` and with 1/100 and 100, `r round(fp_directional_bf_100 * 100, 2)``\%`. With a 80`\%` HDI, `r round(fp_hdi_80 * 100, 2)``\%` of decisions were false positive, with a 90`\%` HDI, `r round(fp_hdi_90 * 100, 2)``\%`, with a 95`\%` HDI, `r round(fp_hdi_95 * 100, 2)``\%` and with a 99`\%` HDI, `r round(fp_hdi_99 * 100, 2)``\%`. With P(effect > 0) > .95 for a positive and P(effect > 0) < .05 for negative effect, `r round(fp_p_effect_95 * 100, 2)``\%` of P(effect > 0) proportions were false positive. With > .975 and < .025 as directional thresholds, `r round(fp_p_effect_975 * 100, 2)``\%` of P(effect > 0) proportions were false positive and with > .99 and < .01, `r round(fp_p_effect_99 * 100, 2)``\%`. 
+
+See Figure `\ref{fig:false_positves}` for the proportions of false positive results per prior and population effect standard deviations.`\\`
+
+
+Table `\ref{tab:false_positives_prior}` shows the proportions of false positive results of all inference methods per prior standard deviation, averaged over all population effect standard deviations.
+
+- add table
+
+
 
 ```
 \begin{figure} [H]
     \centering
     \caption{Proportions of false positive results with conventional decision thresholds}
-    \label{fig:fig_fp}
+    \label{fig:false_positves}
     \includegraphics[width=1\linewidth]{figures/multiplot_fp.pdf}
     \caption*{Note. \textnormal{Dashed lines indicate a proportion of 5\% false positive results.}}
 \end{figure}
