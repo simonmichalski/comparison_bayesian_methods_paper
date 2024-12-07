@@ -4,6 +4,7 @@ library("patchwork")
 library("tidyr")
 library("dplyr")
 library("rstan")
+library("scales")
 
 if (!dir.exists("plots")) {
   dir.create("plots", recursive = TRUE)
@@ -12,112 +13,93 @@ if (!dir.exists("plots")) {
 df_results <- readRDS("final_results/final_results.rds")
 df_sim_thres <- readRDS("final_results/sim_based_thresholds.rds")
 df_recovery <- readRDS("final_results/recovery.rds")
+df_sim_thres_effect_prior <- readRDS(file.path("results", "sim_thres_per_effect_and_prior_sd.rds"))
 
 # Values
-data_savage_dickey_bf <- aggregate(savage_dickey_bf ~ s_log_k_sd + prior_sd, df_results, mean)
-data_directional_bf <- aggregate(directional_bf ~ s_log_k_sd + prior_sd, df_results, mean)
-data_p_effect <- aggregate(p_effect ~ s_log_k_sd + prior_sd, df_results, mean)
+df_results$s_log_k_sd <- format(df_results$s_log_k_sd, nsmall = 0.01)
 
-dodge_width <- 0.8
-point_size <- 0.5
-axis_text_size <- 4.5
-axis_title_size <- 7
+dodge_width <- 0.9
+boxplot_size <- 0.225
+outlier_size = 0.3
+axis_text_size <- 7
+axis_title_size <- 8
 border_size <- 0.3
 tick_length <- -0.05
-tick_width <- 0.3
-line_width <- 1
+tick_width <- border_size/2
 
 plot_savage_dickey_bf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = savage_dickey_bf, color = as.factor(s_log_k_sd))) +
   labs(x = expression("Prior " * italic("SD")), y = expression("Savage-Dickey BF"[10]), color = expression("Population " * italic("SD"))) +
   scale_y_log10(labels = scales::comma) +
-  geom_jitter(
+  scale_x_discrete(labels = c("0.05", "0.10", "0.20", "0.50", "1.00", "1.50", "2.00", "2.50")) +
+  geom_boxplot(
     position = position_dodge(width = dodge_width),
-    alpha = 0.5,
-    size = point_size
+    size = boxplot_size,
+    outlier.size = outlier_size,
   ) +
-  geom_line(data = data_savage_dickey_bf,
-            aes(x = as.factor(prior_sd), 
-                y = savage_dickey_bf, 
-                color = as.factor(s_log_k_sd), 
-                group = as.factor(s_log_k_sd)),
-            linewidth = line_width,
-            position = position_dodge(width = dodge_width)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
     axis.ticks.length = unit(tick_length, 'cm'),
-    axis.ticks = element_line(linewidth = tick_width),
-    legend.position = c(0.2,0.15),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
+    legend.position = c(0.2,0.13),
     legend.background = element_rect('transparent'),
     legend.key.size = unit(0.4, "lines"),
-    legend.title = element_text(size = 4, margin = margin(b = 0)),
-    legend.text = element_text(size = 4),
+    legend.title = element_text(size = 5, margin = margin(b = 0)),
+    legend.text = element_text(size = 5),
     legend.key.height = unit(0.1, "cm"),
     axis.title.y = element_text(size = axis_title_size),
     axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black")
+    axis.text.x = element_text(size = axis_text_size, color = "black", angle = 30, vjust = 1.2, hjust = 1)
   )
 
 plot_dbf <- ggplot(df_results, aes(x = as.factor(prior_sd), y = directional_bf, color = as.factor(s_log_k_sd))) +
   labs(x = expression("Prior " * italic("SD")), y = expression("dBF"["+-"])) +
   scale_y_log10(labels = scales::comma) +
-  geom_jitter(
+  scale_x_discrete(labels = c("0.05", "0.10", "0.20", "0.50", "1.00", "1.50", "2.00", "2.50")) +
+  geom_boxplot(
     position = position_dodge(width = dodge_width),
-    alpha = 0.5,
-    size = point_size
+    size = boxplot_size,
+    outlier.size = outlier_size,
   ) +
-  geom_line(data = data_directional_bf,
-            aes(x = as.factor(prior_sd), 
-                y = directional_bf, 
-                color = as.factor(s_log_k_sd), 
-                group = as.factor(s_log_k_sd)),
-            linewidth = line_width,
-            position = position_dodge(width = dodge_width)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
     axis.ticks.length = unit(tick_length, 'cm'),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
     axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black")
+    axis.text.x = element_text(size = axis_text_size, color = "black", angle = 30, vjust = 1.2, hjust = 1)
   )
 
 
 plot_p_effect <- ggplot(df_results, aes(x = as.factor(prior_sd), y = p_effect, color = as.factor(s_log_k_sd))) +
   labs(x = expression("Prior " * italic("SD")), y = "P(effect > 0)") +
-  geom_jitter(
+  scale_x_discrete(labels = c("0.05", "0.10", "0.20", "0.50", "1.00", "1.50", "2.00", "2.50")) +
+  geom_boxplot(
     position = position_dodge(width = dodge_width),
-    alpha = 0.5,
-    size = point_size
+    size = boxplot_size,
+    outlier.size = outlier_size,
   ) +
-  geom_line(data = data_p_effect,
-            aes(x = as.factor(prior_sd), 
-                y = p_effect, 
-                color = as.factor(s_log_k_sd), 
-                group = as.factor(s_log_k_sd)),
-            linewidth = line_width,
-            position = position_dodge(width = dodge_width)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
     axis.ticks.length = unit(tick_length, 'cm'),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
     axis.text.y = element_text(size = axis_text_size, color = "black"),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black")
+    axis.text.x = element_text(size = axis_text_size, color = "black", angle = 30, vjust = 1.2, hjust = 1)
   )
 
 
 multiplot_values <- plot_savage_dickey_bf + plot_dbf + plot_p_effect +
-  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 14))
+  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
 
-ggsave("plots/multiplot_values.pdf", plot = multiplot_values, width = 6, height = 2, units = "in", dpi = 300)
+ggsave("plots/values.pdf", plot = multiplot_values, width = 6, height = 2, units = "in", dpi = 300)
 
 
 # False positive results (conv)
@@ -125,6 +107,7 @@ data_fp_savage_dickey_bf_3 <- aggregate(fp_savage_dickey_bf_3 ~ prior_sd + s_log
 
 data_fp_directional_bf_3 <- aggregate(fp_directional_bf_3_pos + fp_directional_bf_1_3_neg ~ prior_sd + s_log_k_sd, df_results, sum)
 names(data_fp_directional_bf_3)[names(data_fp_directional_bf_3) == "fp_directional_bf_3_pos + fp_directional_bf_1_3_neg"] <- "fp_directional_bf_3"
+data_fp_directional_bf_3$s_log_k_sd <- format(data_fp_directional_bf_3$s_log_k_sd, nsmall = 0.01)
 
 data_fp_directional_bf_10 <- aggregate(fp_directional_bf_10_pos + fp_directional_bf_1_10_neg ~ prior_sd + s_log_k_sd, df_results, sum)
 names(data_fp_directional_bf_10)[names(data_fp_directional_bf_10) == "fp_directional_bf_10_pos + fp_directional_bf_1_10_neg"] <- "fp_directional_bf_10"
@@ -157,42 +140,42 @@ data_fp_p_effect_99 <- aggregate(fp_p_effect_99_pos + fp_p_effect_01_neg ~ prior
 names(data_fp_p_effect_99)[names(data_fp_p_effect_99) == "fp_p_effect_99_pos + fp_p_effect_01_neg"] <- "fp_p_effect_99"
 
 
-axis_text_size <- 4.5
-axis_title_size <- 7
-plot_title_size <- 6
+axis_text_size <- 7
+axis_title_size <- 8
+plot_title_size <- 7
 border_size <- 0.3
 tick_length <- -0.05
-tick_width <- 0.3
+tick_width <- border_size/2
 line_width <- 1
-hline_width <- 0.3
+hline_width <- border_size/2
 
-plot_fp_savage_dickey_bf_3 <- ggplot(data_fp_savage_dickey_bf_3, aes(x = prior_sd, y = fp_savage_dickey_bf_3/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "Prop. false positives", title = expression("Savage-Dickey" ~ BF[10] > 3)) +
+plot_fp_savage_dickey_bf_3 <- ggplot(data_fp_savage_dickey_bf_3, aes(x = prior_sd, y = (fp_savage_dickey_bf_3/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(y = "% false positives", title = expression("Savage-Dickey" ~ BF[10] > 3)) +
   geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  geom_hline(yintercept = 5, linetype = 'dashed', linewidth = hline_width) +
   scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
     axis.title.y = element_text(size = axis_title_size),
     axis.text.y = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
-plot_fp_savage_dickey_bf_3
 
-plot_fp_p_effect_95 <- ggplot(data_fp_p_effect_95, aes(x = as.factor(prior_sd), y = fp_p_effect_95/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_p_effect_95 <- ggplot(data_fp_p_effect_95, aes(x = prior_sd, y = (fp_p_effect_95/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", title = "P(effect > 0) [.05, .95]") +
   geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  geom_hline(yintercept = 5, linetype = 'dashed', linewidth = hline_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.x = element_blank(),
@@ -202,14 +185,15 @@ plot_fp_p_effect_95 <- ggplot(data_fp_p_effect_95, aes(x = as.factor(prior_sd), 
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_p_effect_975 <- ggplot(data_fp_p_effect_975, aes(x = as.factor(prior_sd), y = fp_p_effect_975/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_p_effect_975 <- ggplot(data_fp_p_effect_975, aes(x = prior_sd, y = (fp_p_effect_975/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", title = "P(effect > 0) [.025, .975]") +
   geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  geom_hline(yintercept = 5, linetype = 'dashed', linewidth = hline_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.x = element_blank(),
@@ -219,14 +203,15 @@ plot_fp_p_effect_975 <- ggplot(data_fp_p_effect_975, aes(x = as.factor(prior_sd)
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_p_effect_99 <- ggplot(data_fp_p_effect_99, aes(x = as.factor(prior_sd), y = fp_p_effect_99/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_p_effect_99 <- ggplot(data_fp_p_effect_99, aes(x = prior_sd, y = (fp_p_effect_99/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = "Prior SD", title = "P(effect > 0) [.01, .99]") +
   geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  geom_hline(yintercept = 5, linetype = 'dashed', linewidth = hline_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.x = element_blank(),
@@ -236,20 +221,21 @@ plot_fp_p_effect_99 <- ggplot(data_fp_p_effect_99, aes(x = as.factor(prior_sd), 
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_dbf_3 <- ggplot(data_fp_directional_bf_3, aes(x = as.factor(prior_sd), y = fp_directional_bf_3/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(y = "Prop. false positives", title = expression("dBF"["+-"] ~~ "[1/3, 3]"), color = "Population SD") +
+plot_fp_dbf_3 <- ggplot(data_fp_directional_bf_3, aes(x = prior_sd, y = (fp_directional_bf_3/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(y = "% false positives", title = expression("dBF"["+-"] ~~ "[1/3, 3]"), color = expression("Population "*italic("SD"))) +
   geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  geom_hline(yintercept = 5, linetype = 'dashed', linewidth = hline_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = c(0.7,0.35),
+    legend.position = c(0.65,0.4),
     legend.background = element_rect('transparent'),
     legend.key.size = unit(0.5, "lines"),
-    legend.title = element_text(size = 5, margin = margin(b = 0)),
-    legend.text = element_text(size = 5),
+    legend.title = element_text(size = 7, margin = margin(b = 0)),
+    legend.text = element_text(size = 7),
     legend.key.height = unit(0.2, "cm"),
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
@@ -258,14 +244,15 @@ plot_fp_dbf_3 <- ggplot(data_fp_directional_bf_3, aes(x = as.factor(prior_sd), y
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_dbf_10 <- ggplot(data_fp_directional_bf_10, aes(x = as.factor(prior_sd), y = fp_directional_bf_10/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_dbf_10 <- ggplot(data_fp_directional_bf_10, aes(x = prior_sd, y = (fp_directional_bf_10/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(title = expression("dBF"["+-"] ~~ "[1/10, 10]")) +
   geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  geom_hline(yintercept = 5, linetype = 'dashed', linewidth = hline_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.x = element_blank(),
@@ -275,14 +262,15 @@ plot_fp_dbf_10 <- ggplot(data_fp_directional_bf_10, aes(x = as.factor(prior_sd),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_dbf_30 <- ggplot(data_fp_directional_bf_30, aes(x = as.factor(prior_sd), y = fp_directional_bf_30/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_dbf_30 <- ggplot(data_fp_directional_bf_30, aes(x = prior_sd, y = (fp_directional_bf_30/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(title = expression("dBF"["+-"] ~~ "[1/30, 30]")) +
   geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  geom_hline(yintercept = 5, linetype = 'dashed', linewidth = hline_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.x = element_blank(),
@@ -292,14 +280,15 @@ plot_fp_dbf_30 <- ggplot(data_fp_directional_bf_30, aes(x = as.factor(prior_sd),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_dbf_100 <- ggplot(data_fp_directional_bf_100, aes(x = as.factor(prior_sd), y = fp_directional_bf_100/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+plot_fp_dbf_100 <- ggplot(data_fp_directional_bf_100, aes(x = prior_sd, y = (fp_directional_bf_100/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(title = expression("dBF"["+-"] ~~ "[1/100, 100]")) +
   geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  geom_hline(yintercept = 5, linetype = 'dashed', linewidth = hline_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.x = element_blank(),
@@ -309,14 +298,16 @@ plot_fp_dbf_100 <- ggplot(data_fp_directional_bf_100, aes(x = as.factor(prior_sd
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_hdi_80 <- ggplot(data_fp_hdi_80, aes(x = as.factor(prior_sd), y = fp_hdi_80/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "Prop. false positives", title = "80% HDI") +
+plot_fp_hdi_80 <- ggplot(data_fp_hdi_80, aes(x = prior_sd, y = (fp_hdi_80/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(x = expression("Prior "*italic("SD")), y = "% false positives", title = "80% HDI") +
   geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  geom_hline(yintercept = 5, linetype = 'dashed', linewidth = hline_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
+                labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
@@ -326,14 +317,16 @@ plot_fp_hdi_80 <- ggplot(data_fp_hdi_80, aes(x = as.factor(prior_sd), y = fp_hdi
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_hdi_90 <- ggplot(data_fp_hdi_90, aes(x = as.factor(prior_sd), y = fp_hdi_90/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", title = "90% HDI") +
+plot_fp_hdi_90 <- ggplot(data_fp_hdi_90, aes(x = prior_sd, y = (fp_hdi_90/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(x = expression("Prior "*italic("SD")), title = "90% HDI") +
   geom_line(linewidth = line_width) +
   geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
+                labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_blank(),
@@ -343,14 +336,16 @@ plot_fp_hdi_90 <- ggplot(data_fp_hdi_90, aes(x = as.factor(prior_sd), y = fp_hdi
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_hdi_95 <- ggplot(data_fp_hdi_95, aes(x = as.factor(prior_sd), y = fp_hdi_95/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", title = "95% HDI") +
+plot_fp_hdi_95 <- ggplot(data_fp_hdi_95, aes(x = prior_sd, y = (fp_hdi_95/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(x = expression("Prior "*italic("SD")), title = "95% HDI") +
   geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  geom_hline(yintercept = 5, linetype = 'dashed', linewidth = hline_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
+                labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_blank(),
@@ -360,14 +355,16 @@ plot_fp_hdi_95 <- ggplot(data_fp_hdi_95, aes(x = as.factor(prior_sd), y = fp_hdi
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
 
-plot_fp_hdi_99 <- ggplot(data_fp_hdi_99, aes(x = as.factor(prior_sd), y = fp_hdi_99/200, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", title = "99% HDI") +
+plot_fp_hdi_99 <- ggplot(data_fp_hdi_99, aes(x = prior_sd, y = (fp_hdi_99/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
+  labs(x = expression("Prior "*italic("SD")), title = "99% HDI") +
   geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  geom_hline(yintercept = 5, linetype = 'dashed', linewidth = hline_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
+                labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_blank(),
@@ -376,14 +373,13 @@ plot_fp_hdi_99 <- ggplot(data_fp_hdi_99, aes(x = as.factor(prior_sd), y = fp_hdi
     axis.text.x = element_text(size = axis_text_size, color = "black"),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   )
-
 
 multiplot_fp <- (plot_fp_savage_dickey_bf_3 | plot_fp_p_effect_95 | plot_fp_p_effect_975 | plot_fp_p_effect_99) /
   (plot_fp_dbf_3 | plot_fp_dbf_10 | plot_fp_dbf_30 | plot_fp_dbf_100) /
   (plot_fp_hdi_80 | plot_fp_hdi_90 | plot_fp_hdi_95 | plot_fp_hdi_99) +
-  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
+  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 8))
 
-ggsave("plots/multiplot_fp.pdf", plot = multiplot_fp, width = 6, height = 4, units = "in", dpi = 300)
+ggsave("plots/false_positives.pdf", plot = multiplot_fp, width = 6, height = 4, units = "in", dpi = 300)
 
 
 # False positive results (sim)
@@ -404,7 +400,7 @@ axis_title_size <- 7
 plot_title_size <- 6
 border_size <- 0.3
 tick_length <- -0.05
-tick_width <- 0.3
+tick_width <- border_size/2
 line_width <- 1
 hline_width <- 0.3
 
@@ -415,7 +411,7 @@ plot_fp_savage_dickey_bf_sim <- ggplot(data_fp_savage_dickey_bf_sim, aes(x = as.
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.x = element_text(size = axis_title_size),
@@ -432,7 +428,7 @@ plot_fp_dbf_sim <- ggplot(data_fp_directional_bf_sim, aes(x = as.factor(prior_sd
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.x = element_text(size = axis_title_size),
@@ -449,7 +445,7 @@ plot_fp_hdi_sim <- ggplot(data_fp_hdi_sim, aes(x = as.factor(prior_sd), y = fp_h
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_blank(),
@@ -466,7 +462,7 @@ plot_fp_p_effect_sim <- ggplot(data_fp_p_effect_sim, aes(x = as.factor(prior_sd)
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.x = element_text(size = axis_title_size),
@@ -487,7 +483,7 @@ axis_text_size <- 4.5
 axis_title_size <- 7
 border_size <- 0.3
 tick_length <- -0.05
-tick_width <- 0.3
+tick_width <- border_size/2
 line_width <- 1
 
 plot_sbdt_savage_dickey_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = savage_dickey_bf, group = 1)) +
@@ -496,7 +492,7 @@ plot_sbdt_savage_dickey_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
@@ -511,7 +507,7 @@ plot_sbdt_directional_bf_lower <- ggplot(df_sim_thres, aes(x = as.factor(n_tests
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
@@ -526,7 +522,7 @@ plot_sbdt_directional_bf_upper <- ggplot(df_sim_thres, aes(x = as.factor(n_tests
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
@@ -541,7 +537,7 @@ plot_sbdt_hdi_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = hdi*100
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
@@ -556,7 +552,7 @@ plot_sbdt_p_effect_bf_lower <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), 
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
@@ -571,7 +567,7 @@ plot_sbdt_p_effect_bf_upper <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), 
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.y = element_text(size = axis_title_size),
@@ -589,140 +585,79 @@ ggsave("plots/multiplot_thresholds.pdf", plot = multiplot_fp, width = 6, height 
 
 
 # Parameter recovery
-data_recovery_log_k <- summarize(group_by(df_recovery, s_log_k_sd, prior_sd, sample), 
-                                 correlation = cor(true_log_k, median_log_k))
-
-data_recovery_log_k <- aggregate(correlation ~ prior_sd + s_log_k_sd, data_recovery_log_k, mean)
-
-df_recovery$diff_s_log_k <- abs(df_recovery$median_s_log_k - df_recovery$true_s_log_k)
-
-data_cor_s_log_k <- summarize(group_by(df_recovery, s_log_k_sd, prior_sd, sample), 
-                              correlation = cor(true_s_log_k, median_s_log_k))
-
-data_cor_s_log_k <- aggregate(correlation ~ prior_sd + s_log_k_sd, data_cor_s_log_k, mean)
-
-data_diff_s_log_k <- aggregate(diff_s_log_k ~ prior_sd + s_log_k_sd, df_recovery, mean)
-
-
-data_group_level_s_log_k <- aggregate(df_results, abs(median_mu_s_log_k) ~ prior_sd + s_log_k_sd, mean)
-
-data_group_level_log_k <- aggregate(df_results, abs(median_mu_log_k) ~ prior_sd, mean)
-
-var_true_s_log_k <- aggregate(df_recovery, true_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
-var_estimate_s_log_k <- aggregate(df_recovery, median_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
-df_var_s_log_k <- merge(var_true_s_log_k, var_estimate_s_log_k, by = c("prior_sd", "s_log_k_sd", "sample"))
-df_var_s_log_k$var_change <- df_var_s_log_k$median_s_log_k - df_var_s_log_k$true_s_log_k
-data_var_s_log_k <- aggregate(df_var_s_log_k, var_change ~ s_log_k_sd + prior_sd, mean)
-
-var_true_log_k <- aggregate(df_recovery, true_log_k ~ prior_sd + s_log_k_sd + sample, sd)
-var_estimate_log_k <- aggregate(df_recovery, median_log_k ~ prior_sd + s_log_k_sd + sample, sd)
-df_var_log_k <- merge(var_true_log_k, var_estimate_log_k, by = c("prior_sd", "s_log_k_sd", "sample"))
-df_var_log_k$var_change <- df_var_log_k$median_log_k - df_var_log_k$true_log_k
-data_var_log_k <- aggregate(df_var_log_k, var_change ~ prior_sd, mean)
-
-
-subj_estimates_sd <- aggregate(df_recovery, median_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
-subj_estimates_sd_effect <- aggregate(subj_estimates_sd, median_s_log_k ~ s_log_k_sd + prior_sd, mean)
-
-true_sd <- aggregate(df_recovery, true_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
-true_sd_effect <- aggregate(true_sd, true_s_log_k ~ s_log_k_sd + prior_sd, mean)
-
-data_shrinkage <- merge(subj_estimates_sd_effect, true_sd_effect, by = c("s_log_k_sd", "prior_sd"))
-
-data_shrinkage$sd_reduction <- 1 - data_shrinkage$median_s_log_k / data_shrinkage$true_s_log_k
-
-
-df_recovery$s_log_k_sd <- factor(df_recovery$s_log_k_sd, levels = c(0.81, 0.51, 0.2))
-
-
-
 sd_true_s_log_k <- aggregate(df_recovery, true_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
 sd_estimates_s_log_k <- aggregate(df_recovery, median_s_log_k ~ prior_sd + s_log_k_sd + sample, sd)
 data_sd_subj <- merge(sd_true_s_log_k, sd_estimates_s_log_k, by = c("prior_sd", "s_log_k_sd", "sample"))
-#data_sd_subj$s_log_k_sd <- factor(data_sd_subj$s_log_k_sd, levels = c(0.81, 0.51, 0.2))
+data_sd_subj$s_log_k_sd <- format(data_sd_subj$s_log_k_sd, nsmall = 0.01)
+
+true_sample_means_s_log_k <- aggregate(df_recovery, true_s_log_k ~ s_log_k_sd + prior_sd + sample, mean)
+true_abs_mean_sample_means_s_log_k <- aggregate(true_sample_means_s_log_k, abs(true_s_log_k) ~ s_log_k_sd, mean)
+
+data_group_level_s_log_k <- aggregate(df_results, abs(median_mu_s_log_k) ~ prior_sd + s_log_k_sd, mean)
+data_group_level_s_log_k$s_log_k_sd <- format(data_group_level_s_log_k$s_log_k_sd, nsmall = 0.01)
 
 
-axis_text_size <- 7
+axis_text_size <- 8
 axis_title_size <- 10
 border_size <- 0.3
 tick_length <- -0.05
-tick_width <- 0.3
+tick_width <- border_size/2
 line_width <- 1
 point_size <- 1.5
-plot_title_size <- 10
+plot_title_size <- 11
+tick_margin <- 4
 
 
-scatter_s_log_k <- ggplot(df_recovery[order(-df_recovery$s_log_k_sd), ], 
-                          aes(x = true_s_log_k, y = median_s_log_k, color = as.factor(s_log_k_sd), 
-                              group = as.factor(s_log_k_sd))) +
-  labs(x = "True value", y = "Subject-level estimate", title = expression("s"["log("*italic(k)*")"])) +
-  geom_jitter(
-    size = 0.01
-  ) +
-  annotate('text', x = -1, y = 4, label = expression(""*italic(r)*" = .89"), size = 2.5) + 
-  scale_x_continuous(limits = c(-3,4.5)) +
-  scale_y_continuous(limits = c(-3,4.5)) +
-  geom_abline(slope = 1, intercept = 0, linewidth = border_size) +
-  coord_fixed(ratio = 1) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
-    axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = 'none',
-    axis.title.y = element_text(size = axis_title_size-1.5),
-    axis.text.y = element_text(size = axis_text_size, color = "black"),
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black"),
-    plot.title = element_text(hjust = 0.5, size = plot_title_size)
-  )
-
-scatter_sd_s_log_k <- ggplot(data_sd_subj[order(-data_sd_subj$s_log_k_sd), ], 
+scatter_sd_s_log_k <- ggplot(data_sd_subj, 
                              aes(x = true_s_log_k, y = median_s_log_k, color = as.factor(s_log_k_sd), 
                               group = as.factor(s_log_k_sd))) +
   labs(x = expression(italic("SD")*" true parameters"), y = expression(italic("SD")*" estimates"), 
        title = expression("s"["log("*italic(k)*")"]), color = expression("Population "*italic("SD"))) +
   geom_jitter(
-    size = 0.05
+    size = 0.1
   ) +
-  scale_x_continuous(limits = c(0,1.1)) +
-  scale_y_continuous(limits = c(0,1.1)) +
-  geom_abline(slope = 1, intercept = 0, linewidth = border_size) +
-  coord_fixed(ratio = 1) +
+  scale_x_continuous(limits = c(0,1.1), breaks = c(0,0.2,0.4,0.6,0.8,1), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0,1.1), breaks = c(0,0.2,0.4,0.6,0.8,1), expand = c(0, 0)) +
+  geom_abline(slope = 1, intercept = 0, linewidth = border_size/2) +
+  coord_fixed(ratio = 1, clip = "off") +
   theme(
     panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size/2),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = c(0.25,0.8),
+    legend.position = c(0.3,0.8),
     legend.background = element_rect('transparent'),
     legend.key.size = unit(0.5, "points"),
     legend.title = element_text(size = 8, margin = margin(b = 0)),
     legend.text = element_text(size = 8),
     legend.key.height = unit(0.3, "cm"),
     axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    axis.text.y = element_text(size = axis_text_size, color = "black", margin = margin(r = tick_margin)),
     axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black"),
+    axis.text.x = element_text(size = axis_text_size, color = "black", margin = margin(t = tick_margin)),
     plot.title = element_text(hjust = 0.5, size = plot_title_size)
   ) +
   guides(
     color = guide_legend(override.aes = list(size = 1))
   )
 
-plot_group_level_s_log_k <- ggplot(data_group_level_s_log_k, aes(x = as.factor(prior_sd), y = `abs(median_mu_s_log_k)`, color = as.factor(s_log_k_sd), group = as.factor(s_log_k_sd))) + 
-  geom_segment(aes(y = 0.02783835, x = "0.05", xend = "2.5", linetype = "True"), color = "#F8766D", linewidth = 0.3) +
-  geom_segment(aes(y = 0.06441371, x = "0.05", xend = "2.5", linetype = "True"), color = "#00BA38", linewidth = 0.3) +
-  geom_segment(aes(y = 0.10842135, x = "0.05", xend = "2.5", linetype = "True"), color = "#619CFF", linewidth = 0.3) +
+plot_group_level_s_log_k <- ggplot(data_group_level_s_log_k, aes(x = prior_sd, y = `abs(median_mu_s_log_k)`, color = as.factor(s_log_k_sd), group = as.factor(s_log_k_sd))) + 
+  geom_segment(aes(y = true_abs_mean_sample_means_s_log_k[1,2], x = 0.05, xend = 2.5, linetype = "True"), color = "#F8766D", linewidth = 0.3) +
+  geom_segment(aes(y = true_abs_mean_sample_means_s_log_k[2,2], x = 0.05, xend = 2.5, linetype = "True"), color = "#00BA38", linewidth = 0.3) +
+  geom_segment(aes(y = true_abs_mean_sample_means_s_log_k[3,2], x = 0.05, xend = 2.5, linetype = "True"), color = "#619CFF", linewidth = 0.3) +
   geom_line(aes(linetype = "Estimate"), linewidth = 1) +
   labs(x = expression("Prior " * italic("SD")), y = "Mean abs. group-level mean", 
        title = expression("s"["log("*italic(k)*")"])) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
+                labels = c("0.05", "0.10", "0.20", "0.50", "1.00", "", "", "2.50")) +
+  scale_y_continuous(breaks = c(0.03, 0.06, 0.09, 0.12)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = c(0.175,0.75),
+    legend.position = c(0.05,0.75),
+    legend.justification = c(0,0.5),
     legend.background = element_rect('transparent'),
     legend.key.size = unit(1, "lines"),
     legend.title = element_blank(),
@@ -737,184 +672,10 @@ plot_group_level_s_log_k <- ggplot(data_group_level_s_log_k, aes(x = as.factor(p
   scale_linetype_manual(values = c("solid","dashed")) +
   guides(color = "none", linetype = guide_legend(override.aes = list(color = "black")))
 
-plot_sd_reduction <- ggplot(data_shrinkage, aes(x = as.factor(prior_sd), y = sd_reduction*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = expression("Prior " * italic("SD")), y = expression("Mean "*italic("SD")*" reduction (%)"), title = expression("s"["log("*italic(k)*")"])) +
-  geom_line(linewidth = line_width) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
-    axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = 'none',
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black"),
-    axis.title.y = element_text(size = axis_title_size-1.5),
-    axis.text.y = element_text(size = axis_text_size, color = "black"),
-    plot.title = element_text(hjust = 0.5, size = plot_title_size)
-  )
-
-plot_var_s_log_k <- ggplot(data_var_s_log_k, aes(x = as.factor(prior_sd), y = var_change, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = expression("Prior " * italic("SD")), y = "Mean variance difference", title = expression("s"["log("*italic(k)*")"])) +
-  geom_line(linewidth = line_width) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
-    axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = 'none',
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black"),
-    axis.title.y = element_text(size = axis_title_size-1.5),
-    axis.text.y = element_text(size = axis_text_size, color = "black"),
-    plot.title = element_text(hjust = 0.5, size = plot_title_size)
-  )
-
-scatter_log_k <- ggplot(df_recovery, aes(x = true_log_k, y = median_log_k)) +
-  labs(x = "True value", y = "Estimate", title = expression("log("*italic(k)*")")) +
-  geom_jitter(
-    alpha = 0.1,
-    size = point_size
-  ) +
-  scale_x_continuous(limits = c(-9,0)) +
-  scale_y_continuous(limits = c(-9,0)) +
-  geom_abline(slope = 1, intercept = 0, linewidth = border_size) +
-  coord_fixed(ratio = 1) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
-    axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = 'none',
-    axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size, color = "black"),
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black"),
-    plot.title = element_text(hjust = 0.5, size = plot_title_size)
-  )
-
-plot_group_level_log_k <- ggplot(data_group_level_log_k, aes(x = as.factor(prior_sd), y = `abs(median_mu_log_k)`, group = 1)) + 
-  geom_line(linewidth = 1) +
-  labs(x = expression("Prior " * italic("SD")), y = "Mean abs. group-level mean", 
-       title = expression("log("*italic(k)*")")) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
-    axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = 'none',
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black"),
-    axis.title.y = element_text(size = axis_title_size-1),
-    axis.text.y = element_text(size = axis_text_size, color = "black"),
-    plot.title = element_text(hjust = 0.5, size = plot_title_size)
-  )
-
-plot_var_log_k <- ggplot(data_var_log_k, aes(x = as.factor(prior_sd), y = var_change, group = 1)) +
-  labs(x = expression("Prior " * italic("SD")), y = "Mean variance difference", title = expression("log("*italic(k)*")")) +
-  geom_line(linewidth = line_width) +
-  scale_y_continuous(limits = c(-0.1,-0.02)) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
-    axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = 'none',
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black"),
-    axis.title.y = element_text(size = axis_title_size-1),
-    axis.text.y = element_text(size = axis_text_size, color = "black"),
-    plot.title = element_text(hjust = 0.5, size = plot_title_size)
-  )
-
-
-
-
-
-
-plot_cor_log_k <- ggplot(data_recovery_log_k, aes(x = as.factor(prior_sd), y = correlation, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "r", title = expression("log("*italic(k)*")")) +
-  geom_line(linewidth = line_width) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
-    axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = 'none',
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black"),
-    axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size, color = "black"),
-    plot.title = element_text(hjust = 0.5, size = plot_title_size)
-  )
-
-plot_cor_s_log_k <- ggplot(data_cor_s_log_k, aes(x = as.factor(prior_sd), y = correlation, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "r", title = expression("s"["log("*italic(k)*")"]), color = "Population SD") +
-  geom_line(linewidth = line_width) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
-    axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = c(0.7,0.45),
-    legend.background = element_rect('transparent'),
-    legend.key.size = unit(0.5, "lines"),
-    legend.title = element_text(size = 5, margin = margin(b = 0)),
-    legend.text = element_text(size = 5),
-    legend.key.height = unit(0.2, "cm"),
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black"),
-    axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size, color = "black"),
-    plot.title = element_text(hjust = 0.5, size = plot_title_size)
-  )
-
-plot_diff_s_log_k <- ggplot(data_diff_s_log_k, aes(x = as.factor(prior_sd), y = diff_s_log_k, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
-  labs(x = "Prior SD", y = "Mean absolute difference", title = expression("s"["log("*italic(k)*")"])) +
-  geom_line(linewidth = line_width) +
-  theme(
-    panel.background = element_blank(),
-    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
-    axis.ticks.length = unit(tick_length, 'cm'),
-    legend.position = 'none',
-    axis.title.x = element_text(size = axis_title_size),
-    axis.text.x = element_text(size = axis_text_size, color = "black"),
-    axis.title.y = element_text(size = axis_title_size),
-    axis.text.y = element_text(size = axis_text_size, color = "black"),
-    plot.title = element_text(hjust = 0.5, size = plot_title_size)
-  )
-
-#multiplot_recovery <- (scatter_s_log_k | plot_group_level_s_log_k | plot_var_s_log_k) / 
-#  (scatter_log_k | plot_group_level_log_k | plot_var_log_k) +
-#  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
-
-#multiplot_recovery <- (scatter_log_k | scatter_s_log_k) /
-#  (plot_group_level_log_k | plot_group_level_s_log_k) /
-#  (plot_var_log_k | plot_var_s_log_k) + 
-#  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
-
-multiplot_recovery2 <- (scatter_s_log_k | plot_var_s_log_k | plot_group_level_s_log_k) +
-  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
-
-ggsave(file.path("plots", "multiplot_recovery.png"), plot = multiplot_recovery2, width = 6, height = 2, units = "in", dpi = 300)
-
-
-multiplot_s_log_k <- (scatter_s_log_k | plot_cor_s_log_k | plot_diff_s_log_k) +
-  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
-
-ggsave(file.path("plots", "recovery_s_log_k.png"), plot = multiplot_s_log_k, width = 6, height = 3, units = "in", dpi = 300)
-
-multiplot_s_log_k <- (scatter_s_log_k | plot_group_level_s_log_k | plot_sd_reduction) +
-  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
-
-ggsave(file.path("plots", "recovery_s_log_k.png"), plot = multiplot_s_log_k, width = 6, height = 3, units = "in", dpi = 300)
-
-
 multiplot_recovery <- (scatter_sd_s_log_k | plot_group_level_s_log_k) +
-  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
+  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 12))
 
-ggsave(file.path("plots", "recovery_s_log_k.png"), plot = multiplot_recovery, width = 6, height = 3, units = "in", dpi = 300)
-
+ggsave(file.path("plots", "recovery_s_log_k.pdf"), plot = multiplot_recovery, width = 6, height = 3, units = "in", dpi = 300)
 
 
 # Prior sensitivity example
@@ -931,7 +692,7 @@ axis_text_size <- 8
 axis_title_size <- 11
 border_size <- 0.3
 tick_length <- -0.05
-tick_width <- 0.3
+tick_width <- border_size/2
 line_width <- 1
 point_size <- 1.5
 plot_title_size <- 10
@@ -946,7 +707,7 @@ ps_example_1 <- ggplot(posterior_1, aes(x = mu_s_log_k)) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = c(0.2,0.85),
     legend.background = element_rect('transparent'),
@@ -966,10 +727,11 @@ ps_example_2 <- ggplot(posterior_2, aes(x = mu_s_log_k)) +
   stat_function(fun = dnorm, n = 10000, args = list(mean = 0, sd = 1.5), aes(linetype = "Prior")) +
   annotate("point", x = 0, y = y_cord_2, size = point_size) + 
   annotate("point", x = 0, y = dnorm(0,0,1.5), size = point_size) + 
+  scale_y_continuous(labels = label_number(accuracy = 0.1)) +
   theme(
   panel.background = element_blank(),
   panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-  axis.ticks = element_line(linewidth = tick_width),
+  axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
   axis.ticks.length = unit(tick_length, 'cm'),
   legend.position = 'none',
   axis.title.x = element_text(size = axis_title_size),
@@ -980,7 +742,6 @@ ps_example_2 <- ggplot(posterior_2, aes(x = mu_s_log_k)) +
 )
 
 ps_example <- (ps_example_1 | ps_example_2) + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 12))
-ps_example
 
 ggsave(file.path("plots", "prior_sensitivity_example.pdf"), plot = ps_example, width = 6, height = 3, units = "in", dpi = 300)
 
@@ -998,7 +759,7 @@ data_shrinkage_example$type <- factor(data_shrinkage_example$type,
 
 border_size <- 0.3
 tick_length <- -0.05
-tick_width <- 0.3
+tick_width <- border_size/2
 
 plot_shrinkage <- ggplot(data_shrinkage_example, aes(x = type, y = value, group = id)) +
   labs(y = expression(theta["i"])) +
@@ -1009,7 +770,7 @@ plot_shrinkage <- ggplot(data_shrinkage_example, aes(x = type, y = value, group 
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
-    axis.ticks = element_line(linewidth = tick_width),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
     axis.ticks.length = unit(tick_length, 'cm'),
     legend.position = 'none',
     axis.title.x = element_blank(),
@@ -1021,5 +782,250 @@ plot_shrinkage <- ggplot(data_shrinkage_example, aes(x = type, y = value, group 
 ggsave(file.path("plots", "shrinkage_example.pdf"), plot = plot_shrinkage, width = 3, height = 3, units = "in", dpi = 300)
 
 
+# Simulation-based decision thresholds
+df_sim_thres_effect_prior$s_log_k_sd <- format(df_sim_thres_effect_prior$s_log_k_sd, nsmall = 0.01)
+
+axis_text_size <- 7
+axis_title_size <- 8
+border_size <- 0.3
+tick_length <- -0.05
+tick_width <- border_size/2
+line_width <- 1
+
+plot_sbdt_savage_dickey_bf <- ggplot(df_sim_thres_effect_prior, 
+                                     aes(x = prior_sd, y = savage_dickey_bf, 
+                                         color = as.factor(s_log_k_sd), group = as.factor(s_log_k_sd))) +
+  labs(y = expression("Savage-Dickey BF"[10])) +
+  geom_line(linewidth = line_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
+                labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank()
+  )
+
+plot_sbdt_directional_bf_lower <- ggplot(df_sim_thres_effect_prior, 
+                                         aes(x = prior_sd, y = directional_bf_lower, 
+                                             color = as.factor(s_log_k_sd), group = as.factor(s_log_k_sd))) +
+  labs(y = expression("dBF"["+-"] ~~ "lower"), color = expression("Population "*italic("SD"))) +
+  geom_line(linewidth = line_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
+                labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = c(0.7,0.65),
+    legend.background = element_rect('transparent'),
+    legend.key.size = unit(0.5, "lines"),
+    legend.title = element_text(size = 7, margin = margin(b = 0)),
+    legend.text = element_text(size = 7),
+    legend.key.height = unit(0.2, "cm"),
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank()
+  )
+
+plot_sbdt_directional_bf_upper <- ggplot(df_sim_thres_effect_prior, 
+                                         aes(x = prior_sd, y = directional_bf_upper, 
+                                             color = as.factor(s_log_k_sd), group = as.factor(s_log_k_sd))) +
+  labs(y = expression("dBF"["+-"] ~~ "upper")) +
+  geom_line(linewidth = line_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
+                labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank()
+  )
+
+plot_sbdt_hdi_bf <- ggplot(df_sim_thres_effect_prior, 
+                           aes(x = prior_sd, y = hdi*100, 
+                               color = as.factor(s_log_k_sd), group = as.factor(s_log_k_sd))) +
+  labs(x = expression("Prior "*italic("SD")), y = "HDI width (%)") +
+  geom_line(linewidth = line_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
+                labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black")
+  )
+
+plot_sbdt_p_effect_bf_lower <- ggplot(df_sim_thres_effect_prior,
+                                      aes(x = prior_sd, y = p_effect_lower,
+                                          color = as.factor(s_log_k_sd), group = as.factor(s_log_k_sd))) +
+  labs(x = expression("Prior "*italic("SD")), y = "P(effect > 0) lower") +
+  geom_line(linewidth = line_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
+                labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black")
+  )
+
+plot_sbdt_p_effect_bf_upper <- ggplot(df_sim_thres_effect_prior,
+                                      aes(x = prior_sd, y = p_effect_upper, 
+                                          color = as.factor(s_log_k_sd), group = as.factor(s_log_k_sd))) +
+  labs(x = expression("Prior "*italic("SD")), y = "P(effect > 0) upper") +
+  geom_line(linewidth = line_width) +
+  scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
+                labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
+  theme(
+    panel.background = element_blank(),
+    panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
+    axis.ticks = element_line(linewidth = tick_width, color = "#000000"),
+    axis.ticks.length = unit(tick_length, 'cm'),
+    legend.position = 'none',
+    axis.title.y = element_text(size = axis_title_size),
+    axis.text.y = element_text(size = axis_text_size, color = "black"),
+    axis.title.x = element_text(size = axis_title_size),
+    axis.text.x = element_text(size = axis_text_size, color = "black")
+  )
+
+multiplot_sim_thres <- (plot_sbdt_savage_dickey_bf | plot_sbdt_directional_bf_lower | plot_sbdt_directional_bf_upper) / 
+  (plot_sbdt_hdi_bf | plot_sbdt_p_effect_bf_lower | plot_sbdt_p_effect_bf_upper) +
+  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 8))
+
+ggsave("plots/sim_thres.pdf", plot = multiplot_sim_thres, width = 6, height = 2.66, units = "in", dpi = 300)
 
 
+# Overlap of false positive results
+df_results$fp_directional_bf_3 <- df_results$fp_directional_bf_3_pos + df_results$fp_directional_bf_1_3_neg
+df_results$fp_directional_bf_10 <- df_results$fp_directional_bf_10_pos + df_results$fp_directional_bf_1_10_neg
+df_results$fp_directional_bf_30 <- df_results$fp_directional_bf_30_pos + df_results$fp_directional_bf_1_30_neg
+df_results$fp_directional_bf_100 <- df_results$fp_directional_bf_100_pos + df_results$fp_directional_bf_1_100_neg
+
+df_results$fp_p_effect_95 <- df_results$fp_p_effect_95_pos + df_results$fp_p_effect_05_neg
+df_results$fp_p_effect_975 <- df_results$fp_p_effect_975_pos + df_results$fp_p_effect_025_neg
+df_results$fp_p_effect_99 <- df_results$fp_p_effect_99_pos + df_results$fp_p_effect_01_neg
+
+df_results$fp_hdi_80 <- df_results$fp_hdi_80_pos + df_results$fp_hdi_80_neg
+df_results$fp_hdi_90 <- df_results$fp_hdi_90_pos + df_results$fp_hdi_90_neg
+df_results$fp_hdi_95 <- df_results$fp_hdi_95_pos + df_results$fp_hdi_95_neg
+df_results$fp_hdi_99 <- df_results$fp_hdi_99_pos + df_results$fp_hdi_99_neg
+
+df_results$fp_directional_bf_sim <- df_results$fp_directional_bf_sim_pos + df_results$fp_directional_bf_sim_neg
+df_results$fp_p_effect_sim <- df_results$fp_p_effect_sim_pos + df_results$fp_p_effect_sim_neg
+df_results$fp_hdi_sim <- df_results$fp_hdi_sim_pos + df_results$fp_hdi_sim_neg
+
+
+columns2 <- list(df_results$fp_savage_dickey_bf_3, df_results$fp_directional_bf_3, df_results$fp_directional_bf_10, 
+                df_results$fp_directional_bf_30, df_results$fp_directional_bf_100, df_results$fp_p_effect_95,
+                df_results$fp_p_effect_975, df_results$fp_p_effect_99, df_results$fp_hdi_80, df_results$fp_hdi_90,
+                df_results$fp_hdi_95, df_results$fp_hdi_99)
+
+columns <- list(df_results$fp_savage_dickey_bf_3, df_results$fp_directional_bf_30,
+                df_results$fp_p_effect_975, df_results$fp_hdi_95)
+
+columns <- list(df_results$fp_savage_dickey_bf_sim, df_results$fp_directional_bf_sim,
+                df_results$fp_p_effect_sim, df_results$fp_hdi_sim)
+
+
+column_names <- c("BF", "dBF", "P(effect > 0)", "95% HDI")
+
+get_overlap_false_positives2 <- function(column_1, column_2){
+  overlap_percentage <- ((sum(column_1 == 1 & column_2 == 1) *2) / (sum(column_1) + sum(column_2))) * 100
+  return(overlap_percentage)
+}
+
+get_overlap_false_positives <- function(column_1, column_2){
+  overlap_percentage <- (sum(column_1 == 1 & column_2 == 1) / sum(column_1)) * 100
+  return(overlap_percentage)
+}
+
+
+#overlap_matrix <- matrix(NA, nrow = length(columns2), ncol = length(columns2))
+
+overlap_df <- data.frame("method_x" = rep(NA, 16), "method_y" = rep(NA, 16), "overlap" = rep(NA, 16))
+counter <- 1
+
+for (i in 1:length(columns)) {
+  
+  for (j in 1:length(columns)) {
+    overlap_df[counter, "method_x"] <- column_names[j]
+    overlap_df[counter, "method_y"] <- column_names[i]
+    overlap_df[counter, "overlap"] <- get_overlap_false_positives(columns[[i]], columns[[j]])
+    counter <- counter + 1
+  }
+}
+
+overlap_df$method_x <- factor(overlap_df$method_x, levels = c("BF", "dBF", "P(effect > 0)", "95% HDI"))
+overlap_df$method_y <- factor(overlap_df$method_y, levels = c("95% HDI", "P(effect > 0)", "dBF", "BF"))
+
+
+ggplot(overlap_df, aes(x = method_x, y = method_y, fill = overlap)) + 
+  geom_tile() +
+  scale_x_discrete(position = "top")
+
+library("pheatmap")
+library("ComplexHeatmap")
+
+
+#rownames(overlap_matrix) <- c("BF > 0", "dBF", "dBF", "dBF", "dBF", "P(effect > 0)", "P(effect > 0)",
+                              #"P(effect > 0)", "HDI", "HDI", "HDI", "HDI")
+
+rownames(overlap_matrix) <- c("BF", "dBF", "P(effect > 0)", "95% HDI")
+colnames(overlap_matrix) <- c("BF", "dBF", "P(effect > 0)", "95% HDI")
+
+pheatmap(overlap_matrix,
+         cluster_rows = FALSE, 
+         cluster_cols = FALSE, 
+         #display_numbers = FALSE,
+         #main = "Mean Overlap Between Inference Methods",
+         fontsize = 12,
+         row_names_side = "left")
+
+heatmap(overlap_matrix, Rowv = NA, Colv = NA)
+
+ggplot(overlap_matrix)
+
+
+
+
+
+df_results$model_number <- seq(1:4800)
+
+df_results_long <- pivot_longer(df_results, 
+                                cols = c("fp_savage_dickey_bf_3", "fp_directional_bf_3", "fp_directional_bf_10",
+                                        "fp_directional_bf_30", "fp_directional_bf_100", "fp_p_effect_95", 
+                                        "fp_p_effect_975", "fp_p_effect_99", "fp_hdi_80", "fp_hdi_90", 
+                                        "fp_hdi_95", "fp_hdi_99"), 
+                                names_to = "decision_rule", values_to = "fp")
+
+df_results_long <- df_results_long[,c("decision_rule", "fp", "model_number")]
+
+ggplot(df_results_long, aes(x = decision_rule, y = as.factor(model_number), fill = as.factor(fp))) +
+  geom_tile(color = "white") +
+  scale_fill_manual(values = c("0" = "white", "1" = "blue")) +
+  labs(title = "Overlap of Inference Methods", x = "Inference Methods", y = "Samples") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
