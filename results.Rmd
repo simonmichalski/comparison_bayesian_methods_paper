@@ -4,13 +4,12 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 ```
 
 ```{r}
-#library('papaja')
 library("dplyr")
 
-df_results <- readRDS(file.path("final_results", "final_results.rds"))
-sim_based_thres <- readRDS(file.path("final_results", "sim_based_thresholds.rds"))
-df_recovery <- readRDS(file.path("final_results", "recovery.rds"))
-#df_sim_thres_prior <- readRDS(file.path("results", "sim_thres_per_effect_sd.rds"))
+df_results <- readRDS(file.path("results", "results.rds"))
+sim_based_thres <- readRDS(file.path("results", "sim_based_thresholds.rds"))
+df_recovery <- readRDS(file.path("results", "recovery.rds"))
+df_sim_thres_prior <- readRDS(file.path("results", "sim_thres_per_prior_sd.rds"))
 
 # Correlation true-estimated subject-level parameters
 data_cor_s_log_k <- summarize(group_by(df_recovery, s_log_k_sd, prior_sd, sample), 
@@ -106,23 +105,7 @@ sd_group_level_sd_0_81 <- sd(df_results[df_results$s_log_k_sd == 0.81, "median_s
 mean_group_level_sd_log_k <- mean(df_results$median_sd_log_k)
 sd_group_level_sd_log_k <- sd(df_results$median_sd_log_k)
 
-# Median within sample range (mwsr)
-get_within_sample_range <- function(column){
-  range_vec <- vector()
-  for (i in seq(from = 1, by = 8, length.out = length(column)/8)){
-    range_vec <- append(range_vec, range(column[seq(i, i+7)])[2] - range(column[seq(i, i+7)])[1])
-  }
-  return(range_vec)
-}
 
-mwsr_savage_dickey_bf <- median(get_within_sample_range(df_results$savage_dickey_bf))
-mwsr_directional_bf <- median(get_within_sample_range(df_results$directional_bf))
-mwsr_p_effect <- median(get_within_sample_range(df_results$p_effect))
-
-mwsr_iqr_savage_dickey_bf <- IQR(get_within_sample_range(df_results$savage_dickey_bf))
-mwsr_iqr_directional_bf <- IQR(get_within_sample_range(df_results$directional_bf))
-mwsr_iqr_p_effect <- IQR(get_within_sample_range(df_results$p_effect))
-  
 # False positive results
 fp_savage_dickey_bf_3 <- sum(df_results$fp_savage_dickey_bf_3)/nrow(df_results)
 
@@ -161,9 +144,6 @@ fp_hdi_99 <- sum(df_results$fp_hdi_99_pos,
 
 # False positives per prior SD
 get_fp_per_prior_sd <- function(column_pos, column_neg){
-  if (!all(c(column_pos, column_neg) %in% colnames(df_results))){
-    print("Wrong column name!")
-  }
   prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
   
   vector_fps <- sapply(prior_sds, function(sd){
@@ -224,8 +204,30 @@ ofp_hdi_p_effect <- sum(df_results$fp_hdi_sim_pos == 1 &
                           df_results$fp_p_effect_sim_neg == 1) / n_fp_hdi
 
 
+# Median within sample range (mwsr)
+get_within_sample_range <- function(column){
+  range_vec <- vector()
+  for (i in seq(from = 1, by = 8, length.out = length(column)/8)){
+    range_vec <- append(range_vec, range(column[seq(i, i+7)])[2] - range(column[seq(i, i+7)])[1])
+  }
+  return(range_vec)
+}
+
+mwsr_savage_dickey_bf <- median(get_within_sample_range(df_results$savage_dickey_bf))
+mwsr_directional_bf <- median(get_within_sample_range(df_results$directional_bf))
+mwsr_p_effect <- median(get_within_sample_range(df_results$p_effect))
+
+mwsr_iqr_savage_dickey_bf <- IQR(get_within_sample_range(df_results$savage_dickey_bf))
+mwsr_iqr_directional_bf <- IQR(get_within_sample_range(df_results$directional_bf))
+mwsr_iqr_p_effect <- IQR(get_within_sample_range(df_results$p_effect))
+
+
 # Prior sensitivity (ps; proportion of samples in which a method came to diverging results)
-get_ps_null_method <- function(column){
+df_results$fp_directional_bf_sim <- df_results$fp_directional_bf_sim_pos + df_results$fp_directional_bf_sim_neg
+df_results$fp_p_effect_sim <- df_results$fp_p_effect_sim_pos + df_results$fp_p_effect_sim_neg
+df_results$fp_hdi_sim <- df_results$fp_hdi_sim_pos + df_results$fp_hdi_sim_neg
+
+get_prior_sensitivity <- function(column){
   counter <- 0
   for (i in seq(from = 1, by = 8, length.out = length(column)/8)){
     if (all(column[i] == column[seq(i, i+7)]) == FALSE){
@@ -236,100 +238,28 @@ get_ps_null_method <- function(column){
   return(proportion)
 }
 
+ps_savage_dickey_bf_sim <- get_prior_sensitivity(df_results$fp_savage_dickey_bf_sim)
+ps_savage_dickey_bf_sim_0_2 <-get_prior_sensitivity(df_results$fp_savage_dickey_bf_sim[df_results$s_log_k_sd == 0.2])
+ps_savage_dickey_bf_sim_0_51 <- get_prior_sensitivity(df_results$fp_savage_dickey_bf_sim[df_results$s_log_k_sd == 0.51])
+ps_savage_dickey_bf_sim_0_81 <- get_prior_sensitivity(df_results$fp_savage_dickey_bf_sim[df_results$s_log_k_sd == 0.81])
 
-get_ps_directional_method <- function(column_pos, column_neg){
-  counter <- 0
-  for (i in seq(from = 1, by = 8, length.out = length(column_pos)/8)){
-    if ((all(column_pos[i] == column_pos[seq(i, i+7)]) == TRUE) &
-        (all(column_neg[i] == column_neg[seq(i, i+7)]) == TRUE)){
-      counter <- counter + 1
-    }
-  }
-  proportion <- 1 - counter/(length(column_pos)/8)
-  return(proportion)
-}
+ps_directional_bf_sim <- get_prior_sensitivity(df_results$fp_directional_bf_sim)
+ps_directional_bf_sim_0_2 <- get_prior_sensitivity(df_results$fp_directional_bf_sim[df_results$s_log_k_sd == 0.2])
+ps_directional_bf_sim_0_51 <- get_prior_sensitivity(df_results$fp_directional_bf_sim[df_results$s_log_k_sd == 0.51])
+ps_directional_bf_sim_0_81 <- get_prior_sensitivity(df_results$fp_directional_bf_sim[df_results$s_log_k_sd == 0.81])
 
-get_prior_sensitivity <- function(column){
-  diverging_samples <- 0
-  only_fp_samples <- 0
-  for (i in seq(from = 1, by = 8, length.out = length(column)/8)){
-    if (any(column[seq(i, i+7)] == 1)){
-      diverging_samples <- diverging_samples + 1
-    }
-    if (all(column[seq(i, i+7)] == 1) == TRUE){
-      only_fp_samples <- only_fp_samples + 1
-    }
-  }
-  proportion <- only_fp_samples / diverging_samples
-  return(proportion)
-}
+ps_hdi_sim <- get_prior_sensitivity(df_results$fp_hdi_sim)
+ps_hdi_sim_0_2 <- get_prior_sensitivity(df_results$fp_hdi_sim[df_results$s_log_k_sd == 0.2])
+ps_hdi_sim_0_51 <- get_prior_sensitivity(df_results$fp_hdi_sim[df_results$s_log_k_sd == 0.51])
+ps_hdi_sim_0_81 <- get_prior_sensitivity(df_results$fp_hdi_sim[df_results$s_log_k_sd == 0.81])
+
+ps_p_effect_sim <- get_prior_sensitivity(df_results$fp_p_effect_sim)
+ps_p_effect_sim_0_2 <- get_prior_sensitivity(df_results$fp_p_effect_sim[df_results$s_log_k_sd == 0.2])
+ps_p_effect_sim_0_51 <- get_prior_sensitivity(df_results$fp_p_effect_sim[df_results$s_log_k_sd == 0.51])
+ps_p_effect_sim_0_81 <- get_prior_sensitivity(df_results$fp_p_effect_sim[df_results$s_log_k_sd == 0.81])
 
 
-
-ps_savage_dickey_bf_sim <- 
-  get_ps_null_method(df_results$fp_savage_dickey_bf_sim)
-
-ps_savage_dickey_bf_sim_0_2 <-
-  get_ps_null_method(df_results$fp_savage_dickey_bf_sim[df_results$s_log_k_sd == 0.2])
-
-ps_savage_dickey_bf_sim_0_51 <- 
-  get_ps_null_method(df_results$fp_savage_dickey_bf_sim[df_results$s_log_k_sd == 0.51])
-
-ps_savage_dickey_bf_sim_0_81 <- 
-  get_ps_null_method(df_results$fp_savage_dickey_bf_sim[df_results$s_log_k_sd == 0.81])
-
-
-ps_directional_bf_sim <- 
-  get_ps_directional_method(df_results$fp_directional_bf_sim_pos,
-                            df_results$fp_directional_bf_sim_neg)
-
-ps_directional_bf_sim_0_2 <- 
-  get_ps_directional_method(df_results$fp_directional_bf_sim_pos[df_results$s_log_k_sd == 0.2],
-                            df_results$fp_directional_bf_sim_neg[df_results$s_log_k_sd == 0.2])
-
-ps_directional_bf_sim_0_51 <-
-  get_ps_directional_method(df_results$fp_directional_bf_sim_pos[df_results$s_log_k_sd == 0.51],
-                            df_results$fp_directional_bf_sim_neg[df_results$s_log_k_sd == 0.51])
-
-ps_directional_bf_sim_0_81 <-
-  get_ps_directional_method(df_results$fp_directional_bf_sim_pos[df_results$s_log_k_sd == 0.81],
-                            df_results$fp_directional_bf_sim_neg[df_results$s_log_k_sd == 0.81])
-
-
-ps_hdi_sim <- 
-  get_ps_directional_method(df_results$fp_hdi_sim_pos,
-                            df_results$fp_hdi_sim_neg)
-
-ps_hdi_sim_0_2 <- 
-  get_ps_directional_method(df_results$fp_hdi_sim_pos[df_results$s_log_k_sd == 0.2],
-                            df_results$fp_hdi_sim_neg[df_results$s_log_k_sd == 0.2])
-
-ps_hdi_sim_0_51 <- 
-  get_ps_directional_method(df_results$fp_hdi_sim_pos[df_results$s_log_k_sd == 0.51],
-                            df_results$fp_hdi_sim_neg[df_results$s_log_k_sd == 0.51])
-
-ps_hdi_sim_0_81 <- 
-  get_ps_directional_method(df_results$fp_hdi_sim_pos[df_results$s_log_k_sd == 0.81],
-                            df_results$fp_hdi_sim_neg[df_results$s_log_k_sd == 0.81])
-
-
-ps_p_effect_sim <- 
-  get_ps_directional_method(df_results$fp_p_effect_sim_pos,
-                            df_results$fp_p_effect_sim_neg)
-
-ps_p_effect_sim_0_2 <- 
-  get_ps_directional_method(df_results$fp_p_effect_sim_pos[df_results$s_log_k_sd == 0.2],
-                            df_results$fp_p_effect_sim_neg[df_results$s_log_k_sd == 0.2])
-
-ps_p_effect_sim_0_51 <- 
-  get_ps_directional_method(df_results$fp_p_effect_sim_pos[df_results$s_log_k_sd == 0.51],
-                            df_results$fp_p_effect_sim_neg[df_results$s_log_k_sd == 0.51])
-
-ps_p_effect_sim_0_81 <- 
-  get_ps_directional_method(df_results$fp_p_effect_sim_pos[df_results$s_log_k_sd == 0.81],
-                            df_results$fp_p_effect_sim_neg[df_results$s_log_k_sd == 0.81])
-
-
+# Formatting functions
 remove_leading_zero <- function(value){
   value <- format(round(value, 2), nsmall = 2)
   value <- gsub("0\\.", ".", value)
@@ -349,13 +279,13 @@ round_and_format <- function(value){
 ```
 
 `\section{Results}`  
-Note that the intervals between the prior standard deviations are not equal, as they were chosen to cover the most plausible prior standard deviations between zero and 2.5. Hence, overall means cannot be interpreted continuously as averages of all possible prior standard deviations between 0.05 and 2.5, but as averages of discrete prior variations selected in this study.
-
+Note that the intervals between the prior standard deviations are not equal, as they were chosen to cover the most plausible prior standard deviations between zero and 2.50. Hence, overall means cannot be interpreted continuously as averages of all possible prior standard deviations between 0.05 and 2.50, but as averages of discrete prior variations selected in this study.
+<br>
 `\subsection{Recovery of subject-level parameters}`  
 Subject-level estimates correspond to the medians of the respective posterior distributions. The median correlation between true and estimated subject-level s`\textsubscript{log(\textit{k})}` parameters was `\textit{r}` = `r remove_leading_zero(median_cor_s_log_k_0_2)` (`\textit{IQR}` = `r remove_leading_zero(iqr_cor_s_log_k_0_2)`) within models fitted to samples of the small population effect standard deviation, `\textit{r}` = `r remove_leading_zero(median_cor_s_log_k_0_51)` (`\textit{IQR}` = `r remove_leading_zero(iqr_cor_s_log_k_0_51)`) within models fitted to samples from the medium population effect standard deviation, and `\textit{r}` = `r remove_leading_zero(median_cor_s_log_k_0_81)` (`\textit{IQR}` = `r remove_leading_zero(iqr_cor_s_log_k_0_81)`) within models fitted to samples from the large population effect standard deviation. The median correlation within models over all population effect standard deviations was `\textit{r}` = `r remove_leading_zero(median_cor_s_log_k_overall)` (`\textit{IQR}` = `r remove_leading_zero(iqr_cor_s_log_k_overall)`). The median correlation within models between true and estimated subject-level log(`\textit{k}`) parameters was `\textit{r}` = `r remove_leading_zero(median_cor_log_k_overall)` (`\textit{IQR}` = `r remove_leading_zero(iqr_cor_log_k_overall)`).
 `\\`  
-Since hierarchical Bayesian models perform partial pooling, subject-level parameter shrinkage was computed for each model by dividing the difference between the standard deviation of the true subject-level parameters and the standard deviation of the estimated subject-level parameters with the standard deviation of the true subject-level parameters `\autocite{kruschke_doing_2015}`. On average, the true subject-level standard deviation of s`\textsubscript{log(\textit{k})}` parameters was reduced by `r proportion_to_percentage(mean_shrinkage_overall)``\%` (`\textit{SD}` = `r proportion_to_percentage(sd_shrinkage_overall)`) within models. See Figure `\hyperref[fig:recovery]{\ref{fig:recovery}A}` for the ratio of true and estimated subject-level standard deviation within each model. Descriptively, shrinkage of subject-level parameters was stronger, the lower the standard deviation of the sampling distribution was (Table `\ref{tab:shrinkage}`), but constant across all variations of the group-level mean prior of s`\textsubscript{log(\textit{k})}` (Figure Supplement).
-
+Since hierarchical Bayesian models perform partial pooling, subject-level parameter shrinkage was computed for each model by dividing the difference between the standard deviation of the true subject-level parameters and the standard deviation of the estimated subject-level parameters with the standard deviation of the true subject-level parameters `\autocite{kruschke_doing_2015}`. On average, the true subject-level standard deviation of s`\textsubscript{log(\textit{k})}` parameters was reduced by `r proportion_to_percentage(mean_shrinkage_overall)``\%` (`\textit{SD}` = `r proportion_to_percentage(sd_shrinkage_overall)`) within models. See Figure `\hyperref[fig:recovery]{\ref{fig:recovery}A}` for the ratios of true and estimated subject-level standard deviations within models. Descriptively, shrinkage of subject-level parameters was stronger, the lower the standard deviation of the sampling distribution was (Table `\ref{tab:shrinkage}`), but constant across all variations of the group-level mean prior of s`\textsubscript{log(\textit{k})}` (Figure Supplement).
+<br>
 ```
 \begin{table}[H]
     \caption{Shrinkage of subject-level parameters within models}
@@ -374,12 +304,12 @@ Since hierarchical Bayesian models perform partial pooling, subject-level parame
     \end{tabularx}
 \end{table}
 ```
-
+<br>
 `\subsection{Recovery of group-level parameters}`  
-Group-level estimates correspond to the medians of the respective posterior distributions. The mean true group-level mean of s`\textsubscript{log(\textit{k})}` parameters was `r round_and_format(mean_true_group_level_mean_0_2)` (`\textit{SD}` = `r round_and_format(sd_true_group_level_mean_0_2)`) within samples from the small population effect standard deviation, `r round_and_format(mean_true_group_level_mean_0_51)` (`\textit{SD}` = `r round_and_format(sd_true_group_level_mean_0_51)`) within samples from the medium population effect standard deviation, and `r round_and_format(mean_true_group_level_mean_0_81)` (`\textit{SD}` = `r round_and_format(sd_true_group_level_mean_0_81)`) within samples from the small population effect standard deviation. The mean true group-level mean of log(`\textit{k}`) parameters was `r round_and_format(mean_true_group_level_mean_log_k)` (`\textit{SD}` = `r round_and_format(sd_true_group_level_mean_log_k)`). The mean estimate of the group-level mean of s`\textsubscript{log(\textit{k})}` was `r round_and_format(mean_group_level_mean_0_2)` (`\textit{SD}` = `r round_and_format(sd_group_level_mean_0_2)`) within models fitted to samples from the small population effect standard deviation, `r round_and_format(mean_group_level_mean_0_51)` (`\textit{SD}` = `r round_and_format(sd_group_level_mean_0_51)`) within models fitted to samples from the medium population effect standard deviation, and `r round_and_format(mean_group_level_mean_0_81)` (`\textit{SD}` = `r round_and_format(sd_group_level_mean_0_81)`) within models fitted to samples from the large population effect standard deviation. Mean absolute estimates of the group-level mean of s`\textsubscript{log(\textit{k})}` per population effect and prior standard deviation are depicted in Figure `\hyperref[fig:recovery]{\ref{fig:recovery}B}`. Descriptively, mean absolute estimates of the group-level mean were constant with wider priors, but decreased with decreasing prior width. The mean estimate of the group-level mean of log(`\textit{k}`) was `r round_and_format(mean_group_level_mean_log_k)` (`\textit{SD}` = `r round_and_format(sd_group_level_mean_log_k)`).
+Group-level estimates correspond to the medians of the respective posterior distributions. The mean true group-level mean of s`\textsubscript{log(\textit{k})}` parameters was `r round_and_format(mean_true_group_level_mean_0_2)` (`\textit{SD}` = `r round_and_format(sd_true_group_level_mean_0_2)`) within samples from the small population effect standard deviation, `r round_and_format(mean_true_group_level_mean_0_51)` (`\textit{SD}` = `r round_and_format(sd_true_group_level_mean_0_51)`) within samples from the medium population effect standard deviation, and `r round_and_format(mean_true_group_level_mean_0_81)` (`\textit{SD}` = `r round_and_format(sd_true_group_level_mean_0_81)`) within samples from the large population effect standard deviation. The mean true group-level mean of log(`\textit{k}`) parameters was `r round_and_format(mean_true_group_level_mean_log_k)` (`\textit{SD}` = `r round_and_format(sd_true_group_level_mean_log_k)`). The mean estimate of the group-level mean of s`\textsubscript{log(\textit{k})}` was `r round_and_format(mean_group_level_mean_0_2)` (`\textit{SD}` = `r round_and_format(sd_group_level_mean_0_2)`) within models fitted to samples from the small population effect standard deviation, `r round_and_format(mean_group_level_mean_0_51)` (`\textit{SD}` = `r round_and_format(sd_group_level_mean_0_51)`) within models fitted to samples from the medium population effect standard deviation, and `r round_and_format(mean_group_level_mean_0_81)` (`\textit{SD}` = `r round_and_format(sd_group_level_mean_0_81)`) within models fitted to samples from the large population effect standard deviation. Mean absolute estimates of the group-level mean of s`\textsubscript{log(\textit{k})}` per population effect and prior standard deviation are depicted in Figure `\hyperref[fig:recovery]{\ref{fig:recovery}B}`. Descriptively, mean absolute estimates of the group-level mean were constant with wider priors, but decreased with decreasing prior width. The mean estimate of the group-level mean of log(`\textit{k}`) was `r round_and_format(mean_group_level_mean_log_k)` (`\textit{SD}` = `r round_and_format(sd_group_level_mean_log_k)`).  
 `\\`  
 The mean estimate of the group-level standard deviation of s`\textsubscript{log(\textit{k})}` was `r round_and_format(mean_group_level_sd_0_2)` (`\textit{SD}` = `r round_and_format(sd_group_level_sd_0_2)`) within models fitted to samples from the small population effect standard deviation, `r round_and_format(mean_group_level_sd_0_51)` (`\textit{SD}` = `r round_and_format(sd_group_level_sd_0_51)`) within models fitted to samples from the medium population effect standard deviation, and `r round_and_format(mean_group_level_sd_0_81)` (`\textit{SD}` = `r round_and_format(sd_group_level_sd_0_81)`) within models fitted to samples from the large population effect standard deviation. The mean estimate of the group-level standard deviation of log(`\textit{k}`) was `r round_and_format(mean_group_level_sd_log_k)` (`\textit{SD}` = `r round_and_format(sd_group_level_sd_log_k)`).
-
+<br>
 ```
 \begin{figure} [H]
     \centering
@@ -390,24 +320,22 @@ The mean estimate of the group-level standard deviation of s`\textsubscript{log(
 \end{figure}
 ```
 <br>
-
 `\subsection{Inference methods}`  
-Across all models, Savage-Dickey BFs ranged from `r round_and_format(min(df_results$savage_dickey_bf))` to `r round_and_format(max(df_results$savage_dickey_bf))` (`\textit{Mdn}` = `r round_and_format(median(df_results$savage_dickey_bf))`, `\textit{IQR}` = `r round_and_format(IQR(df_results$savage_dickey_bf))`), dBFs ranged from `r round_and_format(min(df_results$directional_bf))` to `r round_and_format(max(df_results$directional_bf))` (`\textit{Mdn}` = `r round_and_format(median(df_results$directional_bf))`, `\textit{IQR}` = `r round_and_format(IQR(df_results$directional_bf))`) and P(effect > 0) ranged from `r remove_leading_zero(min(df_results$p_effect))` to `r remove_leading_zero(max(df_results$p_effect))` (`\textit{Mdn}` = `r remove_leading_zero(median(df_results$p_effect))`, `\textit{IQR}` = `r remove_leading_zero(IQR(df_results$p_effect))`). Boxplots of Savage-Dickey BFs, dBFs, and P(effect > 0) proportions per prior and population effect standard deviation are shown in Figure `\ref{fig:values}`.`\\`  
-
+Across all models, Savage-Dickey BFs ranged from `r round_and_format(min(df_results$savage_dickey_bf))` to `r round_and_format(max(df_results$savage_dickey_bf))` (`\textit{Mdn}` = `r round_and_format(median(df_results$savage_dickey_bf))`, `\textit{IQR}` = `r round_and_format(IQR(df_results$savage_dickey_bf))`), dBFs ranged from `r round_and_format(min(df_results$directional_bf))` to `r round_and_format(max(df_results$directional_bf))` (`\textit{Mdn}` = `r round_and_format(median(df_results$directional_bf))`, `\textit{IQR}` = `r round_and_format(IQR(df_results$directional_bf))`), and P(effect > 0) proportions ranged from `r remove_leading_zero(min(df_results$p_effect))` to `r remove_leading_zero(max(df_results$p_effect))` (`\textit{Mdn}` = `r remove_leading_zero(median(df_results$p_effect))`, `\textit{IQR}` = `r remove_leading_zero(IQR(df_results$p_effect))`). Boxplots of Savage-Dickey BFs, dBFs, and P(effect > 0) proportions per prior and population effect standard deviation are shown in Figure `\ref{fig:values}`.
+<br>
 ```
 \begin{figure} [H]
     \centering
     \caption{Savage-Dickey BFs, dBFs, and P(effect > 0) proportions of all models}
     \label{fig:values}
     \includegraphics[width=1\linewidth]{figures/values.pdf}
-    \caption*{Note. \textnormal{The horizontal line within each box shows the median, the box spans from the first to the third quartile, the lower whisker extends to the lowest value not within 1.5*\textit{IQR} from the first quartile, the upper whisker extends to the highest value no further than 1.5*\textit{IQR} from the third quartile, outliers are displayed as dots, which are all data points outside the lower and upper whisker. Savage-Dickey BFs and dBFs are plotted on a logarithmic scale.}}
+    \caption*{Note. \textnormal{The horizontal line within each box shows the median, the box spans from the first to the third quartile, the lower whisker extends to the lowest value within 1.5*\textit{IQR} below the first quartile, the upper whisker extends to the highest value within 1.5*\textit{IQR} above the third quartile, outliers are displayed as dots, which are all data points outside the lower and upper whisker. Savage-Dickey BFs and dBFs are plotted on a logarithmic scale.}}
 \end{figure}
 ```
 <br>
-
 `\subsection{False positive results}` 
-The proportions of false positive results of every decision rule were calculated for all combination of the prior and population effect standard deviation (Figure `\ref{fig:false_positves}`), per prior standard deviation averaged over all population effect standard deviations (Table `\ref{tab:false_positives_prior}`),  and overall. With a decision threshold of 3, `r proportion_to_percentage(fp_savage_dickey_bf_3)``\%` of Savage-Dickey BFs were false positive. With a decision threshold of 1/3 for a negative and 3 for a positive effect, `r proportion_to_percentage(fp_directional_bf_3)``\%` of dBFs were false positive. With 1/10 and 10 as directional decision thresholds, `r proportion_to_percentage(fp_directional_bf_10)``\%` of dBFs were false positive, with 1/30 and 30, `r proportion_to_percentage(fp_directional_bf_30)``\%` of dfBFs  were false positive, and with 1/100 and 100, `r proportion_to_percentage(fp_directional_bf_100)``\%` of dBFs  were false positive. When applying the HDI against zero decision rule with a 80`\%` HDI, `r proportion_to_percentage(fp_hdi_80)``\%` of decisions were false positive, with a 90`\%` HDI, `r proportion_to_percentage(fp_hdi_90)``\%` of decisions were false positive, with a 95`\%` HDI, `r proportion_to_percentage(fp_hdi_95)``\%` of decisions were false positive, and with a 99`\%` HDI, `r proportion_to_percentage(fp_hdi_99)``\%` of decisions were false positive. With P(effect > 0) > .95 for a positive and P(effect > 0) < .05 for negative effect, `r proportion_to_percentage(fp_p_effect_95)``\%` of P(effect > 0) proportions were false positive, with > .975 and < .025, `r proportion_to_percentage(fp_p_effect_975)``\%` of P(effect > 0) proportions were false positive, and with > .99 and < .01, `r proportion_to_percentage(fp_p_effect_99)``\%` of P(effect > 0) proportions were false positive.  
-
+The proportions of false positive results of every decision rule were calculated for all combinations of the prior and population effect standard deviation (Figure `\ref{fig:false_positves}`), per prior standard deviation averaged over all population effect standard deviations (Table `\ref{tab:false_positives_prior}`),  and overall. With a decision threshold of 3, `r proportion_to_percentage(fp_savage_dickey_bf_3)``\%` of Savage-Dickey BFs were false positive. With a decision threshold of 1/3 for a negative and 3 for a positive effect, `r proportion_to_percentage(fp_directional_bf_3)``\%` of dBFs were false positive. With 1/10 and 10 as directional decision thresholds, `r proportion_to_percentage(fp_directional_bf_10)``\%` of dBFs were false positive, with 1/30 and 30, `r proportion_to_percentage(fp_directional_bf_30)``\%` of dfBFs  were false positive, and with 1/100 and 100, `r proportion_to_percentage(fp_directional_bf_100)``\%` of dBFs  were false positive. When applying the HDI against zero decision rule with a 80`\%` HDI, `r proportion_to_percentage(fp_hdi_80)``\%` of decisions were false positive, with a 90`\%` HDI, `r proportion_to_percentage(fp_hdi_90)``\%` of decisions were false positive, with a 95`\%` HDI, `r proportion_to_percentage(fp_hdi_95)``\%` of decisions were false positive, and with a 99`\%` HDI, `r proportion_to_percentage(fp_hdi_99)``\%` of decisions were false positive. With P(effect > 0) > .95 for a positive and P(effect > 0) < .05 for negative effect, `r proportion_to_percentage(fp_p_effect_95)``\%` of P(effect > 0) proportions were false positive, with > .975 and < .025, `r proportion_to_percentage(fp_p_effect_975)``\%` of P(effect > 0) proportions were false positive, and with > .99 and < .01, `r proportion_to_percentage(fp_p_effect_99)``\%` of P(effect > 0) proportions were false positive.
+<br>
 ```
 \begin{figure} [H]
     \centering
@@ -417,14 +345,14 @@ The proportions of false positive results of every decision rule were calculated
     \caption*{Note. \textnormal{Dashed lines indicate a proportion of 5\% false positive results. Prior standard deviations are plotted on a logarithmic scale. Omitted tick labels are 0.10, 0.50, 1.50, and 2.00.}}
 \end{figure}
 ```
-<br>
+
 ```
 \begin{table}[H]
     \caption{False positive results per prior standard deviation}
     \label{tab:false_positives_prior}
     \begin{tabularx}{\textwidth}{lXXXXXXXX}
     \midrule
-    \multicolumn{1}{c}{Decision rule} & \multicolumn{8}{c}{Proportion of false positive results per decision rule and prior \textit{SD} (\%)}\\
+    \multicolumn{1}{c}{Decision rule} & \multicolumn{8}{c}{False positive results per prior \textit{SD} (\%)}\\
     \cmidrule{2-9}
     \multicolumn{1}{c}{} & \multicolumn{1}{c}{0.05} & \multicolumn{1}{c}{0.10} & \multicolumn{1}{c}{0.20} & \multicolumn{1}{c}{0.50} & \multicolumn{1}{c}{1.00} & \multicolumn{1}{c}{1.50} & \multicolumn{1}{c}{2.00} & \multicolumn{1}{c}{2.50}\\
     \midrule
@@ -445,10 +373,9 @@ The proportions of false positive results of every decision rule were calculated
 \end{table}
 ```
 <br>
-
 `\subsection{Simulation-based decision thresholds}`  
-Simulation-based decision thresholds with a proportion of 5`\%` false positive results were computed for every inference method for all combination of the prior and population effect standard deviation (Figure `\ref{fig:sim_thres}`), per prior standard deviation averaged over all population effect standard deviations (Table `\ref{tab:sim_thres_prior}`), and overall. Note that upper and lower thresholds were set to 2.5`\%` false positive results on each side. With a decision threshold of `r round_and_format(sim_based_thres$savage_dickey_bf[1])`, 5`\%` of Savage Dickey BFs were false positive. The dBF produced 5`\%` false positive results, with a decision threshold of `r round_and_format(sim_based_thres$directional_bf_upper[1])` for a positive and `r round_and_format(sim_based_thres$directional_bf_lower[1])` for a negative effect. A decision rule of P(effect > 0) > `r remove_leading_zero(sim_based_thres$p_effect_upper[1])` for a positive and P(effect > 0) < `r remove_leading_zero(sim_based_thres$p_effect_lower[1])` for a negative effect resulted in 5`\%` false positive results. The HDI against zero decision rule produced 5`\%` false positive results with a `r proportion_to_percentage(sim_based_thres$hdi[1])``\%` HDI.  
-
+Simulation-based decision thresholds with a proportion of 5`\%` false positive results were computed for every inference method for all combinations of the prior and population effect standard deviation (Figure `\ref{fig:sim_thres}`), per prior standard deviation averaged over all population effect standard deviations (Table `\ref{tab:sim_thres_prior}`), and overall. Note that upper and lower thresholds were set to 2.5`\%` false positive results on each side. With a decision threshold of `r round_and_format(sim_based_thres$savage_dickey_bf[1])`, 5`\%` of Savage Dickey BFs were false positive. The dBF produced 5`\%` false positive results, with a decision threshold of `r round_and_format(sim_based_thres$directional_bf_upper[1])` for a positive and `r round_and_format(sim_based_thres$directional_bf_lower[1])` for a negative effect. A decision rule of P(effect > 0) > `r remove_leading_zero(sim_based_thres$p_effect_upper[1])` for a positive and P(effect > 0) < `r remove_leading_zero(sim_based_thres$p_effect_lower[1])` for a negative effect resulted in 5`\%` false positive results. The HDI against zero decision rule produced 5`\%` false positive results with a `r proportion_to_percentage(sim_based_thres$hdi[1])``\%` HDI.
+<br>
 ```
 \begin{figure} [H]
     \centering
@@ -458,10 +385,11 @@ Simulation-based decision thresholds with a proportion of 5`\%` false positive r
     \caption*{Note. \textnormal{Prior standard deviations are plotted on a logarithmic scale. Omitted tick labels are 0.10, 0.50, 1.50, and 2.00.}}
 \end{figure}
 ```
+
 ```
 \begin{table}[H]
-    \caption{False positive results per decision rule and prior standard deviation}
-    \label{tab:false_positives_prior}
+    \caption{Simulation-based decision thresholds per prior standard deviation}
+    \label{tab:sim_thres_prior}
     \begin{tabularx}{\textwidth}{lXXXXXXXX}
     \midrule
     \multicolumn{1}{c}{Inference method} & \multicolumn{8}{c}{Simulation-based decision threshold per prior \textit{SD}}\\
@@ -469,66 +397,38 @@ Simulation-based decision thresholds with a proportion of 5`\%` false positive r
     \multicolumn{1}{c}{} & \multicolumn{1}{c}{0.05} & \multicolumn{1}{c}{0.10} & \multicolumn{1}{c}{0.20} & \multicolumn{1}{c}{0.50} & \multicolumn{1}{c}{1.00} & \multicolumn{1}{c}{1.50} & \multicolumn{1}{c}{2.00} & \multicolumn{1}{c}{2.50}\\
     \midrule
     Savage-Dickey BF\textsubscript{10} & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.05,"savage_dickey_bf"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.1,"savage_dickey_bf"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.2,"savage_dickey_bf"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.5,"savage_dickey_bf"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1,"savage_dickey_bf"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1.5,"savage_dickey_bf"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2,"savage_dickey_bf"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2.5,"savage_dickey_bf"])`\arraybackslash\\
-    dBF\textsubscript{+-} (upper) & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.05,"directional_bf_uppper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.1,"directional_bf_uppper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.2,"directional_bf_uppper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.5,"directional_bf_uppper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1,"directional_bf_uppper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1.5,"directional_bf_uppper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2,"directional_bf_uppper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2.5,"directional_bf_uppper"])`\arraybackslash\\
+    dBF\textsubscript{+-} (upper) & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.05,"directional_bf_upper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.1,"directional_bf_upper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.2,"directional_bf_upper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.5,"directional_bf_upper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1,"directional_bf_upper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1.5,"directional_bf_upper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2,"directional_bf_upper"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2.5,"directional_bf_upper"])`\arraybackslash\\
     dBF\textsubscript{+-} (lower) & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.05,"directional_bf_lower"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.1,"directional_bf_lower"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.2,"directional_bf_lower"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.5,"directional_bf_lower"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1,"directional_bf_lower"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1.5,"directional_bf_lower"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2,"directional_bf_lower"])` & \centering `r round_and_format(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2.5,"directional_bf_lower"])`\arraybackslash\\
-    P(effect > 0) (upper) & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.05,"p_effect_upper")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.1,"p_effect_upper")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.2,"p_effect_upper")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.5,"p_effect_upper")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1,"p_effect_upper")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1.5,"p_effect_upper")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2,"p_effect_upper")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2.5,"p_effect_upper")`\arraybackslash\\
-    P(effect > 0) (lower) & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.05,"p_effect_lower")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.1,"p_effect_lower")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.2,"p_effect_lower")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.5,"p_effect_lower")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1,"p_effect_lower")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1.5,"p_effect_lower")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2,"p_effect_lower")` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2.5,"p_effect_lower")`\arraybackslash\\
-    HDI & \centering `r proportion_to_percentage(df_sim_thres_prior$prior_sd == 0.05,"hdi")` & \centering `r proportion_to_percentage(df_sim_thres_prior$prior_sd == 0.1,"hdi")` & \centering `r proportion_to_percentage(df_sim_thres_prior$prior_sd == 0.2,"hdi")` & \centering `r proportion_to_percentage(df_sim_thres_prior$prior_sd == 0.5,"hdi")` & \centering `r proportion_to_percentage(df_sim_thres_prior$prior_sd == 1,"hdi")` & \centering `r proportion_to_percentage(df_sim_thres_prior$prior_sd == 1.5,"hdi")` & \centering `r proportion_to_percentage(df_sim_thres_prior$prior_sd == 2,"hdi")` & \centering `r proportion_to_percentage(df_sim_thres_prior$prior_sd == 2.5,"hdi")`\arraybackslash\\
+    P(effect > 0) (upper) & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.05,"p_effect_upper"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.1,"p_effect_upper"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.2,"p_effect_upper"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.5,"p_effect_upper"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1,"p_effect_upper"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1.5,"p_effect_upper"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2,"p_effect_upper"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2.5,"p_effect_upper"])`\arraybackslash\\
+    P(effect > 0) (lower) & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.05,"p_effect_lower"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.1,"p_effect_lower"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.2,"p_effect_lower"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.5,"p_effect_lower"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1,"p_effect_lower"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1.5,"p_effect_lower"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2,"p_effect_lower"])` & \centering `r remove_leading_zero(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2.5,"p_effect_lower"])`\arraybackslash\\
+    HDI width (\%) & \centering `r proportion_to_percentage(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.05,"hdi"])` & \centering `r proportion_to_percentage(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.1,"hdi"])` & \centering `r proportion_to_percentage(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.2,"hdi"])` & \centering `r proportion_to_percentage(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 0.5,"hdi"])` & \centering `r proportion_to_percentage(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1,"hdi"])` & \centering `r proportion_to_percentage(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 1.5,"hdi"])` & \centering `r proportion_to_percentage(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2,"hdi"])` & \centering `r proportion_to_percentage(df_sim_thres_prior[df_sim_thres_prior$prior_sd == 2.5,"hdi"])`\arraybackslash\\
     \midrule
     \end{tabularx}
 \end{table}
 ```
 <br>
-
-`\subsubsection{Adjustments for multiple tests}`
-Simulation-based decision thresholds for multiple tests are shown in Figure `\ref{fig:thresholds}`.`\\`
-
-```
-\begin{figure} [H]
-    \centering
-    \caption{Simulation-based decision thresholds for multiple tests}
-    \label{fig:thresholds}
-    \includegraphics[width=1\linewidth]{figures/multiplot_thresholds.pdf}
-\end{figure}
-```
-<br>
-
 `\subsubsection{Overlap of false positive results}`  
 With simulation-based decision thresholds, `r proportion_to_percentage(ofp_savage_dickey_bf_directional_bf)``\%` of false positive Savage-Dickey BFs overlapped with false positive dBFs, `r proportion_to_percentage(ofp_savage_dickey_bf_hdi)``\%` overlapped with false positive HDI decisions and `r proportion_to_percentage(ofp_savage_dickey_bf_p_effect)``\%` overlapped with false positive P(effect > 0) proportions. `r proportion_to_percentage(ofp_directional_bf_hdi)``\%` of false positive dBFs overlapped with false positive HDI decisions and `r proportion_to_percentage(ofp_directional_bf_p_effect)``\%` overlapped with false positive P(effect > 0) proportions. `r proportion_to_percentage(ofp_hdi_p_effect)``\%` of false positive HDI decisions overlapped with false positive P(effect > 0) proportions.
-
+<br>
 `\subsubsection{Prior sensitivity}`  
-The prior sensitivity of the Savage-Dickey BF, dBF, and P(effect > 0) was assessed by calculating the median range of the respective inference method between the models within samples. The median range of Savage-Dickey BFs  within samples was `r round_and_format(mwsr_savage_dickey_bf)` (`\textit{IQR}` = `r mwsr_iqr_savage_dickey_bf`), the mean range of dBFs within samples was `r round_and_format(mwsr_iqr_directional_bf)` (`\textit{IQR}` = `r mwsr_directional_bf`), and the mean range of P(effect > 0) proportions within samples was `r round_and_format(mwsr_p_effect)` (`\textit{IQR}` = `r mwsr_iqr_p_effect`).
-
-how to assess the prior sensitivity of HDI against zero decision rule?
-
-
+The prior sensitivity of the Savage-Dickey BF, dBF, and P(effect > 0) was assessed by calculating the median range of the respective inference method between the models within samples. The median range of Savage-Dickey BFs  within samples was `r round_and_format(mwsr_savage_dickey_bf)` (`\textit{IQR}` = `r round_and_format(mwsr_iqr_savage_dickey_bf)`), the median range of dBFs within samples was `r round_and_format(mwsr_directional_bf)` (`\textit{IQR}` = `r round_and_format(mwsr_iqr_directional_bf)`), and the median range of P(effect > 0) proportions within samples was `r round_and_format(mwsr_p_effect)` (`\textit{IQR}` = `r round_and_format(mwsr_iqr_p_effect)`).  
 `\\`  
-To assess the prior sensitivity of the inference methods in terms of the hypothesis decision, the respective proportions of samples for which the decisions of an inference method diverged between models was calculated.
-
--> sollte unabhängig von der Gesamtanzahl der false positives sein
-- Wie viel % der false positive samples sind konsistent (also haben 8 false positive models)?
-- False positive models / false positve samples
-
-
--> für die 4 empfohlenen decision rules (?)
-
-
-With simulation-based decision thresholds, the Savage-Dickey BF came to diverging results due to different priors within `r round(ps_savage_dickey_bf_sim * 100, 2)``\%` of all samples. The dBF produced inconsistent results within `r round(ps_directional_bf_sim * 100, 2)``\%` of all samples. The HDI against zero decision rule came to different results within `r round(ps_hdi_sim * 100, 2)``\%` of all samples and P(effect > 0) came to diverging results within `r round(ps_p_effect_sim * 100, 2)``\%` of all samples. See Table `\ref{tab:prior_sensitivity}` for the prior sensitivities per population effect standard deviation.`\\`
-
+To assess the prior sensitivity of the inference methods in terms of the hypothesis decision, the respective proportions of samples for which the decisions of an inference method diverged between models was calculated. The simulation-based decision thresholds over all prior and population effect standard deviations were choosen to keep the total number of false positive results comparable. With simulation-based decision thresholds, the Savage-Dickey BF came to diverging results due to different priors within `r proportion_to_percentage(ps_savage_dickey_bf_sim)``\%` of all samples. The dBF produced inconsistent results within `r proportion_to_percentage(ps_directional_bf_sim)``\%` of all samples. The HDI against zero decision rule came to different results within `r proportion_to_percentage(ps_hdi_sim)``\%` of all samples and P(effect > 0) came to diverging results within `r proportion_to_percentage(ps_p_effect_sim)``\%` of all samples. See Table `\ref{tab:prior_sensitivity}` for the prior sensitivities per population effect standard deviation.
+<br>
 ```
 \begin{table}[H]
     \caption{Prior sensitivity of each inference method per population effect SD}
     \label{tab:prior_sensitivity}
     \begin{tabularx}{\textwidth}{lXXX}
     \midrule
-    \multicolumn{1}{c}{Inference method} & \multicolumn{3}{c}{Prior sensitivity per effect \textit{SD}}\\
+    \multicolumn{1}{c}{Inference method} & \multicolumn{3}{c}{Samples with diverging results per population effect \textit{SD} (\%)}\\
     \cmidrule{2-4}
     \multicolumn{1}{c}{} & \multicolumn{1}{c}{0.20} & \multicolumn{1}{c}{0.51} & \multicolumn{1}{c}{0.81}\\
     \midrule
-    Savage-Dickey $BF_{10}$ & \centering `r remove_leading_zero(round(ps_savage_dickey_bf_sim_0_2, 2))` & \centering `r remove_leading_zero(round(ps_savage_dickey_bf_sim_0_51, 2))` & \centering `r remove_leading_zero(round(ps_savage_dickey_bf_sim_0_81, 2))`\arraybackslash\\
-    $dBF_{+-}$ & \centering `r remove_leading_zero(round(ps_directional_bf_sim_0_2, 2))` & \centering `r remove_leading_zero(round(ps_directional_bf_sim_0_51, 2))` & \centering `r remove_leading_zero(round(ps_directional_bf_sim_0_81, 2))`\arraybackslash\\
-    95\% HDI & \centering `r remove_leading_zero(round(ps_hdi_sim_0_2, 2))` & \centering `r remove_leading_zero(round(ps_hdi_sim_0_51, 2))` & \centering `r remove_leading_zero(round(ps_hdi_sim_0_81, 2))`\arraybackslash\\
-    P(effect > 0) & \centering `r remove_leading_zero(round(ps_p_effect_sim_0_2, 2))` & \centering `r remove_leading_zero(round(ps_p_effect_sim_0_51, 2))` & \centering `r remove_leading_zero(round(ps_p_effect_sim_0_81, 2))`\arraybackslash\\
+    Savage-Dickey $BF_{10}$ & \centering `r proportion_to_percentage(ps_savage_dickey_bf_sim_0_2)` & \centering `r proportion_to_percentage(ps_savage_dickey_bf_sim_0_51)` & \centering `r proportion_to_percentage(ps_savage_dickey_bf_sim_0_81)`\arraybackslash\\
+    $dBF_{+-}$ & \centering `r proportion_to_percentage(ps_directional_bf_sim_0_2)` & \centering `r proportion_to_percentage(ps_directional_bf_sim_0_51)` & \centering `r proportion_to_percentage(ps_directional_bf_sim_0_81)`\arraybackslash\\
+    95\% HDI & \centering `r proportion_to_percentage(ps_hdi_sim_0_2)` & \centering `r proportion_to_percentage(ps_hdi_sim_0_51)` & \centering `r proportion_to_percentage(ps_hdi_sim_0_81)`\arraybackslash\\
+    P(effect > 0) & \centering `r proportion_to_percentage(ps_p_effect_sim_0_2)` & \centering `r proportion_to_percentage(ps_p_effect_sim_0_51)` & \centering `r proportion_to_percentage(ps_p_effect_sim_0_81)`\arraybackslash\\
     \midrule
     \end{tabularx}
 \end{table}
