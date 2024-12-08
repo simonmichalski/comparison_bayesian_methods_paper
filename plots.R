@@ -10,9 +10,9 @@ if (!dir.exists("plots")) {
   dir.create("plots", recursive = TRUE)
 }
 
-df_results <- readRDS("final_results/final_results.rds")
-df_sim_thres <- readRDS("final_results/sim_based_thresholds.rds")
-df_recovery <- readRDS("final_results/recovery.rds")
+df_results <- readRDS(file.path("results", "results.rds"))
+df_sim_thres <- readRDS(file.path("results", "sim_based_thresholds.rds"))
+df_recovery <- readRDS(file.path("results", "recovery.rds"))
 df_sim_thres_effect_prior <- readRDS(file.path("results", "sim_thres_per_effect_and_prior_sd.rds"))
 
 # Values
@@ -916,116 +916,3 @@ multiplot_sim_thres <- (plot_sbdt_savage_dickey_bf | plot_sbdt_directional_bf_lo
   plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 8))
 
 ggsave("plots/sim_thres.pdf", plot = multiplot_sim_thres, width = 6, height = 2.66, units = "in", dpi = 300)
-
-
-# Overlap of false positive results
-df_results$fp_directional_bf_3 <- df_results$fp_directional_bf_3_pos + df_results$fp_directional_bf_1_3_neg
-df_results$fp_directional_bf_10 <- df_results$fp_directional_bf_10_pos + df_results$fp_directional_bf_1_10_neg
-df_results$fp_directional_bf_30 <- df_results$fp_directional_bf_30_pos + df_results$fp_directional_bf_1_30_neg
-df_results$fp_directional_bf_100 <- df_results$fp_directional_bf_100_pos + df_results$fp_directional_bf_1_100_neg
-
-df_results$fp_p_effect_95 <- df_results$fp_p_effect_95_pos + df_results$fp_p_effect_05_neg
-df_results$fp_p_effect_975 <- df_results$fp_p_effect_975_pos + df_results$fp_p_effect_025_neg
-df_results$fp_p_effect_99 <- df_results$fp_p_effect_99_pos + df_results$fp_p_effect_01_neg
-
-df_results$fp_hdi_80 <- df_results$fp_hdi_80_pos + df_results$fp_hdi_80_neg
-df_results$fp_hdi_90 <- df_results$fp_hdi_90_pos + df_results$fp_hdi_90_neg
-df_results$fp_hdi_95 <- df_results$fp_hdi_95_pos + df_results$fp_hdi_95_neg
-df_results$fp_hdi_99 <- df_results$fp_hdi_99_pos + df_results$fp_hdi_99_neg
-
-df_results$fp_directional_bf_sim <- df_results$fp_directional_bf_sim_pos + df_results$fp_directional_bf_sim_neg
-df_results$fp_p_effect_sim <- df_results$fp_p_effect_sim_pos + df_results$fp_p_effect_sim_neg
-df_results$fp_hdi_sim <- df_results$fp_hdi_sim_pos + df_results$fp_hdi_sim_neg
-
-
-columns2 <- list(df_results$fp_savage_dickey_bf_3, df_results$fp_directional_bf_3, df_results$fp_directional_bf_10, 
-                df_results$fp_directional_bf_30, df_results$fp_directional_bf_100, df_results$fp_p_effect_95,
-                df_results$fp_p_effect_975, df_results$fp_p_effect_99, df_results$fp_hdi_80, df_results$fp_hdi_90,
-                df_results$fp_hdi_95, df_results$fp_hdi_99)
-
-columns <- list(df_results$fp_savage_dickey_bf_3, df_results$fp_directional_bf_30,
-                df_results$fp_p_effect_975, df_results$fp_hdi_95)
-
-columns <- list(df_results$fp_savage_dickey_bf_sim, df_results$fp_directional_bf_sim,
-                df_results$fp_p_effect_sim, df_results$fp_hdi_sim)
-
-
-column_names <- c("BF", "dBF", "P(effect > 0)", "95% HDI")
-
-get_overlap_false_positives2 <- function(column_1, column_2){
-  overlap_percentage <- ((sum(column_1 == 1 & column_2 == 1) *2) / (sum(column_1) + sum(column_2))) * 100
-  return(overlap_percentage)
-}
-
-get_overlap_false_positives <- function(column_1, column_2){
-  overlap_percentage <- (sum(column_1 == 1 & column_2 == 1) / sum(column_1)) * 100
-  return(overlap_percentage)
-}
-
-
-#overlap_matrix <- matrix(NA, nrow = length(columns2), ncol = length(columns2))
-
-overlap_df <- data.frame("method_x" = rep(NA, 16), "method_y" = rep(NA, 16), "overlap" = rep(NA, 16))
-counter <- 1
-
-for (i in 1:length(columns)) {
-  
-  for (j in 1:length(columns)) {
-    overlap_df[counter, "method_x"] <- column_names[j]
-    overlap_df[counter, "method_y"] <- column_names[i]
-    overlap_df[counter, "overlap"] <- get_overlap_false_positives(columns[[i]], columns[[j]])
-    counter <- counter + 1
-  }
-}
-
-overlap_df$method_x <- factor(overlap_df$method_x, levels = c("BF", "dBF", "P(effect > 0)", "95% HDI"))
-overlap_df$method_y <- factor(overlap_df$method_y, levels = c("95% HDI", "P(effect > 0)", "dBF", "BF"))
-
-
-ggplot(overlap_df, aes(x = method_x, y = method_y, fill = overlap)) + 
-  geom_tile() +
-  scale_x_discrete(position = "top")
-
-library("pheatmap")
-library("ComplexHeatmap")
-
-
-#rownames(overlap_matrix) <- c("BF > 0", "dBF", "dBF", "dBF", "dBF", "P(effect > 0)", "P(effect > 0)",
-                              #"P(effect > 0)", "HDI", "HDI", "HDI", "HDI")
-
-rownames(overlap_matrix) <- c("BF", "dBF", "P(effect > 0)", "95% HDI")
-colnames(overlap_matrix) <- c("BF", "dBF", "P(effect > 0)", "95% HDI")
-
-pheatmap(overlap_matrix,
-         cluster_rows = FALSE, 
-         cluster_cols = FALSE, 
-         #display_numbers = FALSE,
-         #main = "Mean Overlap Between Inference Methods",
-         fontsize = 12,
-         row_names_side = "left")
-
-heatmap(overlap_matrix, Rowv = NA, Colv = NA)
-
-ggplot(overlap_matrix)
-
-
-
-
-
-df_results$model_number <- seq(1:4800)
-
-df_results_long <- pivot_longer(df_results, 
-                                cols = c("fp_savage_dickey_bf_3", "fp_directional_bf_3", "fp_directional_bf_10",
-                                        "fp_directional_bf_30", "fp_directional_bf_100", "fp_p_effect_95", 
-                                        "fp_p_effect_975", "fp_p_effect_99", "fp_hdi_80", "fp_hdi_90", 
-                                        "fp_hdi_95", "fp_hdi_99"), 
-                                names_to = "decision_rule", values_to = "fp")
-
-df_results_long <- df_results_long[,c("decision_rule", "fp", "model_number")]
-
-ggplot(df_results_long, aes(x = decision_rule, y = as.factor(model_number), fill = as.factor(fp))) +
-  geom_tile(color = "white") +
-  scale_fill_manual(values = c("0" = "white", "1" = "blue")) +
-  labs(title = "Overlap of Inference Methods", x = "Inference Methods", y = "Samples") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
