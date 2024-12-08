@@ -14,7 +14,7 @@ prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 n_subj <- 40
 n_models <- length(s_log_k_sds)*num_samples*length(prior_sds)
 
-hdi_seq <- seq(from = 0.7, to = 0.97, by = 0.0001)
+hdi_seq <- seq(from = 0.6, to = 0.97, by = 0.0001)
 
 
 # dBF+-
@@ -290,6 +290,29 @@ get_sim_thresholds_per_effect_and_prior_sd <- function(results, hdi_bounds){
 }
 
 
+# Get sim-based thresholds per prior SD
+get_sim_thresholds_per_prior_sd <- function(results, hdi_bounds){
+  df_sim_thresholds <- data.frame()
+  column_prior_sds <- c()
+  
+  for (k in 1:length(prior_sds)){
+    indices <- which(results$prior_sd == prior_sds[k])
+    rows_results <- results[indices,]
+    models_hdi_bounds <- hdi_bounds[indices]
+    
+    sim_thresholds <- get_simulation_based_thresholds(rows_results, models_hdi_bounds, 1)
+    df_sim_thresholds <- rbind(df_sim_thresholds, sim_thresholds[,-1])
+    column_prior_sds <- append(column_prior_sds, prior_sds[k])
+    
+  }
+  df_sim_thresholds$prior_sd <- column_prior_sds
+  
+  df_sim_thresholds <- df_sim_thresholds[c("prior_sd", "savage_dickey_bf", "directional_bf_upper", 
+                                           "directional_bf_lower", "p_effect_upper", "p_effect_lower", "hdi")]
+  return(df_sim_thresholds)
+}
+
+
 loop_out <- loop_through_model_files()
 results <- loop_out$results
 hdi_bounds <- loop_out$hdi_bounds
@@ -306,3 +329,6 @@ saveRDS(results, file.path("results", "results.rds"))
 
 sim_thresholds_per_effect_and_prior_sd <- get_sim_thresholds_per_effect_and_prior_sd(results, hdi_bounds)
 saveRDS(sim_thresholds_per_effect_and_prior_sd, file.path("results", "sim_thres_per_effect_and_prior_sd.rds"))
+
+sim_thresholds_per_prior_sd <- get_sim_thresholds_per_prior_sd(results, hdi_bounds)
+saveRDS(sim_thresholds_per_prior_sd, file.path("results", "sim_thres_per_prior_sd.rds"))
