@@ -14,7 +14,7 @@ prior_sds <- c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5)
 n_subj <- 40
 n_models <- length(s_log_k_sds)*num_samples*length(prior_sds)
 
-hdi_seq <- seq(from = 0.6, to = 0.97, by = 0.0001)
+hdi_seq <- seq(from = 0.6, to = 1, by = 0.0001)
 
 
 # dBF+-
@@ -322,7 +322,7 @@ saveRDS(hdi_bounds, file.path("results", "hdi_bounds.rds"))
 saveRDS(recovery, file.path("results", "recovery.rds"))
 
 sim_based_thresholds <- get_simulation_based_thresholds(results, hdi_bounds, 10)
-saveRDS(sim_based_thresholds, file.path("results", "sim_based_thresholds.rds"))
+saveRDS(sim_based_thresholds, file.path("results", "sim_thres.rds"))
 
 results <- add_false_positive_results_columns(results, hdi_bounds, sim_based_thresholds)
 saveRDS(results, file.path("results", "results.rds"))
