@@ -11,7 +11,7 @@ if (!dir.exists("plots")) {
 }
 
 df_results <- readRDS(file.path("results", "results.rds"))
-df_sim_thres <- readRDS(file.path("results", "sim_based_thresholds.rds"))
+df_sim_thres <- readRDS(file.path("results", "sim_thres.rds"))
 df_recovery <- readRDS(file.path("results", "recovery.rds"))
 df_sim_thres_effect_prior <- readRDS(file.path("results", "sim_thres_per_effect_and_prior_sd.rds"))
 
@@ -384,7 +384,7 @@ ggsave("plots/false_positives.pdf", plot = multiplot_fp, width = 6, height = 4, 
 
 # Adjusted simulation-based decision thresholds (asbdt)
 axis_text_size <- 7
-axis_title_size <- 8
+axis_title_size <- 7
 border_size <- 0.3
 tick_length <- -0.05
 tick_width <- border_size/2
