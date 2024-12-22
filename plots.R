@@ -408,6 +408,8 @@ plot_asbdt_savage_dickey_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), 
 plot_asbdt_directional_bf_lower <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = directional_bf_lower, group = 1)) +
   labs(y = expression("dBF"["+-"] ~~ "lower")) +
   geom_line(linewidth = line_width) +
+  scale_y_continuous(breaks = c(0.01, 0.02, 0.0333333333), 
+                     labels = c("1/100", "1/50", "1/30")) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
@@ -453,6 +455,8 @@ plot_asbdt_hdi_bf <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = hdi*10
 plot_asbdt_p_effect_bf_lower <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = p_effect_lower, group = 1)) +
   labs(x = expression(italic("n")*" tests"), y = "P(effect > 0) lower") +
   geom_line(linewidth = line_width) +
+  scale_y_continuous(breaks = c(0.01, 0.02, 0.03), 
+                     labels = c(".01", ".02", ".03")) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
@@ -468,6 +472,8 @@ plot_asbdt_p_effect_bf_lower <- ggplot(df_sim_thres, aes(x = as.factor(n_tests),
 plot_asbdt_p_effect_bf_upper <- ggplot(df_sim_thres, aes(x = as.factor(n_tests), y = p_effect_upper, group = 1)) +
   labs(x = expression(italic("n")*" tests"), y = "P(effect > 0) upper") +
   geom_line(linewidth = line_width) +
+  scale_y_continuous(breaks = c(0.96, 0.97, 0.98, 0.99, 1), 
+                     labels = c(".96", ".97", ".98", ".99", "1.00")) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
@@ -722,6 +728,8 @@ plot_sbdt_directional_bf_lower <- ggplot(df_sim_thres_effect_prior,
   geom_line(linewidth = line_width) +
   scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
                 labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
+  scale_y_continuous(breaks = c(0.0333333333, 0.1, 0.2), 
+                     labels = c("1/30", "1/10", "1/5")) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
@@ -784,6 +792,8 @@ plot_sbdt_p_effect_bf_lower <- ggplot(df_sim_thres_effect_prior,
   geom_line(linewidth = line_width) +
   scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
                 labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
+  scale_y_continuous(breaks = c(0.05, 0.1, 0.15, 0.2), 
+                     labels = c(".05", ".10", ".15", ".20")) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
@@ -803,6 +813,8 @@ plot_sbdt_p_effect_bf_upper <- ggplot(df_sim_thres_effect_prior,
   geom_line(linewidth = line_width) +
   scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
                 labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
+  scale_y_continuous(breaks = c(0.8, 0.9), 
+                     labels = c(".80", ".90")) +
   theme(
     panel.background = element_blank(),
     panel.border = element_rect(color = 'black', fill = NA, linewidth = border_size),
