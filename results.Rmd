@@ -364,16 +364,6 @@ Across all models, Savage-Dickey BFs ranged from `r round_and_format(min(df_resu
 The proportions of false positive results of every decision rule were calculated for all combinations of the prior and population effect standard deviation (Figure `\ref{fig:false_positves}`), per prior standard deviation averaged over all population effect standard deviations (Table `\ref{tab:false_positives_prior}`),  and overall. With a decision threshold of 3, `r proportion_to_percentage(fp_savage_dickey_bf_3)``\%` of Savage-Dickey BFs were false positive. With a decision threshold of 1/3 for a negative and 3 for a positive effect, `r proportion_to_percentage(fp_directional_bf_3)``\%` of dBFs were false positive. With 1/10 and 10 as directional decision thresholds, `r proportion_to_percentage(fp_directional_bf_10)``\%` of dBFs were false positive, with 1/30 and 30, `r proportion_to_percentage(fp_directional_bf_30)``\%` of dfBFs  were false positive, and with 1/100 and 100, `r proportion_to_percentage(fp_directional_bf_100)``\%` of dBFs  were false positive. When applying the HDI against zero decision rule with a 80`\%` HDI, `r proportion_to_percentage(fp_hdi_80)``\%` of decisions were false positive, with a 90`\%` HDI, `r proportion_to_percentage(fp_hdi_90)``\%` of decisions were false positive, with a 95`\%` HDI, `r proportion_to_percentage(fp_hdi_95)``\%` of decisions were false positive, and with a 99`\%` HDI, `r proportion_to_percentage(fp_hdi_99)``\%` of decisions were false positive. With P(effect > 0) > .95 for a positive and P(effect > 0) < .05 for negative effect, `r proportion_to_percentage(fp_p_effect_95)``\%` of P(effect > 0) proportions were false positive, with > .975 and < .025, `r proportion_to_percentage(fp_p_effect_975)``\%` of P(effect > 0) proportions were false positive, and with > .99 and < .01, `r proportion_to_percentage(fp_p_effect_99)``\%` of P(effect > 0) proportions were false positive. For each inference method, false positive results were lower, the stricter the decision threshold was. False positive results descriptively increased with increasing prior width for all decision thresholds of the dBF, P(effect > 0), and the HDI against zero decision rule, whereas false positive Savage-Dickey BFs did not increase with wider priors. With wider priors and relatively stricter thresholds, false positive results were descriptively higher within samples from the highest population effect standard deviation.
 <br>
 ```
-\begin{figure} [H]
-    \centering
-    \caption{Proportions of false positive results with conventional decision thresholds}
-    \label{fig:false_positves}
-    \includegraphics[width=1\linewidth]{figures/false_positives.pdf}
-    \caption*{Note. \textnormal{Dashed lines indicate a proportion of 5\% false positive results. Prior standard deviations are plotted on a logarithmic scale. Omitted tick labels are 0.10, 0.50, 1.50, and 2.00.}}
-\end{figure}
-```
-
-```
 \begin{table}[H]
     \caption{False positive results per prior standard deviation}
     \label{tab:false_positives_prior}
@@ -398,6 +388,15 @@ The proportions of false positive results of every decision rule were calculated
     \midrule
     \end{tabularx}
 \end{table}
+```
+```
+\begin{figure} [H]
+    \centering
+    \caption{Proportions of false positive results with conventional decision thresholds}
+    \label{fig:false_positves}
+    \includegraphics[width=1\linewidth]{figures/false_positives.pdf}
+    \caption*{Note. \textnormal{Dashed lines indicate a proportion of 5\% false positive results. Prior standard deviations are plotted on a logarithmic scale. Omitted tick labels are 0.10, 0.50, 1.50, and 2.00.}}
+\end{figure}
 ```
 <br>
 `\subsection{Simulation-based decision thresholds}`  
