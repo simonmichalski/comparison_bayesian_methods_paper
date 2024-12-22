@@ -320,7 +320,7 @@ plot_fp_hdi_80 <- ggplot(data_fp_hdi_80, aes(x = prior_sd, y = (fp_hdi_80/200)*1
 plot_fp_hdi_90 <- ggplot(data_fp_hdi_90, aes(x = prior_sd, y = (fp_hdi_90/200)*100, group = as.factor(s_log_k_sd), color = as.factor(s_log_k_sd))) +
   labs(x = expression("Prior "*italic("SD")), title = "90% HDI") +
   geom_line(linewidth = line_width) +
-  geom_hline(yintercept = 0.05, linetype = 'dashed', linewidth = hline_width) +
+  geom_hline(yintercept = 5, linetype = 'dashed', linewidth = hline_width) +
   scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
                 labels = c("0.05", "", "0.20", "", "1.00", "", "", "2.50")) +
   theme(
