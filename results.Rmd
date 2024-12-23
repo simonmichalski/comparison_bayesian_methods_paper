@@ -308,14 +308,14 @@ round_and_format_down <- function(value){
 `\section{Results}`  
 Note that the intervals between the prior standard deviations are not equal, as they were chosen to cover the most plausible prior standard deviations up to 2.50. Hence, overall means cannot be interpreted continuously as averages of all possible prior standard deviations between 0.05 and 2.50, but as averages of discrete prior variations selected in this study.
 <br>
-`\subsection{Recovery of subject-level parameters}`  
+`\subsection{Recovery of Subject-Level Parameters}`  
 Subject-level estimates correspond to the medians of the respective posterior distributions. The median correlation between true and estimated subject-level s`\textsubscript{log(\textit{k})}` parameters was `\textit{r}` = `r remove_leading_zero(median_cor_s_log_k_0_2)` (`\textit{IQR}` = `r remove_leading_zero(iqr_cor_s_log_k_0_2)`) within models fitted to samples of the small population effect standard deviation, `\textit{r}` = `r remove_leading_zero(median_cor_s_log_k_0_51)` (`\textit{IQR}` = `r remove_leading_zero(iqr_cor_s_log_k_0_51)`) within models fitted to samples from the medium population effect standard deviation, and `\textit{r}` = `r remove_leading_zero(median_cor_s_log_k_0_81)` (`\textit{IQR}` = `r remove_leading_zero(iqr_cor_s_log_k_0_81)`) within models fitted to samples from the large population effect standard deviation. The median correlation within models over all population effect standard deviations was `\textit{r}` = `r remove_leading_zero(median_cor_s_log_k_overall)` (`\textit{IQR}` = `r remove_leading_zero(iqr_cor_s_log_k_overall)`). The median correlation within models between true and estimated subject-level log(`\textit{k}`) parameters was `\textit{r}` = `r remove_leading_zero(median_cor_log_k_overall)` (`\textit{IQR}` = `r remove_leading_zero(iqr_cor_log_k_overall)`).
 `\\`  
 Since hierarchical Bayesian models perform partial pooling, the shrinkage of subject-level parameter variability was computed for each model by dividing the difference between the standard deviation of the true subject-level parameters and the standard deviation of the estimated subject-level parameters with the standard deviation of the true subject-level parameters `\autocite{kruschke_doing_2015}`. On average, the standard deviation of true subject-level s`\textsubscript{log(\textit{k})}` parameters was reduced by `r proportion_to_percentage(mean_shrinkage_overall)``\%` (`\textit{SD}` = `r proportion_to_percentage(sd_shrinkage_overall)`) within models. See Figure `\hyperref[fig:recovery]{\ref{fig:recovery}A}` for the ratios of the standard deviations of true and estimated subject-level s`\textsubscript{log(\textit{k})}` parameters within models. Descriptively, shrinkage of the standard deviations of subject-level parameters was stronger, the lower the standard deviation of the sampling distribution was (Table `\ref{tab:shrinkage}`), but constant across all variations of the group-level mean prior of s`\textsubscript{log(\textit{k})}`.
 <br>
 ```
 \begin{table}[H]
-    \caption{Shrinkage of the standard deviations of subject-level parameters within models}
+    \caption{Shrinkage of the Standard Deviations of Subject-Level Parameters Within Models}
     \label{tab:shrinkage}
     \begin{tabularx}{\textwidth}{lXXXXXX}
     \midrule
@@ -332,7 +332,7 @@ Since hierarchical Bayesian models perform partial pooling, the shrinkage of sub
 \end{table}
 ```
 <br>
-`\subsection{Recovery of group-level parameters}`  
+`\subsection{Recovery of Group-Level Parameters}`  
 Group-level estimates correspond to the medians of the respective posterior distributions. The mean true group-level mean of s`\textsubscript{log(\textit{k})}` parameters was `r round_and_format(mean_true_group_level_mean_0_2)` (`\textit{SD}` = `r round_and_format(sd_true_group_level_mean_0_2)`) within samples from the small population effect standard deviation, `r round_and_format(mean_true_group_level_mean_0_51)` (`\textit{SD}` = `r round_and_format(sd_true_group_level_mean_0_51)`) within samples from the medium population effect standard deviation, and `r round_and_format(mean_true_group_level_mean_0_81)` (`\textit{SD}` = `r round_and_format(sd_true_group_level_mean_0_81)`) within samples from the large population effect standard deviation. The mean true group-level mean of log(`\textit{k}`) parameters was `r round_and_format(mean_true_group_level_mean_log_k)` (`\textit{SD}` = `r round_and_format(sd_true_group_level_mean_log_k)`). The mean estimate of the group-level mean of s`\textsubscript{log(\textit{k})}` was `r round_and_format(mean_group_level_mean_0_2)` (`\textit{SD}` = `r round_and_format(sd_group_level_mean_0_2)`) within models fitted to samples from the small population effect standard deviation, `r round_and_format(mean_group_level_mean_0_51)` (`\textit{SD}` = `r round_and_format(sd_group_level_mean_0_51)`) within models fitted to samples from the medium population effect standard deviation, and `r round_and_format(mean_group_level_mean_0_81)` (`\textit{SD}` = `r round_and_format(sd_group_level_mean_0_81)`) within models fitted to samples from the large population effect standard deviation. Mean absolute estimates of the group-level mean of s`\textsubscript{log(\textit{k})}` per population effect and prior standard deviation are depicted in Figure `\hyperref[fig:recovery]{\ref{fig:recovery}B}`. Descriptively, mean absolute estimates of the group-level mean were constant with wider priors, but decreased with decreasing prior width. The mean estimate of the group-level mean of log(`\textit{k}`) was `r round_and_format(mean_group_level_mean_log_k)` (`\textit{SD}` = `r round_and_format(sd_group_level_mean_log_k)`).  
 `\\`  
 The mean estimate of the group-level standard deviation of s`\textsubscript{log(\textit{k})}` was `r round_and_format(mean_group_level_sd_0_2)` (`\textit{SD}` = `r round_and_format(sd_group_level_sd_0_2)`) within models fitted to samples from the small population effect standard deviation, `r round_and_format(mean_group_level_sd_0_51)` (`\textit{SD}` = `r round_and_format(sd_group_level_sd_0_51)`) within models fitted to samples from the medium population effect standard deviation, and `r round_and_format(mean_group_level_sd_0_81)` (`\textit{SD}` = `r round_and_format(sd_group_level_sd_0_81)`) within models fitted to samples from the large population effect standard deviation. The mean estimate of the group-level standard deviation of log(`\textit{k}`) was `r round_and_format(mean_group_level_sd_log_k)` (`\textit{SD}` = `r round_and_format(sd_group_level_sd_log_k)`).
@@ -340,32 +340,44 @@ The mean estimate of the group-level standard deviation of s`\textsubscript{log(
 ```
 \begin{figure} [H]
     \centering
-    \caption{Parameter recovery}
+    \caption{Parameter Recovery}
     \label{fig:recovery}
     \includegraphics[width=1\linewidth]{figures/recovery_s_log_k.pdf}
-    \caption*{Note. \textnormal{(A) Ratios of the standard deviations of true and estimated subject-level parameters within models. The standard deviations of true subject-level parameters of models below the line were shrunk. Note that absolute shrinkage was comparable between population effect standard deviations, but relative shrinkage was higher, the lower the population effect standard deviation was. (B) Decrease of absolute group-level mean estimates towards zero with informative priors. Prior standard deviations are plotted on a logarithmic scale. Omitted tick labels are 1.50 and 2.00.}}
+    \caption*{Note. \textnormal{(A) Ratios of the standard deviations of true and estimated subject-level parameters within models. The standard deviations of true subject-level parameters of models below the line were shrunk. Note that absolute shrinkage was comparable between population effect standard deviations, but relative shrinkage was higher, the lower the population effect standard deviation was. (B) Decrease of absolute group-level mean estimates toward zero with informative priors. Note that with wider priors, estimates of the group-level mean can slightly diverge from their true mean in both directions due to the added noise in the data, which resulted in a slightly higher range of estimated group-level means. Hence, when comparing absolute means, mean absolute estimates of the group-level mean were descriptively higher than mean absolute true group-level means with wider priors. Prior standard deviations are plotted on a logarithmic scale. Omitted tick labels are 1.50 and 2.00.}}
 \end{figure}
 ```
 <br>
-`\subsection{Inference methods}`  
+`\subsection{Inference Methods}`  
 Across all models, Savage-Dickey BFs ranged from `r round_and_format(min(df_results$savage_dickey_bf))` to `r round_and_format(max(df_results$savage_dickey_bf))` (`\textit{Mdn}` = `r round_and_format(median(df_results$savage_dickey_bf))`, `\textit{IQR}` = `r round_and_format(IQR(df_results$savage_dickey_bf))`), dBFs ranged from `r round_and_format(min(df_results$directional_bf))` to `r round_and_format(max(df_results$directional_bf))` (`\textit{Mdn}` = `r round_and_format(median(df_results$directional_bf))`, `\textit{IQR}` = `r round_and_format(IQR(df_results$directional_bf))`), and P(effect > 0) proportions ranged from `r remove_leading_zero(min(df_results$p_effect))` to `r remove_leading_zero(max(df_results$p_effect))` (`\textit{Mdn}` = `r remove_leading_zero(median(df_results$p_effect))`, `\textit{IQR}` = `r remove_leading_zero(IQR(df_results$p_effect))`). Boxplots of Savage-Dickey BFs, dBFs, and P(effect > 0) proportions per prior and population effect standard deviation are shown in Figure `\ref{fig:values}`. With increasing prior width, the median Savage-Dickey BF descriptively decreased, whereas the median dBF and median P(effect > 0) remained constant. The `\textit{IQR}` of dBFs and the `\textit{IQR}` of P(effect > 0) proportions both descriptively increased with increasing prior width, whereas the `\textit{IQR}` of Savage-Dickey BFs was descriptively lower with high prior widths.
 <br>
 ```
 \begin{figure} [H]
     \centering
-    \caption{Savage-Dickey BFs, dBFs, and P(effect > 0) proportions of all models}
+    \caption{Savage-Dickey BFs, dBFs, and P(effect > 0) Proportions of all Models}
     \label{fig:values}
     \includegraphics[width=1\linewidth]{figures/values.pdf}
     \caption*{Note. \textnormal{The horizontal line within each box shows the median, the box spans from the first to the third quartile, the lower whisker extends to the lowest value within 1.5*\textit{IQR} below the first quartile, the upper whisker extends to the highest value within 1.5*\textit{IQR} above the third quartile, outliers are displayed as dots, which are all data points outside the lower and upper whisker. Savage-Dickey BFs and dBFs are plotted on a logarithmic scale.}}
 \end{figure}
 ```
 <br>
-`\subsection{False positive results}` 
-The proportions of false positive results of every decision rule were calculated for all combinations of the prior and population effect standard deviation (Figure `\ref{fig:false_positves}`), per prior standard deviation averaged over all population effect standard deviations (Table `\ref{tab:false_positives_prior}`),  and overall. With a decision threshold of 3, `r proportion_to_percentage(fp_savage_dickey_bf_3)``\%` of Savage-Dickey BFs were false positives. With a decision threshold of 1/3 for a negative and 3 for a positive effect, `r proportion_to_percentage(fp_directional_bf_3)``\%` of dBFs were false positives. With 1/10 and 10 as directional decision thresholds, `r proportion_to_percentage(fp_directional_bf_10)``\%` of dBFs were false positives, with 1/30 and 30, `r proportion_to_percentage(fp_directional_bf_30)``\%` of dBFs  were false positives, and with 1/100 and 100, `r proportion_to_percentage(fp_directional_bf_100)``\%` of dBFs  were false positives. When applying the HDI against zero decision rule with a 80`\%` HDI, `r proportion_to_percentage(fp_hdi_80)``\%` of decisions were false positives, with a 90`\%` HDI, `r proportion_to_percentage(fp_hdi_90)``\%` of decisions were false positives, with a 95`\%` HDI, `r proportion_to_percentage(fp_hdi_95)``\%` of decisions were false positives, and with a 99`\%` HDI, `r proportion_to_percentage(fp_hdi_99)``\%` of decisions were false positives. With P(effect > 0) > .95 for a positive and P(effect > 0) < .05 for negative effect, `r proportion_to_percentage(fp_p_effect_95)``\%` of P(effect > 0) proportions were false positives, with > .975 and < .025, `r proportion_to_percentage(fp_p_effect_975)``\%` of P(effect > 0) proportions were false positives, and with > .99 and < .01, `r proportion_to_percentage(fp_p_effect_99)``\%` of P(effect > 0) proportions were false positives. For each inference method, false positive results were lower, the stricter the decision threshold was. False positive results descriptively increased with increasing prior width for all decision thresholds of the dBF, P(effect > 0), and the HDI against zero decision rule, whereas false positive Savage-Dickey BFs did not increase with wider priors. With wider priors and relatively stricter thresholds, false positive results were descriptively higher within samples from the highest population effect standard deviation.
+`\subsection{False Positive Results}`  
+The proportions of false positive results of every decision rule were calculated for all combinations of the prior and population effect standard deviation (Figure `\ref{fig:false_positves}`), per prior standard deviation averaged over all population effect standard deviations (Table `\ref{tab:false_positives_prior}`),  and overall. 
+<br>
+```
+\begin{figure} [H]
+    \centering
+    \caption{Proportions of False Positive Results With Conventional Decision Thresholds}
+    \label{fig:false_positves}
+    \includegraphics[width=1\linewidth]{figures/false_positives.pdf}
+    \caption*{Note. \textnormal{Dashed lines indicate a proportion of 5\% false positive results. Prior standard deviations are plotted on a logarithmic scale. Omitted tick labels are 0.10, 0.50, 1.50, and 2.00.}}
+\end{figure}
+```
+<br>
+With a decision threshold of 3, `r proportion_to_percentage(fp_savage_dickey_bf_3)``\%` of Savage-Dickey BFs were false positives. With a decision threshold of 1/3 for a negative and 3 for a positive effect, `r proportion_to_percentage(fp_directional_bf_3)``\%` of dBFs were false positives. With 1/10 and 10 as directional decision thresholds, `r proportion_to_percentage(fp_directional_bf_10)``\%` of dBFs were false positives, with 1/30 and 30, `r proportion_to_percentage(fp_directional_bf_30)``\%` of dBFs  were false positives, and with 1/100 and 100, `r proportion_to_percentage(fp_directional_bf_100)``\%` of dBFs  were false positives. When applying the HDI against zero decision rule with a 80`\%` HDI, `r proportion_to_percentage(fp_hdi_80)``\%` of decisions were false positives, with a 90`\%` HDI, `r proportion_to_percentage(fp_hdi_90)``\%` of decisions were false positives, with a 95`\%` HDI, `r proportion_to_percentage(fp_hdi_95)``\%` of decisions were false positives, and with a 99`\%` HDI, `r proportion_to_percentage(fp_hdi_99)``\%` of decisions were false positives. With P(effect > 0) > .95 for a positive and P(effect > 0) < .05 for negative effect, `r proportion_to_percentage(fp_p_effect_95)``\%` of P(effect > 0) proportions were false positives, with > .975 and < .025, `r proportion_to_percentage(fp_p_effect_975)``\%` of P(effect > 0) proportions were false positives, and with > .99 and < .01, `r proportion_to_percentage(fp_p_effect_99)``\%` of P(effect > 0) proportions were false positives. For each inference method, false positive results were lower, the stricter the decision threshold was. False positive results descriptively increased with increasing prior width for all decision thresholds of the dBF, P(effect > 0), and the HDI against zero decision rule, whereas false positive Savage-Dickey BFs did not increase with wider priors. With wider priors and relatively stricter thresholds, false positive results were descriptively higher within samples from the highest population effect standard deviation.
 <br>
 ```
 \begin{table}[H]
-    \caption{False positive results per prior standard deviation}
+    \caption{False Positive Results per Prior Standard Deviation}
     \label{tab:false_positives_prior}
     \begin{tabularx}{\textwidth}{lXXXXXXXX}
     \midrule
@@ -389,32 +401,13 @@ The proportions of false positive results of every decision rule were calculated
     \end{tabularx}
 \end{table}
 ```
-```
-\begin{figure} [H]
-    \centering
-    \caption{Proportions of false positive results with conventional decision thresholds}
-    \label{fig:false_positves}
-    \includegraphics[width=1\linewidth]{figures/false_positives.pdf}
-    \caption*{Note. \textnormal{Dashed lines indicate a proportion of 5\% false positive results. Prior standard deviations are plotted on a logarithmic scale. Omitted tick labels are 0.10, 0.50, 1.50, and 2.00.}}
-\end{figure}
-```
 <br>
-`\subsection{Simulation-based decision thresholds}`  
+`\subsection{Simulation-Based Decision Thresholds}`  
 Simulation-based decision thresholds with a proportion of 5`\%` false positive results were computed for every inference method for all combinations of the prior and population effect standard deviation (Figure `\ref{fig:sim_thres}`), per prior standard deviation averaged over all population effect standard deviations (Table `\ref{tab:sim_thres_prior}`), and overall. Upper thresholds were rounded up, lower thresholds were rounded down. Directional thresholds were set to 2.5`\%` false positive results on each side. With a decision threshold of `r round_and_format_up(sim_based_thres$savage_dickey_bf[1])`, 5`\%` of Savage Dickey BFs were false positives. The dBF produced 5`\%` false positive results with a decision threshold of `r round_and_format_up(sim_based_thres$directional_bf_upper[1])` for a positive and 1/`r round_and_format_up(1/sim_based_thres$directional_bf_lower[1])` for a negative effect. A decision rule of P(effect > 0) > `r remove_leading_zero_up(sim_based_thres$p_effect_upper[1])` for a positive and P(effect > 0) < `r remove_leading_zero_down(sim_based_thres$p_effect_lower[1])` for a negative effect resulted in 5`\%` false positive results. The HDI against zero decision rule produced 5`\%` false positive results with a `r proportion_to_percentage_up(sim_based_thres$hdi[1])``\%` HDI. Simulation-based decision thresholds of the dBF, P(effect > 0), and the HDI against zero decision rule became descriptively stricter with increasing prior width, whereas the simulation-based threshold of the Savage-Dickey BF was the lowest with the widest prior. Adjustments of simulation-based decision thresholds for multiple tests under the assumption of statistical independence are shown in Figure `\ref{fig:thresholds}`.
 <br>
 ```
-\begin{figure} [H]
-    \centering
-    \caption{Simulation-based decision thresholds}
-    \label{fig:sim_thres}
-    \includegraphics[width=1\linewidth]{figures/sim_thres.pdf}
-    \caption*{Note. \textnormal{Prior standard deviations are plotted on a logarithmic scale. Omitted tick labels are 0.10, 0.50, 1.50, and 2.00.}}
-\end{figure}
-```
-
-```
 \begin{table}[H]
-    \caption{Simulation-based decision thresholds per prior standard deviation}
+    \caption{Simulation-Based Decision Thresholds per Prior Standard Deviations}
     \label{tab:sim_thres_prior}
     \begin{tabularx}{\textwidth}{lXXXXXXXX}
     \midrule
@@ -432,27 +425,37 @@ Simulation-based decision thresholds with a proportion of 5`\%` false positive r
     \end{tabularx}
 \end{table}
 ```
-
+<br>
 ```
 \begin{figure} [H]
     \centering
-    \caption{Adjustments of simulation-based decision thresholds for multiple testing}
+    \caption{Simulation-Based Decision Thresholds}
+    \label{fig:sim_thres}
+    \includegraphics[width=1\linewidth]{figures/sim_thres.pdf}
+    \caption*{Note. \textnormal{Prior standard deviations are plotted on a logarithmic scale. Omitted tick labels are 0.10, 0.50, 1.50, and 2.00.}}
+\end{figure}
+```
+<br>
+```
+\begin{figure} [H]
+    \centering
+    \caption{Adjustments of Simulation-Based Decision Thresholds for Multiple Testing}
     \label{fig:thresholds_multiple_test}
     \includegraphics[width=1\linewidth]{figures/thresholds_multiple_tests.pdf}
 \end{figure}
 ```
 <br>
-`\subsubsection{Overlap of false positive results}`  
+`\subsubsection{Overlap of False Positive Results}`  
 With simulation-based decision thresholds, `r proportion_to_percentage(ofp_savage_dickey_bf_directional_bf)``\%` of false positive Savage-Dickey BFs overlapped with false positive dBFs, `r proportion_to_percentage(ofp_savage_dickey_bf_hdi)``\%` overlapped with false positive HDI decisions and `r proportion_to_percentage(ofp_savage_dickey_bf_p_effect)``\%` overlapped with false positive P(effect > 0) proportions. `r proportion_to_percentage(ofp_directional_bf_hdi)``\%` of false positive dBFs overlapped with false positive HDI decisions and `r proportion_to_percentage(ofp_directional_bf_p_effect)``\%` overlapped with false positive P(effect > 0) proportions. `r proportion_to_percentage(ofp_hdi_p_effect)``\%` of false positive HDI decisions overlapped with false positive P(effect > 0) proportions.
 <br>
-`\subsubsection{Prior sensitivity}`  
+`\subsubsection{Prior Sensitivity}`  
 The prior sensitivity of the Savage-Dickey BF, dBF, and P(effect > 0) was assessed by calculating the median range of the respective inference method between the models within samples. The median range of Savage-Dickey BFs  within samples was `r round_and_format(mwsr_savage_dickey_bf)` (`\textit{IQR}` = `r round_and_format(mwsr_iqr_savage_dickey_bf)`), the median range of dBFs within samples was `r round_and_format(mwsr_directional_bf)` (`\textit{IQR}` = `r round_and_format(mwsr_iqr_directional_bf)`), and the median range of P(effect > 0) proportions within samples was `r round_and_format(mwsr_p_effect)` (`\textit{IQR}` = `r round_and_format(mwsr_iqr_p_effect)`).  
 `\\`  
-To assess the prior sensitivity of the inference methods in terms of the hypothesis decision, the respective proportions of samples for which the decisions of an inference method diverged between models was calculated. The simulation-based decision thresholds over all prior and population effect standard deviations were chosen to keep the total number of false positive results comparable. With simulation-based decision thresholds, the Savage-Dickey BF came to diverging results due to different priors within `r proportion_to_percentage(ps_savage_dickey_bf_sim)``\%` of all samples. The dBF produced inconsistent results within `r proportion_to_percentage(ps_directional_bf_sim)``\%` of all samples. The HDI against zero decision rule came to different results within `r proportion_to_percentage(ps_hdi_sim)``\%` of all samples and P(effect > 0) came to diverging results within `r proportion_to_percentage(ps_p_effect_sim)``\%` of all samples. See Table `\ref{tab:prior_sensitivity}` for the prior sensitivities per population effect standard deviations. The prior sensitivity of the Savage-Dickey BF slightly decreased descriptively with increasing standard deviation of the population effect, whereas the prior sensitivity of the dBF, P(effect > 0), and the HDI against zero decision rule descriptively increased with increasing population effect standard deviation.
+To assess the prior sensitivity of the inference methods in terms of the hypothesis decision, the respective proportions of samples for which the decisions of an inference method diverged between models were calculated. The simulation-based decision thresholds over all prior and population effect standard deviations were chosen to keep the total number of false positive results comparable. With simulation-based decision thresholds, the Savage-Dickey BF came to diverging results due to different priors within `r proportion_to_percentage(ps_savage_dickey_bf_sim)``\%` of all samples. The dBF produced inconsistent results within `r proportion_to_percentage(ps_directional_bf_sim)``\%` of all samples. The HDI against zero decision rule came to different results within `r proportion_to_percentage(ps_hdi_sim)``\%` of all samples and P(effect > 0) came to diverging results within `r proportion_to_percentage(ps_p_effect_sim)``\%` of all samples. See Table `\ref{tab:prior_sensitivity}` for the prior sensitivities per population effect standard deviations. The prior sensitivity of the Savage-Dickey BF slightly decreased descriptively with increasing standard deviation of the population effect, whereas the prior sensitivity of the dBF, P(effect > 0), and the HDI against zero decision rule descriptively increased with increasing population effect standard deviation.
 <br>
 ```
 \begin{table}[H]
-    \caption{Prior sensitivity of each inference method per population effect standard deviation}
+    \caption{Prior Sensitivity of Each Inference Method per Population Effect Standard Deviation}
     \label{tab:prior_sensitivity}
     \begin{tabularx}{\textwidth}{lXXX}
     \midrule
