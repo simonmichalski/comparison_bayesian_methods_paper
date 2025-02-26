@@ -97,9 +97,9 @@ plot_p_effect <- ggplot(df_results, aes(x = as.factor(prior_sd), y = p_effect, c
 
 
 multiplot_values <- plot_savage_dickey_bf + plot_dbf + plot_p_effect +
-  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
+  plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 10))
 
-ggsave("plots/values.pdf", plot = multiplot_values, width = 6, height = 2, units = "in", dpi = 300)
+ggsave("plots/fig4.eps", plot = multiplot_values, width = 6, height = 2, units = "in", dpi = 600, device="eps")
 
 
 # False positive results (conv)
@@ -377,9 +377,9 @@ plot_fp_hdi_99 <- ggplot(data_fp_hdi_99, aes(x = prior_sd, y = (fp_hdi_99/200)*1
 multiplot_fp <- (plot_fp_savage_dickey_bf_3 | plot_fp_p_effect_95 | plot_fp_p_effect_975 | plot_fp_p_effect_99) /
   (plot_fp_dbf_3 | plot_fp_dbf_10 | plot_fp_dbf_30 | plot_fp_dbf_100) /
   (plot_fp_hdi_80 | plot_fp_hdi_90 | plot_fp_hdi_95 | plot_fp_hdi_99) +
-  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 8))
+  plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 8))
 
-ggsave("plots/false_positives.pdf", plot = multiplot_fp, width = 6, height = 4, units = "in", dpi = 300)
+ggsave("plots/fig5.eps", plot = multiplot_fp, width = 6, height = 4, units = "in", dpi = 600, device="eps")
 
 
 # Adjusted simulation-based decision thresholds (asbdt)
@@ -489,9 +489,9 @@ plot_asbdt_p_effect_bf_upper <- ggplot(df_sim_thres, aes(x = as.factor(n_tests),
 
 multiplot_asbd <- (plot_asbdt_savage_dickey_bf | plot_asbdt_directional_bf_lower | plot_asbdt_directional_bf_upper) / 
   (plot_asbdt_hdi_bf | plot_asbdt_p_effect_bf_lower | plot_asbdt_p_effect_bf_upper) +
-  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 10))
+  plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 10))
 
-ggsave("plots/thresholds_multiple_tests.pdf", plot = multiplot_asbd, width = 6, height = 2.66, units = "in", dpi = 300)
+ggsave("plots/fig7.eps", plot = multiplot_asbd, width = 6, height = 2.66, units = "in", dpi = 600, device="eps")
 
 
 # Parameter recovery
@@ -522,7 +522,7 @@ scatter_sd_s_log_k <- ggplot(data_sd_subj,
                              aes(x = true_s_log_k, y = median_s_log_k, color = as.factor(s_log_k_sd), 
                               group = as.factor(s_log_k_sd))) +
   labs(x = expression(italic("SD")*" true parameters"), y = expression(italic("SD")*" estimates"), 
-       title = expression("s"["log("*italic(k)*")"]), color = expression("Population "*italic("SD"))) +
+       title = expression(italic(s)["log("*italic(k)*")"]), color = expression("Population "*italic("SD"))) +
   geom_jitter(
     size = 0.1
   ) +
@@ -557,7 +557,7 @@ plot_group_level_s_log_k <- ggplot(data_group_level_s_log_k, aes(x = prior_sd, y
   geom_segment(aes(y = true_abs_mean_sample_means_s_log_k[3,2], x = 0.05, xend = 2.5, linetype = "True"), color = "#619CFF", linewidth = 0.3) +
   geom_line(aes(linetype = "Estimate"), linewidth = 1) +
   labs(x = expression("Prior " * italic("SD")), y = "Mean abs. group-level mean", 
-       title = expression("s"["log("*italic(k)*")"])) +
+       title = expression(italic(s)["log("*italic(k)*")"])) +
   scale_x_log10(breaks = c(0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5),
                 labels = c("0.05", "0.10", "0.20", "0.50", "1.00", "", "", "2.50")) +
   scale_y_continuous(breaks = c(0.03, 0.06, 0.09, 0.12)) +
@@ -583,9 +583,9 @@ plot_group_level_s_log_k <- ggplot(data_group_level_s_log_k, aes(x = prior_sd, y
   guides(color = "none", linetype = guide_legend(override.aes = list(color = "black")))
 
 multiplot_recovery <- (scatter_sd_s_log_k | plot_group_level_s_log_k) +
-  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 12))
+  plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 12))
 
-ggsave(file.path("plots", "recovery_s_log_k.pdf"), plot = multiplot_recovery, width = 6, height = 3, units = "in", dpi = 300)
+ggsave(file.path("plots", "fig3.eps"), plot = multiplot_recovery, width = 6, height = 3, units = "in", dpi = 600, device="eps")
 
 
 # Prior sensitivity example
@@ -651,9 +651,9 @@ ps_example_2 <- ggplot(posterior_2, aes(x = mu_s_log_k)) +
   plot.title = element_text(hjust = 0.5, size = plot_title_size)
 )
 
-ps_example <- (ps_example_1 | ps_example_2) + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 12))
+ps_example <- (ps_example_1 | ps_example_2) + plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 12))
 
-ggsave(file.path("plots", "prior_sensitivity_example.pdf"), plot = ps_example, width = 6, height = 3, units = "in", dpi = 300)
+ggsave(file.path("plots", "fig2.eps"), plot = ps_example, width = 6, height = 3, units = "in", dpi = 600, device="eps")
 
 
 # Partial pooling example
@@ -689,7 +689,7 @@ plot_shrinkage <- ggplot(data_shrinkage_example, aes(x = type, y = value, group 
     axis.text.y = element_text(size = 7, color = "black")
   )
 
-ggsave(file.path("plots", "shrinkage_example.pdf"), plot = plot_shrinkage, width = 3, height = 3, units = "in", dpi = 300)
+ggsave(file.path("plots", "fig1.eps"), plot = plot_shrinkage, width = 3, height = 3, units = "in", dpi = 600)
 
 
 # Simulation-based decision thresholds (sbdt)
@@ -829,6 +829,6 @@ plot_sbdt_p_effect_bf_upper <- ggplot(df_sim_thres_effect_prior,
 
 multiplot_sim_thres <- (plot_sbdt_savage_dickey_bf | plot_sbdt_directional_bf_lower | plot_sbdt_directional_bf_upper) / 
   (plot_sbdt_hdi_bf | plot_sbdt_p_effect_bf_lower | plot_sbdt_p_effect_bf_upper) +
-  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 8))
+  plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 8))
 
-ggsave("plots/sim_thres.pdf", plot = multiplot_sim_thres, width = 6, height = 2.66, units = "in", dpi = 300)
+ggsave("plots/fig6.eps", plot = multiplot_sim_thres, width = 6, height = 2.66, units = "in", dpi = 600, device="eps")
