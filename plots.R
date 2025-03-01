@@ -5,6 +5,7 @@ library("tidyr")
 library("dplyr")
 library("rstan")
 library("scales")
+library("svglite")
 
 if (!dir.exists("plots")) {
   dir.create("plots", recursive = TRUE)
@@ -99,7 +100,7 @@ plot_p_effect <- ggplot(df_results, aes(x = as.factor(prior_sd), y = p_effect, c
 multiplot_values <- plot_savage_dickey_bf + plot_dbf + plot_p_effect +
   plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 10))
 
-ggsave("plots/fig4.eps", plot = multiplot_values, width = 6, height = 2, units = "in", dpi = 600, device="eps")
+ggsave(file.path("plots", "fig4.svg"), plot = multiplot_values, width = 6, height = 2, units = "in", dpi = 600)
 
 
 # False positive results (conv)
@@ -379,7 +380,7 @@ multiplot_fp <- (plot_fp_savage_dickey_bf_3 | plot_fp_p_effect_95 | plot_fp_p_ef
   (plot_fp_hdi_80 | plot_fp_hdi_90 | plot_fp_hdi_95 | plot_fp_hdi_99) +
   plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 8))
 
-ggsave("plots/fig5.eps", plot = multiplot_fp, width = 6, height = 4, units = "in", dpi = 600, device="eps")
+ggsave(file.path("plots", "fig5.svg"), plot = multiplot_fp, width = 6, height = 4, units = "in", dpi = 600)
 
 
 # Adjusted simulation-based decision thresholds (asbdt)
@@ -491,7 +492,7 @@ multiplot_asbd <- (plot_asbdt_savage_dickey_bf | plot_asbdt_directional_bf_lower
   (plot_asbdt_hdi_bf | plot_asbdt_p_effect_bf_lower | plot_asbdt_p_effect_bf_upper) +
   plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 10))
 
-ggsave("plots/fig7.eps", plot = multiplot_asbd, width = 6, height = 2.66, units = "in", dpi = 600, device="eps")
+ggsave(file.path("plots", "fig7.svg"), plot = multiplot_asbd, width = 6, height = 2.66, units = "in", dpi = 600)
 
 
 # Parameter recovery
@@ -585,7 +586,7 @@ plot_group_level_s_log_k <- ggplot(data_group_level_s_log_k, aes(x = prior_sd, y
 multiplot_recovery <- (scatter_sd_s_log_k | plot_group_level_s_log_k) +
   plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 12))
 
-ggsave(file.path("plots", "fig3.eps"), plot = multiplot_recovery, width = 6, height = 3, units = "in", dpi = 600, device="eps")
+ggsave(file.path("plots", "fig3.svg"), plot = multiplot_recovery, width = 6, height = 3, units = "in", dpi = 600)
 
 
 # Prior sensitivity example
@@ -609,7 +610,7 @@ plot_title_size <- 10
 point_size <-2
 
 ps_example_1 <- ggplot(posterior_1, aes(x = mu_s_log_k)) +
-  labs(x = expression(theta), y = "Density", title = expression("Prior " * italic("SD") *  "= 0.1")) +
+  labs(x = expression(theta), y = "Density", title = expression("Prior " * italic("SD") *  " = 0.1")) +
   geom_density(aes(linetype = "Posterior"), key_glyph = draw_key_path) +
   stat_function(fun = dnorm, n = 10000, args = list(mean = 0, sd = 0.1), aes(linetype = "Prior")) +
   annotate("point", x = 0, y = y_cord_1, size = point_size) + 
@@ -632,7 +633,7 @@ ps_example_1 <- ggplot(posterior_1, aes(x = mu_s_log_k)) +
   )
 
 ps_example_2 <- ggplot(posterior_2, aes(x = mu_s_log_k)) +
-  labs(x = expression(theta), title = expression("Prior " * italic("SD") *  "= 1.5")) +
+  labs(x = expression(theta), title = expression("Prior " * italic("SD") *  " = 1.5")) +
   geom_density(aes(linetype = "Posterior")) +
   stat_function(fun = dnorm, n = 10000, args = list(mean = 0, sd = 1.5), aes(linetype = "Prior")) +
   annotate("point", x = 0, y = y_cord_2, size = point_size) + 
@@ -653,7 +654,7 @@ ps_example_2 <- ggplot(posterior_2, aes(x = mu_s_log_k)) +
 
 ps_example <- (ps_example_1 | ps_example_2) + plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 12))
 
-ggsave(file.path("plots", "fig2.eps"), plot = ps_example, width = 6, height = 3, units = "in", dpi = 600, device="eps")
+ggsave(file.path("plots", "fig2.svg"), plot = ps_example, width = 6, height = 3, units = "in", dpi = 600)
 
 
 # Partial pooling example
@@ -689,7 +690,7 @@ plot_shrinkage <- ggplot(data_shrinkage_example, aes(x = type, y = value, group 
     axis.text.y = element_text(size = 7, color = "black")
   )
 
-ggsave(file.path("plots", "fig1.eps"), plot = plot_shrinkage, width = 3, height = 3, units = "in", dpi = 600)
+ggsave(file.path("plots", "fig1.svg"), plot = plot_shrinkage, width = 3, height = 3, units = "in", dpi = 600)
 
 
 # Simulation-based decision thresholds (sbdt)
@@ -831,4 +832,5 @@ multiplot_sim_thres <- (plot_sbdt_savage_dickey_bf | plot_sbdt_directional_bf_lo
   (plot_sbdt_hdi_bf | plot_sbdt_p_effect_bf_lower | plot_sbdt_p_effect_bf_upper) +
   plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 8))
 
-ggsave("plots/fig6.eps", plot = multiplot_sim_thres, width = 6, height = 2.66, units = "in", dpi = 600, device="eps")
+ggsave("plots/fig6.svg", plot = multiplot_sim_thres, width = 6, height = 2.66, units = "in", dpi = 600)
+
