@@ -474,7 +474,7 @@ To assess the prior sensitivity of the inference methods in terms of the hypothe
     \midrule
     Savage-Dickey BF\textsubscript{10} & \centering `r proportion_to_percentage(ps_savage_dickey_bf_sim_0_2)` & \centering `r proportion_to_percentage(ps_savage_dickey_bf_sim_0_51)` & \centering `r proportion_to_percentage(ps_savage_dickey_bf_sim_0_81)`\arraybackslash\\
     dBF\textsubscript{+$-$} & \centering `r proportion_to_percentage(ps_directional_bf_sim_0_2)` & \centering `r proportion_to_percentage(ps_directional_bf_sim_0_51)` & \centering `r proportion_to_percentage(ps_directional_bf_sim_0_81)`\arraybackslash\\
-    95\% HDI & \centering `r proportion_to_percentage(ps_hdi_sim_0_2)` & \centering `r proportion_to_percentage(ps_hdi_sim_0_51)` & \centering `r proportion_to_percentage(ps_hdi_sim_0_81)`\arraybackslash\\
+    HDI decision rule & \centering `r proportion_to_percentage(ps_hdi_sim_0_2)` & \centering `r proportion_to_percentage(ps_hdi_sim_0_51)` & \centering `r proportion_to_percentage(ps_hdi_sim_0_81)`\arraybackslash\\
     P(effect > 0) & \centering `r proportion_to_percentage(ps_p_effect_sim_0_2)` & \centering `r proportion_to_percentage(ps_p_effect_sim_0_51)` & \centering `r proportion_to_percentage(ps_p_effect_sim_0_81)`\arraybackslash\\
     \midrule
     \end{tabularx}
