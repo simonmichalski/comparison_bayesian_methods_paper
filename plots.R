@@ -832,5 +832,5 @@ multiplot_sim_thres <- (plot_sbdt_savage_dickey_bf | plot_sbdt_directional_bf_lo
   (plot_sbdt_hdi_bf | plot_sbdt_p_effect_bf_lower | plot_sbdt_p_effect_bf_upper) +
   plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 8))
 
-ggsave("plots/fig6.eps", plot = multiplot_sim_thres, width = 6, height = 2.66, units = "in", dpi = 600)
+ggsave(file.path("plots", "fig6.eps"), plot = multiplot_sim_thres, width = 6, height = 2.66, units = "in", dpi = 600)
 
